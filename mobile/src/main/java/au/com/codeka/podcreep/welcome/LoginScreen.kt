@@ -9,6 +9,7 @@ import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
+import au.com.codeka.podcreep.ui.ScreenOptions
 
 data class LoginRequest(
     val username: String,
@@ -21,6 +22,9 @@ data class LoginResponse(
 
 class LoginScreen(val taskRunner: TaskRunner): Screen() {
   private var layout: LoginLayout? = null
+
+  override val options: ScreenOptions
+    get() = ScreenOptions(enableActionBar = false)
 
   override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)

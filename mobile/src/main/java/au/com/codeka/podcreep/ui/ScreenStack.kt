@@ -2,6 +2,7 @@ package au.com.codeka.podcreep.ui
 
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
+import au.com.codeka.podcreep.util.Event
 import java.util.Stack
 import kotlin.reflect.KClass
 
@@ -15,6 +16,8 @@ class ScreenStack(
   private val screens = Stack<ScreenHolder>()
   private val context = ScreenContext(activity, this, container)
 
+  data class ScreenUpdatedEvent (val prev: Screen?, val current: Screen?)
+  val screenUpdated = Event<ScreenUpdatedEvent>()
 
   fun <S: Screen> register(cls: KClass<S>, creator: (ScreenContext) -> Screen) {
     context.registerScreen(cls, creator)
@@ -24,6 +27,9 @@ class ScreenStack(
     register(S::class, creator)
   }
 
+  val top: Screen?
+    get() = if (screens.empty()) null else screens.peek().screen
+
   /**
    * Push the given [Screen] onto the stack. The currently visible screen (if any) will
    * become hidden (though not destroyed).
@@ -31,22 +37,37 @@ class ScreenStack(
    * @param screen The [Screen] to push.
    */
   fun push(screen: Screen, sharedViews: SharedViews? = null) {
-    if (!screens.isEmpty()) {
+    val prev = top
+
+    if (screen.options.isRootScreen) {
+      // If the screen is meant to be a root screen, pop everything first.
+      while (!screens.empty()) {
+        popInternal()
+      }
+    } else if (!screens.isEmpty()) {
+      // This screen is now going to be shown on top of the current top.
       val top = screens.peek()
       top.screen.onHide()
     }
 
-//    if (screens.contains(screen)) {
-//      // If the screen is already on the stack, we'll just remove everything up to that screen
-//      while (screens.peek().screen !== screen) {
-//        pop()
-//      }
-//    } else {
-      screens.push(ScreenHolder(screen, sharedViews))
-      screen.onCreate(context, container)
-//    }
-
+    screens.push(ScreenHolder(screen, sharedViews))
+    screen.onCreate(context, container)
     screen.performShow(sharedViews)
+
+    screenUpdated(ScreenUpdatedEvent(prev, screen))
+  }
+
+  /** Internal pop, does not fire screensUpdated. */
+  private fun popInternal() {
+    var screenHolder: ScreenHolder = screens.pop() ?: return
+
+    screenHolder.screen.onHide()
+    screenHolder.screen.onDestroy()
+
+    if (!screens.isEmpty()) {
+      screenHolder = screens.peek()
+      screenHolder.screen.performShow(screenHolder.sharedViews)
+    }
   }
 
   /**
@@ -56,27 +77,21 @@ class ScreenStack(
    * [Screen].
    */
   fun pop(): Boolean {
-    var screenHolder: ScreenHolder? = screens.pop() ?: return false
-
-    screenHolder!!.screen.onHide()
-    screenHolder.screen.onDestroy()
-
-    if (!screens.isEmpty()) {
-      screenHolder = screens.peek()
-      screenHolder!!.screen.performShow(screenHolder.sharedViews)
-      return true
-    }
-
-    return false
+    val prev = screens.peek()?.screen
+    popInternal()
+    screenUpdated(ScreenUpdatedEvent(prev, top))
+    return top != null
   }
 
   /**
    * Pop all screen from the stack, return to blank "home".
    */
   fun home() {
-    while (pop()) {
-      // Keep going.
+    val prev = screens.peek()?.screen
+    while (!screens.empty()) {
+      popInternal()
     }
+    screenUpdated(ScreenUpdatedEvent(prev, top))
   }
 
   /** Contains info we need about a [Screen] while it's on the stack.  */

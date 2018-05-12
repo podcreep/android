@@ -51,6 +51,12 @@ abstract class Screen {
   open fun onDestroy() {}
 
   /**
+   * Get the [ScreenOptions] for this screen. By default, just returns the default options.
+   */
+  open val options: ScreenOptions
+    get() = ScreenOptions()
+
+  /**
    * Performs the "show". Calls [.onShow] to get the view, then creates a [Scene] (if
    * needed), and transitions to it.
    */

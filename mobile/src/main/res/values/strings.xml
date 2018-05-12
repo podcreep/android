@@ -12,4 +12,8 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_register">Register</string>
+
+    <!-- Drawer items -->
+    <string name="subscriptions">Subscriptions</string>
+    <string name="podcasts">Podcasts</string>
 </resources>
