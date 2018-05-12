@@ -1,4 +1,4 @@
-package codeka.com.au.podcreep
+package au.com.codeka.podcreep
 
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem

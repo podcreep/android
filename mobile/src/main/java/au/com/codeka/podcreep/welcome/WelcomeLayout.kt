@@ -1,0 +1,19 @@
+package au.com.codeka.podcreep.welcome
+
+import android.content.Context
+import android.widget.RelativeLayout
+import au.com.codeka.podcreep.R
+import kotlinx.android.synthetic.main.welcome.view.*
+
+class WelcomeLayout(context: Context, var callbacks: Callbacks) : RelativeLayout(context) {
+  interface Callbacks {
+    fun onLoginClick()
+    fun onRegisterClick()
+  }
+
+  init {
+    inflate(context, R.layout.welcome, this)
+    login.setOnClickListener { callbacks.onLoginClick() }
+    register.setOnClickListener { callbacks.onRegisterClick() }
+  }
+}
