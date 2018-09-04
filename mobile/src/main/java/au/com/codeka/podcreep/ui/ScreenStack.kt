@@ -63,11 +63,6 @@ class ScreenStack(
 
     screenHolder.screen.onHide()
     screenHolder.screen.onDestroy()
-
-    if (!screens.isEmpty()) {
-      screenHolder = screens.peek()
-      screenHolder.screen.performShow(screenHolder.sharedViews)
-    }
   }
 
   /**
@@ -79,6 +74,10 @@ class ScreenStack(
   fun pop(): Boolean {
     val prev = screens.peek()?.screen
     popInternal()
+    if (!screens.isEmpty()) {
+      val screenHolder = screens.peek()
+      screenHolder.screen.performShow(screenHolder.sharedViews)
+    }
     screenUpdated(ScreenUpdatedEvent(prev, top))
     return top != null
   }
@@ -91,6 +90,7 @@ class ScreenStack(
     while (!screens.empty()) {
       popInternal()
     }
+    container.removeAllViews()
     screenUpdated(ScreenUpdatedEvent(prev, top))
   }
 

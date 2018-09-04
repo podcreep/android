@@ -63,42 +63,37 @@ abstract class Screen {
   fun performShow(sharedViews: SharedViews?) {
     val view = onShow()
     if (view != null) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        if (scene == null) {
-          scene = Scene(container, view)
-        }
-        val mainTransition = TransitionSet()
-        val fadeTransition = Transitions.fade().clone()
-        mainTransition.addTransition(fadeTransition)
+      if (scene == null) {
+        scene = Scene(container, view)
+      }
+      val mainTransition = TransitionSet()
+      val fadeTransition = Transitions.fade().clone()
+      mainTransition.addTransition(fadeTransition)
 
-        if (sharedViews != null) {
-          val transformTransition = Transitions.transform().clone()
-          mainTransition.addTransition(transformTransition)
-          for (sharedView in sharedViews.sharedViews) {
-            if (sharedView.viewId != 0) {
-              fadeTransition.excludeTarget(sharedView.viewId, true)
-              transformTransition.addTarget(sharedView.viewId)
+      if (sharedViews != null) {
+        val transformTransition = Transitions.transform().clone()
+        mainTransition.addTransition(transformTransition)
+        for (sharedView in sharedViews.sharedViews) {
+          if (sharedView.viewId != 0) {
+            fadeTransition.excludeTarget(sharedView.viewId, true)
+            transformTransition.addTarget(sharedView.viewId)
+          } else {
+            val name = "shared-" + java.lang.Long.toString(RANDOM.nextLong())
+            if (sharedView.fromViewId != 0 && sharedView.toViewId != 0) {
+              container!!.findViewById<View>(sharedView.fromViewId).transitionName = name
+              view.findViewById<View>(sharedView.toViewId).transitionName = name
+            } else if (sharedView.fromView != null && sharedView.toViewId != 0) {
+              sharedView.fromView.transitionName = name
+              view.findViewById<View>(sharedView.toViewId).transitionName = name
             } else {
-              val name = "shared-" + java.lang.Long.toString(RANDOM.nextLong())
-              if (sharedView.fromViewId != 0 && sharedView.toViewId != 0) {
-                container!!.findViewById<View>(sharedView.fromViewId).transitionName = name
-                view.findViewById<View>(sharedView.toViewId).transitionName = name
-              } else if (sharedView.fromView != null && sharedView.toViewId != 0) {
-                sharedView.fromView.transitionName = name
-                view.findViewById<View>(sharedView.toViewId).transitionName = name
-              } else {
-                //log.error("Unexpected SharedView configuration.");
-              }
-              fadeTransition.excludeTarget(name, true)
-              transformTransition.addTarget(name)
+              //log.error("Unexpected SharedView configuration.");
             }
+            fadeTransition.excludeTarget(name, true)
+            transformTransition.addTarget(name)
           }
         }
-        TransitionManager.go(scene, mainTransition)
-      } else {
-        container!!.removeAllViews()
-        container!!.addView(view)
       }
+      TransitionManager.go(scene, mainTransition)
     } else {
       container!!.removeAllViews()
     }
