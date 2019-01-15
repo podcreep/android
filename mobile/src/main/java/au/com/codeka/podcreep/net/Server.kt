@@ -1,6 +1,7 @@
 package au.com.codeka.podcreep.net
 
 import android.os.Build
+import au.com.codeka.podcreep.BuildConfig
 
 class Server {
   companion object {
@@ -20,6 +21,8 @@ class Server {
     fun url(url: String): String {
       return if (isEmulator()) {
         "http://10.0.2.2:8080$url"
+      } else if (BuildConfig.DEBUG) {
+        "http://127.0.0.1:8080$url"
       } else {
         "https://podcreep.appspot.com$url"
       }
