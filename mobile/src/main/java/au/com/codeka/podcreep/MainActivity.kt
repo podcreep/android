@@ -8,7 +8,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
 import au.com.codeka.podcreep.R.layout.activity
-import au.com.codeka.podcreep.app.podcasts.PodcastsScreen
+import au.com.codeka.podcreep.app.podcasts.DiscoverScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.ui.Screen
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
     ss.register<WelcomeScreen> { WelcomeScreen() }
     ss.register<LoginScreen> { LoginScreen(taskRunner) }
-    ss.register<PodcastsScreen> { PodcastsScreen() }
+    ss.register<DiscoverScreen> { DiscoverScreen() }
     screenStack = ss
     ss.push(WelcomeScreen())
   }

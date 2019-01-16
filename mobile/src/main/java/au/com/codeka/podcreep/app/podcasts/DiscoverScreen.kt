@@ -6,8 +6,8 @@ import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
 import au.com.codeka.podcreep.ui.ScreenOptions
 
-class PodcastsScreen: Screen() {
-  private var layout: PodcastsLayout? = null
+class DiscoverScreen: Screen() {
+  private var layout: DiscoverLayout? = null
 
   override val options: ScreenOptions
     get() = ScreenOptions(isRootScreen = true)
@@ -15,7 +15,7 @@ class PodcastsScreen: Screen() {
   override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
 
-    layout = PodcastsLayout(context.activity, object: PodcastsLayout.Callbacks {
+    layout = DiscoverLayout(context.activity, object: DiscoverLayout.Callbacks {
       override fun onFoo() {
         TODO("not implemented")
       }

@@ -15,7 +15,7 @@
 
     <!-- Drawer items -->
     <string name="subscriptions">Subscriptions</string>
-    <string name="podcasts">Podcasts</string>
+    <string name="discover">Discover</string>
 
     <!-- Podcasts screen -->
     <string name="trending">Trending</string>

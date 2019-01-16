@@ -4,15 +4,15 @@ import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
 import au.com.codeka.podcreep.R
-import kotlinx.android.synthetic.main.podcasts.view.*
+import kotlinx.android.synthetic.main.discover.view.*
 
-class PodcastsLayout(context: Context, var callbacks: Callbacks) : RelativeLayout(context) {
+class DiscoverLayout(context: Context, var callbacks: Callbacks) : RelativeLayout(context) {
   interface Callbacks {
     fun onFoo()
   }
 
   init {
-    View.inflate(context, R.layout.podcasts, this)
+    View.inflate(context, R.layout.discover, this)
     viewpager.adapter = TabPagerAdapter(context)
     tab_layout.setupWithViewPager(viewpager)
   }
