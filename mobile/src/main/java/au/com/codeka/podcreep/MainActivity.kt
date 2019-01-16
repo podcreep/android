@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
     ss.register<WelcomeScreen> { WelcomeScreen() }
     ss.register<LoginScreen> { LoginScreen(taskRunner) }
-    ss.register<DiscoverScreen> { DiscoverScreen() }
+    ss.register<DiscoverScreen> { DiscoverScreen(taskRunner) }
     screenStack = ss
     ss.push(WelcomeScreen())
   }

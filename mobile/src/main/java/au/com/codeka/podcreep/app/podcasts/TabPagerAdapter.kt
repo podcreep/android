@@ -5,13 +5,17 @@ import android.support.v4.view.PagerAdapter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import au.com.codeka.podcreep.concurrency.TaskRunner
 
-class TabPagerAdapter(private val context: Context): PagerAdapter() {
+class TabPagerAdapter(
+    private val context: Context,
+    private val taskRunner: TaskRunner)
+  : PagerAdapter() {
 
   override fun instantiateItem(container: ViewGroup, position: Int): Any {
     Log.i("DEANH", "instantiating item for position $position")
     val tab = Tabs.values()[position]
-    val view = tab.layoutClass.constructors.first().call(context)
+    val view = tab.layoutClass.constructors.first().call(context, taskRunner)
     container.addView(view)
     return view
   }
