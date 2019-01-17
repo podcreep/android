@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts
+package au.com.codeka.podcreep.app.podcasts.discover
 
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +16,7 @@ class DiscoverScreen(private val taskRunner: TaskRunner): Screen() {
   override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
 
-    layout = DiscoverLayout(context.activity, taskRunner, object: DiscoverLayout.Callbacks {
+    layout = DiscoverLayout(context.activity, taskRunner, object : DiscoverLayout.Callbacks {
       override fun onFoo() {
         TODO("not implemented")
       }

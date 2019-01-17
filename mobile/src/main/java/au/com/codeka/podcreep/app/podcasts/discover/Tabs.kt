@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts
+package au.com.codeka.podcreep.app.podcasts.discover
 
 import android.view.View
 import au.com.codeka.podcreep.R

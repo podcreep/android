@@ -8,7 +8,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
 import au.com.codeka.podcreep.R.layout.activity
-import au.com.codeka.podcreep.app.podcasts.DiscoverScreen
+import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.ui.Screen

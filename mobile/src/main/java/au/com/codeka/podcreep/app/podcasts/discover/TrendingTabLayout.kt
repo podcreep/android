@@ -1,9 +1,8 @@
-package au.com.codeka.podcreep.app.podcasts
+package au.com.codeka.podcreep.app.podcasts.discover
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import au.com.codeka.podcreep.concurrency.TaskRunner
@@ -32,7 +31,7 @@ class TrendingTabLayout(context: Context, val taskRunner: TaskRunner): RecyclerV
     }, Threads.BACKGROUND)
   }
 
-  class Adapter(private val dataset: Array<Podcast>): RecyclerView.Adapter<TrendingTabLayout.ViewHolder>() {
+  class Adapter(private val dataset: Array<Podcast>): RecyclerView.Adapter<ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
       val inflater = LayoutInflater.from(parent.context)
       val binding = DiscoverTrendingRowBinding.inflate(inflater, parent, false)
@@ -40,11 +39,10 @@ class TrendingTabLayout(context: Context, val taskRunner: TaskRunner): RecyclerV
     }
 
     override fun getItemCount(): Int {
-      Log.i("DEANH", "Got ${dataset.size} items")
       return dataset.size
     }
 
-    override fun onBindViewHolder(holder: TrendingTabLayout.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
       holder.bind(dataset[position])
     }
   }

@@ -2,7 +2,7 @@ package au.com.codeka.podcreep.welcome
 
 import android.view.View
 import android.view.ViewGroup
-import au.com.codeka.podcreep.app.podcasts.DiscoverScreen
+import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.net.HttpRequest

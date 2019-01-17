@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts
+package au.com.codeka.podcreep.app.podcasts.discover
 
 import android.content.Context
 import android.support.v4.view.PagerAdapter
