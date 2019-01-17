@@ -2,6 +2,7 @@ package au.com.codeka.podcreep.welcome
 
 import android.view.View
 import android.view.ViewGroup
+import au.com.codeka.podcreep.Settings
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
@@ -37,6 +38,8 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
               .body(LoginRequest(username, password))
               .build()
           val resp = request.execute<LoginResponse>()
+          val s = Settings(context.activity)
+          s.putString(Settings.COOKIE, resp.cookie)
           Server.updateCookie(resp.cookie)
 
           taskRunner.runTask({

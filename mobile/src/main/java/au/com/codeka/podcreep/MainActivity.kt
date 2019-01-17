@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
@@ -11,6 +12,7 @@ import au.com.codeka.podcreep.R.layout.activity
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenStack
 import au.com.codeka.podcreep.welcome.LoginScreen
@@ -44,7 +46,16 @@ class MainActivity : AppCompatActivity() {
     ss.register<LoginScreen> { LoginScreen(taskRunner) }
     ss.register<DiscoverScreen> { DiscoverScreen(taskRunner) }
     screenStack = ss
-    ss.push(WelcomeScreen())
+
+    val s = Settings(this)
+    if (s.getString(Settings.COOKIE) != "") {
+      Server.updateCookie(s.getString(Settings.COOKIE))
+
+      // TODO: go back to the screen you were on.
+      ss.push(DiscoverScreen(taskRunner))
+    } else {
+      ss.push(WelcomeScreen())
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

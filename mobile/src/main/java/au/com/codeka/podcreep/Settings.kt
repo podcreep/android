@@ -21,6 +21,10 @@ class Settings(context: Context) {
     return preferences.getString(key.name(), "")
   }
 
+  fun putString(key: Key, value: String) {
+    preferences.edit().putString(key.name(), value).apply()
+  }
+
   fun getInt(key: Key): Int {
     return preferences.getInt(key.name(), 0)
   }
