@@ -9,13 +9,14 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 
 class TabPagerAdapter(
     private val context: Context,
-    private val taskRunner: TaskRunner)
+    private val taskRunner: TaskRunner,
+    private val callback: DiscoverLayout.Callbacks)
   : PagerAdapter() {
 
   override fun instantiateItem(container: ViewGroup, position: Int): Any {
     Log.i("DEANH", "instantiating item for position $position")
     val tab = Tabs.values()[position]
-    val view = tab.layoutClass.constructors.first().call(context, taskRunner)
+    val view = tab.layoutClass.constructors.first().call(context, taskRunner, callback)
     container.addView(view)
     return view
   }

@@ -5,21 +5,22 @@ import android.view.View
 import android.widget.RelativeLayout
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
+import au.com.codeka.podcreep.model.Podcast
 import kotlinx.android.synthetic.main.discover.view.*
 
 class DiscoverLayout(
     context: Context,
     taskRunner: TaskRunner,
-    var callbacks: Callbacks)
+    callbacks: Callbacks)
   : RelativeLayout(context) {
 
   interface Callbacks {
-    fun onFoo()
+    fun onViewPodcastClick(podcast: Podcast)
   }
 
   init {
     View.inflate(context, R.layout.discover, this)
-    viewpager.adapter = TabPagerAdapter(context, taskRunner)
+    viewpager.adapter = TabPagerAdapter(context, taskRunner, callbacks)
     tab_layout.setupWithViewPager(viewpager)
   }
 }

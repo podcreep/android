@@ -14,9 +14,9 @@ class ScreenContext(
     val activity: AppCompatActivity,
     private val stack: ScreenStack,
     private val container: ViewGroup) {
-  private val creators = HashMap<KClass<out Screen>, (ScreenContext) -> Screen>()
+  private val creators = HashMap<KClass<out Screen>, (ScreenContext, params: Array<Any>?) -> Screen>()
 
-  fun <S: Screen> registerScreen(cls: KClass<S>, creator: (ScreenContext) -> Screen) {
+  fun <S: Screen> registerScreen(cls: KClass<S>, creator: (ScreenContext, params: Array<Any>?) -> Screen) {
     creators[cls] = creator
   }
 
@@ -25,16 +25,22 @@ class ScreenContext(
   }
 
   inline fun <reified S: Screen> pushScreen() {
-    pushScreen(S::class, null)
+    pushScreen(S::class, null, null)
+  }
+
+  inline fun <reified S: Screen> pushScreen(param: Any) {
+    pushScreen(S::class, null, arrayOf(param))
   }
 
   inline fun <reified S: Screen> pushScreen(sharedViews: SharedViews) {
-    pushScreen(S::class, sharedViews)
+    pushScreen(S::class, sharedViews, null)
   }
 
-  fun <S: Screen> pushScreen(cls: KClass<S>, sharedViews: SharedViews?) {
-    val creator = creators[cls] ?: throw IllegalArgumentException("cls does not have a registered ScreenCreator.")
-    stack.push(creator.invoke(this), sharedViews)
+  fun <S: Screen> pushScreen(cls: KClass<S>, sharedViews: SharedViews?, params: Array<Any>?) {
+    val creator = creators[cls]
+        ?: throw IllegalArgumentException("cls does not have a registered ScreenCreator.")
+
+    stack.push(creator.invoke(this, params), sharedViews)
   }
 
   fun popScreen() {

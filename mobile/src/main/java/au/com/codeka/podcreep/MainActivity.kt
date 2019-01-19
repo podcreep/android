@@ -9,11 +9,14 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
 import au.com.codeka.podcreep.R.layout.activity
+import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.model.Podcast
 import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
+import au.com.codeka.podcreep.ui.ScreenContext
 import au.com.codeka.podcreep.ui.ScreenStack
 import au.com.codeka.podcreep.welcome.LoginScreen
 import au.com.codeka.podcreep.welcome.WelcomeScreen
@@ -42,9 +45,12 @@ class MainActivity : AppCompatActivity() {
 
     val ss = ScreenStack(this, content)
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
-    ss.register<WelcomeScreen> { WelcomeScreen() }
-    ss.register<LoginScreen> { LoginScreen(taskRunner) }
-    ss.register<DiscoverScreen> { DiscoverScreen(taskRunner) }
+    ss.register<WelcomeScreen> { _: ScreenContext, _: Array<Any>? -> WelcomeScreen() }
+    ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(taskRunner) }
+    ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(taskRunner) }
+    ss.register<DetailsScreen> {
+      _: ScreenContext, params: Array<Any>? -> DetailsScreen(taskRunner, params?.get(0) as Podcast)
+    }
     screenStack = ss
 
     val s = Settings(this)

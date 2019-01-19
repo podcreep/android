@@ -19,11 +19,14 @@ class ScreenStack(
   data class ScreenUpdatedEvent (val prev: Screen?, val current: Screen?)
   val screenUpdated = Event<ScreenUpdatedEvent>()
 
-  fun <S: Screen> register(cls: KClass<S>, creator: (ScreenContext) -> Screen) {
+  fun <S: Screen> register(
+      cls: KClass<S>,
+      creator: (ScreenContext, params: Array<Any>?) -> Screen) {
     context.registerScreen(cls, creator)
   }
 
-  inline fun <reified S: Screen> register(noinline creator: (ScreenContext) -> Screen) {
+  inline fun <reified S: Screen> register(
+      noinline creator: (ScreenContext, params: Array<Any>?) -> Screen) {
     register(S::class, creator)
   }
 
