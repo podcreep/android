@@ -1,23 +1,26 @@
 <resources>
-    <string name="app_name">Pod Creep</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="title_activity_login">Sign in</string>
+  <string name="app_name">Pod Creep</string>
+  <string name="title_home">Home</string>
+  <string name="title_dashboard">Dashboard</string>
+  <string name="title_notifications">Notifications</string>
+  <string name="title_activity_login">Sign in</string>
 
-    <string name="error_field_required">This field is required</string>
+  <string name="error_field_required">This field is required</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_username">Username</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_register">Register</string>
+  <!-- Strings related to login -->
+  <string name="prompt_username">Username</string>
+  <string name="prompt_password">Password</string>
+  <string name="action_sign_in">Sign in</string>
+  <string name="action_register">Register</string>
 
-    <!-- Drawer items -->
-    <string name="subscriptions">Subscriptions</string>
-    <string name="discover">Discover</string>
+  <!-- Drawer items -->
+  <string name="subscriptions">Subscriptions</string>
+  <string name="discover">Discover</string>
 
-    <!-- Podcasts screen -->
-    <string name="trending">Trending</string>
-    <string name="search">Search</string>
+  <!-- Podcasts screen -->
+  <string name="trending">Trending</string>
+  <string name="search">Search</string>
+
+  <!-- Episodes screens -->
+  <string name="play">Play</string>
 </resources>
