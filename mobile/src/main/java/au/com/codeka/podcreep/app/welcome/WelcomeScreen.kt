@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.welcome
+package au.com.codeka.podcreep.app.welcome
 
 import android.view.View
 import au.com.codeka.podcreep.ui.Screen

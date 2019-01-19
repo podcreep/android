@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.welcome
+package au.com.codeka.podcreep.app.welcome
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

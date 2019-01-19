@@ -5,7 +5,7 @@
     tools:parentTag="android.widget.RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".welcome.WelcomeLayout">
+    tools:context=".app.welcome.WelcomeLayout">
 
     <ImageView
         android:id="@+id/logo"

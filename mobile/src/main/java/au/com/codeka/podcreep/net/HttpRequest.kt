@@ -1,10 +1,7 @@
 package au.com.codeka.podcreep.net
 
-import au.com.codeka.podcreep.welcome.LoginRequest
-import au.com.codeka.podcreep.welcome.LoginResponse
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
-import okio.Buffer
 import okio.BufferedSource
 import okio.Okio
 import java.io.IOException

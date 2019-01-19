@@ -26,21 +26,16 @@
     <meta-data
       android:name="com.google.android.gms.car.application"
       android:resource="@xml/automotive_app_desc" />
-    <!--
-         Use this meta data to override the theme from which Android Auto will
-         look for colors. If you don't set this, Android Auto will look
-         for color attributes in your application theme.
-    -->
     <meta-data
       android:name="com.google.android.gms.car.application.theme"
       android:resource="@style/CarTheme" />
+
     <!--
-     Main music service, provides media browsing and media playback services to
-     consumers through MediaBrowserService and MediaSession. Consumers connect to it through
-     MediaBrowser (for browsing) and MediaController (for playback control)
+     Main media service, which controls playback and also handle browse functions for MediaBrowser
+     (i.e. Android Auto)
     -->
     <service
-      android:name=".MediaService"
+      android:name=".app.service.MediaService"
       android:exported="true">
       <intent-filter>
         <action android:name="android.media.browse.MediaBrowserService" />

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
@@ -18,8 +17,8 @@ import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
 import au.com.codeka.podcreep.ui.ScreenStack
-import au.com.codeka.podcreep.welcome.LoginScreen
-import au.com.codeka.podcreep.welcome.WelcomeScreen
+import au.com.codeka.podcreep.app.welcome.LoginScreen
+import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 
 /** The main, in fact one-and-only activity. */

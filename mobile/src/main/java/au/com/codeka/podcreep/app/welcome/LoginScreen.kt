@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.welcome
+package au.com.codeka.podcreep.app.welcome
 
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +30,7 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
   override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
 
-    layout = LoginLayout(context.activity, callbacks = object: LoginLayout.Callbacks {
+    layout = LoginLayout(context.activity, callbacks = object : LoginLayout.Callbacks {
       override fun onSignIn(username: String, password: String) {
         taskRunner.runTask({
           val request = Server.request("/api/accounts/login")
