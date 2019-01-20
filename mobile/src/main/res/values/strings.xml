@@ -23,4 +23,7 @@
 
   <!-- Episodes screens -->
   <string name="play">Play</string>
+
+  <!-- Notification controls -->
+  <string name="pause">Pause</string>
 </resources>
