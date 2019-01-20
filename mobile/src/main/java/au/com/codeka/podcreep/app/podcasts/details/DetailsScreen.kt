@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import au.com.codeka.podcreep.app.service.MediaService
+import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.Episode
@@ -29,14 +30,7 @@ class DetailsScreen(
     layout = DetailsLayout(context.activity, podcast, taskRunner, object : DetailsLayout.Callbacks {
       override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
 
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-        val intent = Intent(context.activity, MediaService::class.java)
-        intent.putExtra("podcast", moshi.adapter(Podcast::class.java).toJson(
-            podcast.copy(episodes = null))) // Remove the episode list.
-        intent.putExtra("episode", moshi.adapter(Episode::class.java).toJson(episode))
-        context.activity.startService(intent)
+        MediaServiceClient.i.play(podcast, episode)
       }
     })
 

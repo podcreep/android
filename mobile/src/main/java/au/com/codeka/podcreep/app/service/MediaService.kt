@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import au.com.codeka.podcreep.model.Episode
 import au.com.codeka.podcreep.model.Podcast
 import com.squareup.moshi.KotlinJsonAdapterFactory
@@ -22,21 +23,24 @@ class MediaService : MediaBrowserServiceCompat() {
 
   override fun onCreate() {
     super.onCreate()
-    
-    mediaManager = MediaManager(this)
-    notificationManager = NotificationManager(this)
 
     session = MediaSessionCompat(this, "MediaService")
     sessionToken = session.sessionToken
     session.setCallback(MediaSessionCallback())
-    session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
+    session.setFlags(
+        MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
+
+    mediaManager = MediaManager(this, session)
+    notificationManager = NotificationManager(this)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val id = super.onStartCommand(intent, flags, startId)
 
     if (intent != null) {
+      Log.i("DEANH", "intent=$intent")
+
       val podcastStr = intent.extras["podcast"] as String
       val episodeStr = intent.extras["episode"] as String
 
@@ -71,26 +75,54 @@ class MediaService : MediaBrowserServiceCompat() {
   }
 
   private inner class MediaSessionCallback : MediaSessionCompat.Callback() {
-    override fun onPlay() {}
+    override fun onPlay() {
+      Log.i("DEANH", "onPlay")
+    }
 
     override fun onSkipToQueueItem(queueId: Long) {}
 
-    override fun onSeekTo(position: Long) {}
+    override fun onSeekTo(position: Long) {
 
-    override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {}
+    }
 
-    override fun onPause() {}
+    override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
+      Log.i("DEANH", "onPlayFromMediaId($mediaId)")
+
+      val pair = MediaIdBuilder().parse(mediaId!!)
+      val podcast = pair!!.first
+      var episode = pair.second
+
+      // Display the notification and place the service in the foreground
+      notificationManager.refresh(podcast, episode, session.sessionToken)
+      notificationManager.startForeground()
+
+      mediaManager.play(podcast, episode)
+
+    }
+
+    override fun onPause() {
+      Log.i("DEANH", "onPause")
+    }
 
     override fun onStop() {
+      Log.i("DEANH", "onStop")
       stopSelf()
     }
 
-    override fun onSkipToNext() {}
+    override fun onSkipToNext() {
+      Log.i("DEANH", "onSkipToNext")
+    }
 
-    override fun onSkipToPrevious() {}
+    override fun onSkipToPrevious() {
+      Log.i("DEANH", "onSkipToPrevious")
+    }
 
-    override fun onCustomAction(action: String?, extras: Bundle?) {}
+    override fun onCustomAction(action: String?, extras: Bundle?) {
+      Log.i("DEANH", "onCustomAction($action)")
+    }
 
-    override fun onPlayFromSearch(query: String?, extras: Bundle?) {}
+    override fun onPlayFromSearch(query: String?, extras: Bundle?) {
+      Log.i("DEANH", "onPlayFromSearch($query)")
+    }
   }
 }

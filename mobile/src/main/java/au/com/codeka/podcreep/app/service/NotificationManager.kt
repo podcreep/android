@@ -81,7 +81,7 @@ class NotificationManager(private val service: MediaService) {
       setSmallIcon(R.drawable.ic_notification)
       color = ContextCompat.getColor(service, R.color.colorPrimaryDark)
 
-      // Add a pause button
+      // Add a pause button.
       addAction(
           NotificationCompat.Action(
               R.drawable.ic_pause_black_24dp,

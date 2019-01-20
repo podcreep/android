@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import au.com.codeka.podcreep.R.layout.activity
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
+import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.Podcast
@@ -41,6 +42,8 @@ class MainActivity : AppCompatActivity() {
 
     Threads.UI.setThread(Thread.currentThread(), Handler())
     var taskRunner = TaskRunner()
+
+    MediaServiceClient.i.setup(this)
 
     val ss = ScreenStack(this, content)
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
@@ -91,6 +94,9 @@ class MainActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
+
+    MediaServiceClient.i.destroy()
+
     screenStack = null
   }
 
