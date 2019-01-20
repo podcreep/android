@@ -6,6 +6,7 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import android.view.KeyEvent
 import au.com.codeka.podcreep.model.Episode
 import au.com.codeka.podcreep.model.Podcast
 import com.squareup.moshi.KotlinJsonAdapterFactory
@@ -77,12 +78,12 @@ class MediaService : MediaBrowserServiceCompat() {
   private inner class MediaSessionCallback : MediaSessionCompat.Callback() {
     override fun onPlay() {
       Log.i("DEANH", "onPlay")
+      mediaManager.play()
     }
 
-    override fun onSkipToQueueItem(queueId: Long) {}
-
-    override fun onSeekTo(position: Long) {
-
+    override fun onPause() {
+      Log.i("DEANH", "onPause")
+      mediaManager.pause()
     }
 
     override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
@@ -100,8 +101,15 @@ class MediaService : MediaBrowserServiceCompat() {
 
     }
 
-    override fun onPause() {
-      Log.i("DEANH", "onPause")
+    override fun onSkipToQueueItem(queueId: Long) {}
+
+    override fun onSeekTo(position: Long) {
+
+    }
+
+    override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
+      Log.i("DEANH", "onMediaButtonEvent($mediaButtonEvent)")
+      return super.onMediaButtonEvent(mediaButtonEvent)
     }
 
     override fun onStop() {

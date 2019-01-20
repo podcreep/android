@@ -1,10 +1,12 @@
 package au.com.codeka.podcreep
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.widget.FrameLayout
 import au.com.codeka.podcreep.R.layout.activity
