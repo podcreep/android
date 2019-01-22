@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.SystemClock
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import au.com.codeka.podcreep.model.Episode
 import au.com.codeka.podcreep.model.Podcast
 
@@ -21,6 +22,10 @@ class MediaManager(
 
   val playbackState: PlaybackStateCompat.Builder
     get() = _playbackState
+
+  init {
+    updateState()
+  }
 
   fun play(podcast: Podcast, episode: Episode) {
     // TODO: obviously we should do better than this!
@@ -50,20 +55,27 @@ class MediaManager(
     _playbackState.setActions(PlaybackStateCompat.ACTION_PLAY or
         PlaybackStateCompat.ACTION_PAUSE or
         PlaybackStateCompat.ACTION_PLAY_PAUSE)
-    val mediaPlayer = _mediaPlayer!!
-    if (mediaPlayer.isPlaying) {
+
+    if (_mediaPlayer == null) {
       _playbackState.setState(
-          PlaybackStateCompat.STATE_PLAYING,
-          mediaPlayer.currentPosition.toLong(),
-          1.0f,
-          SystemClock.elapsedRealtime())
+          PlaybackStateCompat.STATE_NONE, 0, 1.0f, SystemClock.elapsedRealtime())
     } else {
-      _playbackState.setState(
-          PlaybackStateCompat.STATE_PAUSED,
-          mediaPlayer.currentPosition.toLong(),
-          1.0f,
-          SystemClock.elapsedRealtime())
+      val mediaPlayer = _mediaPlayer!!
+      if (mediaPlayer.isPlaying) {
+        _playbackState.setState(
+            PlaybackStateCompat.STATE_PLAYING,
+            mediaPlayer.currentPosition.toLong(),
+            1.0f,
+            SystemClock.elapsedRealtime())
+      } else {
+        _playbackState.setState(
+            PlaybackStateCompat.STATE_PAUSED,
+            mediaPlayer.currentPosition.toLong(),
+            1.0f,
+            SystemClock.elapsedRealtime())
+      }
     }
+    Log.i("DEANH", "Updating media session state")
     mediaSession.setPlaybackState(_playbackState.build())
   }
 }

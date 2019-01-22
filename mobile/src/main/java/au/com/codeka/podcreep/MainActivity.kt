@@ -2,9 +2,14 @@ package au.com.codeka.podcreep
 
 import android.os.Bundle
 import android.os.Handler
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
@@ -22,6 +27,9 @@ import au.com.codeka.podcreep.ui.ScreenStack
 import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
+import android.util.TypedValue
+
+
 
 /** The main, in fact one-and-only activity. */
 class MainActivity : AppCompatActivity() {
@@ -65,6 +73,8 @@ class MainActivity : AppCompatActivity() {
     } else {
       ss.push(WelcomeScreen())
     }
+
+    MediaServiceClient.i.addCallback(mediaCallback)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -96,6 +106,7 @@ class MainActivity : AppCompatActivity() {
   override fun onDestroy() {
     super.onDestroy()
 
+    MediaServiceClient.i.removeCallback(mediaCallback)
     MediaServiceClient.i.destroy()
 
     screenStack = null
@@ -106,4 +117,32 @@ class MainActivity : AppCompatActivity() {
       super.onBackPressed()
     }
   }
+
+  private var mediaCallback = object : MediaControllerCompat.Callback() {
+    override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+
+    }
+
+    override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+      Log.i("DEANH", "Playback state: " + state?.state)
+      // If we're not stopped, then set ourselves visible.
+      var contentMarginPx = 0
+      if (state?.state != PlaybackStateCompat.STATE_STOPPED &&
+          state?.state != PlaybackStateCompat.STATE_NONE) {
+        now_playing.visibility = View.VISIBLE
+        shadow.visibility = View.VISIBLE
+
+        contentMarginPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            64.0f,
+            resources.displayMetrics).toInt()
+      } else {
+        now_playing.visibility = View.GONE
+        shadow.visibility = View.GONE
+      }
+
+      (content.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin = contentMarginPx
+    }
+  }
+
 }

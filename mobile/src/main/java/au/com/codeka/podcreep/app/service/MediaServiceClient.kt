@@ -20,11 +20,16 @@ import au.com.codeka.podcreep.model.Podcast
 class MediaServiceClient {
   companion object {
     val i: MediaServiceClient = MediaServiceClient()
+    val TAG = "MediaServiceClient"
   }
 
   private var activity: MainActivity? = null
   private var mediaBrowser: MediaBrowserCompat? = null
   private var mediaController: MediaControllerCompat? = null
+  private val callbacks: ArrayList<MediaControllerCompat.Callback> = ArrayList()
+
+  private var lastPlaybackState: PlaybackStateCompat? = null
+  private var lastMetadata: MediaMetadataCompat? = null
 
   fun setup(activity: MainActivity) {
     this.activity = activity
@@ -46,6 +51,21 @@ class MediaServiceClient {
     activity = null
   }
 
+  fun addCallback(callback: MediaControllerCompat.Callback) {
+    callbacks.add(callback)
+
+    if (lastPlaybackState != null) {
+      callback.onPlaybackStateChanged(lastPlaybackState!!)
+    }
+    if (lastMetadata != null) {
+      callback.onMetadataChanged(lastMetadata!!)
+    }
+  }
+
+  fun removeCallback(callback: MediaControllerCompat.Callback) {
+    callbacks.remove(callback)
+  }
+
   fun play(podcast: Podcast, episode: Episode) {
     val mediaIdBuilder = MediaIdBuilder()
     mediaController?.transportControls?.playFromMediaId(
@@ -62,19 +82,23 @@ class MediaServiceClient {
 
   private var controllerCallback = object : MediaControllerCompat.Callback() {
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-      // TODO: notify UI
-      Log.i("DEANH", "metadata changed!")
+      Log.i("DEANH", "metadata changed")
+      callbacks.forEach {
+        it.onMetadataChanged(metadata)
+      }
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      // TODO: notify UI
-      Log.i("DEANH", "playback state changed!")
-      
+      Log.i("DEANH", "playback state changed")
+      callbacks.forEach {
+        it.onPlaybackStateChanged(state)
+      }
     }
   }
 
   private val mediaBrowserConnectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
     override fun onConnected() {
+      Log.i("DEANH", "onConnected")
       if (activity == null) {
         // Activity was finished before we connected.
         return
@@ -85,8 +109,15 @@ class MediaServiceClient {
         mediaController = MediaControllerCompat(activity, token!!)
         MediaControllerCompat.setMediaController(activity!!, mediaController)
 
+        // Get the current values of things.
+        lastPlaybackState = mediaController?.playbackState
+        lastMetadata = mediaController?.metadata
+        controllerCallback.onPlaybackStateChanged(lastPlaybackState)
+        controllerCallback.onMetadataChanged(lastMetadata)
+
         // Register a Callback to stay in sync
         mediaController?.registerCallback(controllerCallback)
+
       }
     }
 

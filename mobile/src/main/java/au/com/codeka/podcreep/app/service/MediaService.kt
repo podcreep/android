@@ -32,6 +32,7 @@ class MediaService : MediaBrowserServiceCompat() {
         MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
+    Log.i("DEANH", "MediaService.onCreate")
     mediaManager = MediaManager(this, session)
     notificationManager = NotificationManager(this)
   }
@@ -40,8 +41,6 @@ class MediaService : MediaBrowserServiceCompat() {
     val id = super.onStartCommand(intent, flags, startId)
 
     if (intent != null) {
-      Log.i("DEANH", "intent=$intent")
-
       val podcastStr = intent.extras!!["podcast"] as String
       val episodeStr = intent.extras!!["episode"] as String
 
