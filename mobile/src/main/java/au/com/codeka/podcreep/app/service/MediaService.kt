@@ -3,7 +3,7 @@ package au.com.codeka.podcreep.app.service
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
-import android.support.v4.media.MediaBrowserServiceCompat
+import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.KeyEvent
@@ -42,8 +42,8 @@ class MediaService : MediaBrowserServiceCompat() {
     if (intent != null) {
       Log.i("DEANH", "intent=$intent")
 
-      val podcastStr = intent.extras["podcast"] as String
-      val episodeStr = intent.extras["episode"] as String
+      val podcastStr = intent.extras!!["podcast"] as String
+      val episodeStr = intent.extras!!["episode"] as String
 
       val moshi = Moshi.Builder()
           .add(KotlinJsonAdapterFactory())

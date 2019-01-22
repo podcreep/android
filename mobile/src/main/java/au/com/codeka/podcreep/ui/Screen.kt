@@ -1,7 +1,7 @@
 package au.com.codeka.podcreep.ui
 
 import android.os.Build
-import android.support.annotation.CallSuper
+import androidx.annotation.CallSuper
 import android.transition.Scene
 import android.transition.TransitionManager
 import android.transition.TransitionSet

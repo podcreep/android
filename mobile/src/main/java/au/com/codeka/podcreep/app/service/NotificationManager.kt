@@ -8,12 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
-import android.support.v4.media.session.MediaButtonReceiver
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media.app.NotificationCompat.MediaStyle
 import au.com.codeka.podcreep.MainActivity
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.model.Episode
@@ -94,7 +95,7 @@ class NotificationManager(private val service: MediaService) {
       )
 
       // Take advantage of MediaStyle features
-      setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
+      setStyle(MediaStyle()
           .setMediaSession(sessionToken)
           .setShowActionsInCompactView(0)
 

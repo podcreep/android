@@ -1,14 +1,12 @@
 package au.com.codeka.podcreep
 
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AppCompatActivity
-import android.view.Gravity
-import android.view.KeyEvent
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.FrameLayout
+import androidx.core.view.GravityCompat
 import au.com.codeka.podcreep.R.layout.activity
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
@@ -71,7 +69,7 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        drawer_layout.openDrawer(Gravity.START)
+        drawer_layout.openDrawer(GravityCompat.START)
         true
       }
       else -> super.onOptionsItemSelected(item)

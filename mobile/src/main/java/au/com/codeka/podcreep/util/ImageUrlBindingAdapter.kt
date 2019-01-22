@@ -1,6 +1,6 @@
 package au.com.codeka.podcreep.util
 
-import android.databinding.BindingAdapter
+import androidx.databinding.BindingAdapter
 import android.util.Log
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
