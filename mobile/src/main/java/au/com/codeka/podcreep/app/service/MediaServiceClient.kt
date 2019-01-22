@@ -69,6 +69,7 @@ class MediaServiceClient {
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
       // TODO: notify UI
       Log.i("DEANH", "playback state changed!")
+      
     }
   }
 

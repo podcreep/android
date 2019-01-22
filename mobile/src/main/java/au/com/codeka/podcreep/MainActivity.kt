@@ -6,6 +6,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.FrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import au.com.codeka.podcreep.R.layout.activity
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
@@ -84,11 +85,11 @@ class MainActivity : AppCompatActivity() {
     if (enabled) {
       drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
       supportActionBar?.show()
-      (content.layoutParams as FrameLayout.LayoutParams).topMargin = actionBarHeight
+      (content.layoutParams as CoordinatorLayout.LayoutParams).topMargin = actionBarHeight
     } else {
       drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
       supportActionBar?.hide()
-      (content.layoutParams as FrameLayout.LayoutParams).topMargin = 0
+      (content.layoutParams as CoordinatorLayout.LayoutParams).topMargin = 0
     }
   }
 

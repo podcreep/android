@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  tools:parentTag="android.widget.RelativeLayout">
+
+  <TextView
+    android:id="@+id/title"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:gravity="center_vertical"
+    android:text="Now playing"
+    android:background="@color/design_default_color_background"/>
+
+  <TextView
+    android:id="@+id/title_extra"
+    android:layout_below="@+id/title"
+    android:layout_width="match_parent"
+    android:layout_height="512dp"
+    android:gravity="center_vertical"
+    android:text="Extra content here."
+    android:background="@color/design_default_color_background" />
+
+</merge>
