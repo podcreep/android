@@ -4,6 +4,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.SystemClock
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
@@ -18,7 +19,11 @@ class MediaManager(
     private val mediaSession: MediaSessionCompat) {
 
   private var _playbackState = PlaybackStateCompat.Builder()
+  private var _metadata = MediaMetadataCompat.Builder()
   private var _mediaPlayer: MediaPlayer? = null
+
+  private var _currPodcast: Podcast? = null
+  private var _currEpisode: Episode? = null
 
   val playbackState: PlaybackStateCompat.Builder
     get() = _playbackState
@@ -28,6 +33,9 @@ class MediaManager(
   }
 
   fun play(podcast: Podcast, episode: Episode) {
+    _currPodcast = podcast
+    _currEpisode = episode
+
     // TODO: obviously we should do better than this!
     val uri = Uri.parse(episode.mediaUrl)
     _mediaPlayer = MediaPlayer().apply {
@@ -75,7 +83,14 @@ class MediaManager(
             SystemClock.elapsedRealtime())
       }
     }
-    Log.i("DEANH", "Updating media session state")
     mediaSession.setPlaybackState(_playbackState.build())
+
+    if (_currEpisode != null && _currPodcast != null) {
+      _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, _currPodcast!!.title)
+      _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, _currPodcast!!.title)
+      _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, _currEpisode!!.title)
+      _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, _currPodcast!!.imageUrl)
+      mediaSession.setMetadata(_metadata.build())
+    }
   }
 }

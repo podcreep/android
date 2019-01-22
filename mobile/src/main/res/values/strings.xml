@@ -26,4 +26,6 @@
 
   <!-- Notification controls -->
   <string name="pause">Pause</string>
+
+  <string name="contentdesc_podcast_logo">Podcast logo</string>
 </resources>

@@ -5,37 +5,62 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
-import android.view.View
-import android.widget.RelativeLayout
-import au.com.codeka.podcreep.R
+import android.view.LayoutInflater
+import android.widget.FrameLayout
 import au.com.codeka.podcreep.app.service.MediaServiceClient
+import au.com.codeka.podcreep.databinding.NowPlayingSheetBinding
+
+interface Callbacks {
+  fun onPlayPauseClick()
+}
 
 class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
-  : RelativeLayout(context, attributeSet) {
+  : FrameLayout(context, attributeSet), Callbacks {
+
+  private val binding: NowPlayingSheetBinding
+  private var currPlaybackState: PlaybackStateCompat? = null
+  private var currMetadata: MediaMetadataCompat? = null
 
   init {
-    View.inflate(context, R.layout.now_playing_sheet, this)
+    val inflater = LayoutInflater.from(context)
+    binding = NowPlayingSheetBinding.inflate(inflater, this, true)
+    binding.callbacks = this
+    binding.executePendingBindings()
   }
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
 
-    MediaServiceClient.i.addCallback(callback)
+    MediaServiceClient.i.addCallback(mediaCallback)
   }
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
 
-    MediaServiceClient.i.removeCallback(callback)
+    MediaServiceClient.i.removeCallback(mediaCallback)
   }
 
-  private var callback = object : MediaControllerCompat.Callback() {
-    override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+  override fun onPlayPauseClick() {
+    if (currPlaybackState?.state == PlaybackStateCompat.STATE_PLAYING) {
+      MediaServiceClient.i.pause()
+    } else {
+      MediaServiceClient.i.play()
+    }
+  }
 
+  private val mediaCallback = object : MediaControllerCompat.Callback() {
+    override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+      currMetadata = metadata
+
+      if (metadata != null) {
+        binding.metadata = metadata
+        binding.albumArtUri = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)
+        binding.executePendingBindings()
+      }
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-
+      currPlaybackState = state
     }
   }
 }
