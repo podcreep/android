@@ -28,8 +28,10 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
+import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
+import com.google.android.material.navigation.NavigationView
 
 
 /** The main, in fact one-and-only activity. */
@@ -85,6 +87,22 @@ class MainActivity : AppCompatActivity() {
         }
       }
     })
+
+    findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener {
+      when (it.itemId) {
+        R.id.nav_subscriptions -> {
+          ss.home()
+          ss.push(SubscriptionsScreen(taskRunner))
+          true
+        }
+        R.id.nav_discover -> {
+          ss.home()
+          ss.push(DiscoverScreen(taskRunner))
+          true
+        }
+        else -> false
+      }
+    }
 
     MediaServiceClient.i.addCallback(mediaCallback)
   }

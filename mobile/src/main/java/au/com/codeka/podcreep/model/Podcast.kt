@@ -7,5 +7,3 @@ data class Podcast(
     val imageUrl: String,
     val episodes: List<Episode>?)
 
-data class PodcastList(
-    val podcasts: List<Podcast>)
