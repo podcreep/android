@@ -32,8 +32,7 @@
         android:layout_height="64dp"
         android:scaleType="center"
         android:background="?attr/selectableItemBackgroundBorderless"
-        />
-      <!-- android:onClick="@{() -> callbacks.onPlayPauseClick()}" -->
+        android:onClick="@{() -> callbacks.onPlayPauseClick()}" />
 
       <TextView
         android:id="@+id/title"
