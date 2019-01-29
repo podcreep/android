@@ -16,6 +16,18 @@ class HttpRequest private constructor(
     private val method: Method,
     private val headers: Map<String, String>,
     private val body: ByteArray?) {
+  interface ErrorHandler {
+    fun onError(e: HttpException)
+  }
+
+  companion object {
+    private val globalErrorHandlers = ArrayList<ErrorHandler>()
+
+    fun addGlobalErrorHandler(handler: ErrorHandler) {
+      globalErrorHandlers.add(handler)
+    }
+  }
+
   enum class Method {
     GET,
     POST,
@@ -40,8 +52,18 @@ class HttpRequest private constructor(
       }
 
       return Okio.buffer(Okio.source(conn.inputStream))
+    } catch (e: HttpException) {
+      for (errorHandler in globalErrorHandlers) {
+        errorHandler.onError(e)
+      }
+      throw e
     } catch (e: IOException) {
-      throw HttpException(e)
+      val httpException = HttpException(e)
+      for (errorHandler in globalErrorHandlers) {
+        errorHandler.onError(httpException)
+      }
+
+      throw httpException
     }
   }
 

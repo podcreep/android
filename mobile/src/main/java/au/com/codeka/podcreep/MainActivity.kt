@@ -28,7 +28,8 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
-
+import au.com.codeka.podcreep.net.HttpException
+import au.com.codeka.podcreep.net.HttpRequest
 
 
 /** The main, in fact one-and-only activity. */
@@ -73,6 +74,17 @@ class MainActivity : AppCompatActivity() {
     } else {
       ss.push(WelcomeScreen())
     }
+
+    HttpRequest.addGlobalErrorHandler(object : HttpRequest.ErrorHandler{
+      override fun onError(e: HttpException) {
+        if (e.statusCode == 401) {
+          taskRunner.runTask({
+            ss.home()
+            ss.push(WelcomeScreen())
+          }, Threads.UI)
+        }
+      }
+    })
 
     MediaServiceClient.i.addCallback(mediaCallback)
   }

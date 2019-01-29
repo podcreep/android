@@ -26,4 +26,7 @@ class HttpException : Exception {
       exception!!.toString()
     }
   }
+
+  val statusCode: Int?
+      get() = this.status
 }
