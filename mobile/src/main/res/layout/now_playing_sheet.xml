@@ -26,14 +26,14 @@
       android:layout_height="64dp"
       android:background="@color/design_default_color_background">
 
-      <ImageView
+      <au.com.codeka.podcreep.app.views.PlayPauseButton
         android:id="@+id/play_pause"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/ic_pause_black_24dp"
         android:scaleType="center"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:onClick="@{() -> callbacks.onPlayPauseClick()}"/>
+        />
+      <!-- android:onClick="@{() -> callbacks.onPlayPauseClick()}" -->
 
       <TextView
         android:id="@+id/title"
