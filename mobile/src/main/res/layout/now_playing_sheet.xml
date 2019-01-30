@@ -13,7 +13,7 @@
       type="String" />
     <variable
       name="callbacks"
-      type="au.com.codeka.podcreep.app.podcasts.nowplaying.Callbacks" />
+      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingCallbacks" />
   </data>
 
   <LinearLayout
@@ -23,8 +23,7 @@
 
     <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="64dp"
-      android:background="@color/design_default_color_background">
+      android:layout_height="64dp">
 
       <au.com.codeka.podcreep.app.views.PlayPauseButton
         android:id="@+id/play_pause"
@@ -62,6 +61,7 @@
 
       <ImageView
         android:id="@+id/podcast_logo"
+        android:transitionName="logo"
         android:contentDescription="@string/contentdesc_podcast_logo"
         android:layout_width="64dp"
         android:layout_height="64dp"
@@ -70,13 +70,12 @@
         tools:src="@drawable/podcreep" />
     </RelativeLayout>
 
-    <TextView
+    <View
       android:id="@+id/title_extra"
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_weight="1"
-      android:gravity="center_vertical"
-      android:text="Extra content here." />
+      android:gravity="center_vertical" />
 
   </LinearLayout>
 </layout>
