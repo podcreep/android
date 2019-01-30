@@ -2,9 +2,11 @@ package au.com.codeka.podcreep.app.podcasts.subscriptions
 
 import android.view.View
 import android.view.ViewGroup
+import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.TrendingTabLayout
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.model.Podcast
 import au.com.codeka.podcreep.model.PodcastList
 import au.com.codeka.podcreep.model.SubscriptionList
 import au.com.codeka.podcreep.net.HttpRequest
@@ -23,8 +25,8 @@ class SubscriptionsScreen(private val taskRunner: TaskRunner): Screen() {
     super.onCreate(context, container)
 
     layout = SubscriptionsLayout(context.activity, taskRunner, object : SubscriptionsLayout.Callbacks {
-      override fun onFoo() {
-        TODO("not implemented")
+      override fun onViewPodcastClick(podcast: Podcast) {
+        context.pushScreen<DetailsScreen>(podcast)
       }
     })
   }

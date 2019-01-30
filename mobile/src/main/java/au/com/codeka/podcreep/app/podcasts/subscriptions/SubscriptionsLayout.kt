@@ -23,9 +23,8 @@ class SubscriptionsLayout(
   private val adapter: Adapter
 
   interface Callbacks {
-    fun onFoo()
+    fun onViewPodcastClick(podcast: Podcast)
   }
-
   init {
     View.inflate(context, R.layout.subscriptions, this)
     adapter = Adapter(callbacks)
@@ -71,7 +70,7 @@ class SubscriptionsLayout(
       binding.executePendingBindings()
       binding.root.setOnClickListener {
         run {
-          callbacks.onFoo() //onViewPodcastClick(podcast)
+          callbacks.onViewPodcastClick(subscription.podcast)
         }
       }
     }
