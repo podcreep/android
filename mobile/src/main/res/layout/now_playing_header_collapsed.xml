@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+    <variable
+      name="metadata"
+      type="android.support.v4.media.MediaMetadataCompat" />
+    <variable
+      name="albumArtUri"
+      type="String" />
+    <variable
+      name="callbacks"
+      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingCallbacks" />
+  </data>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="64dp">
+
+      <ImageView
+        android:id="@+id/podcast_logo"
+        android:transitionName="logo"
+        android:contentDescription="@string/contentdesc_podcast_logo"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentStart="true"
+        app:imageUrl="@{albumArtUri}"
+        tools:src="@drawable/podcreep" />
+
+      <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_toStartOf="@+id/play_pause"
+        android:layout_toEndOf="@+id/podcast_logo"
+        android:gravity="bottom"
+        android:textStyle="bold"
+        android:text="@{metadata.description.title}"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="Podcast title" />
+
+      <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_toStartOf="@+id/play_pause"
+        android:layout_toEndOf="@+id/podcast_logo"
+        android:layout_alignParentBottom="true"
+        android:gravity="top"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="@{metadata.description.subtitle}"
+        tools:text="Episode title" />
+
+      <au.com.codeka.podcreep.app.views.PlayPauseButton
+        android:id="@+id/play_pause"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentEnd="true"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:onClick="@{() -> callbacks.onPlayPauseClick()}" />
+
+    </RelativeLayout>
+
+    <View
+      android:id="@+id/title_extra"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:gravity="center_vertical" />
+
+  </LinearLayout>
+</layout>
+

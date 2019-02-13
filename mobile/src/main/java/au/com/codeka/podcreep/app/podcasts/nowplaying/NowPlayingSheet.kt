@@ -13,12 +13,18 @@ import android.view.View
 import android.widget.FrameLayout
 import android.transition.Fade
 import android.transition.TransitionSet
+import android.widget.ImageView
+import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.app.service.MediaServiceClient
+import au.com.codeka.podcreep.databinding.NowPlayingHeaderCollapsedBinding
+import au.com.codeka.podcreep.databinding.NowPlayingHeaderExpandedBinding
 import au.com.codeka.podcreep.databinding.NowPlayingSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import au.com.codeka.podcreep.databinding.NowPlayingSheetExpandedBinding
 
-
+/**
+ * The {@link NowPlayingSheet} is displayed at the bottom of the screen, you can drag it up to
+ * display more details.
+ */
 class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   : FrameLayout(context, attributeSet), NowPlayingCallbacks {
 
@@ -26,23 +32,32 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   private var currMetadata: MediaMetadataCompat? = null
 
   private val transitions: TransitionSet
-  private val collapsedBinding: NowPlayingSheetBinding
-  private val collapsedScene: Scene
-  private val expandedBinding: NowPlayingSheetExpandedBinding
-  private val expandedScene: Scene
+  private val sheetBinding: NowPlayingSheetBinding
+  private val collapsedHeaderBinding: NowPlayingHeaderCollapsedBinding
+  private val collapsedHeaderScene: Scene
+  private val expandedHeaderBinding: NowPlayingHeaderExpandedBinding
+  private val expandedHeaderScene: Scene
   private var lastState: Int = BottomSheetBehavior.STATE_COLLAPSED
 
   init {
     val inflater = LayoutInflater.from(context)
-    collapsedBinding = NowPlayingSheetBinding.inflate(inflater, this, true)
-    collapsedBinding.callbacks = this
-    collapsedBinding.executePendingBindings()
-    collapsedScene = Scene(this, collapsedBinding.root)
+    sheetBinding = NowPlayingSheetBinding.inflate(inflater, this, true)
+    sheetBinding.callbacks = this
+    sheetBinding.executePendingBindings()
 
-    expandedBinding = NowPlayingSheetExpandedBinding.inflate(inflater, this, false)
-    expandedBinding.callbacks = this
-    expandedBinding.executePendingBindings()
-    expandedScene = Scene(this, expandedBinding.root)
+    val headerContainer = sheetBinding.root.findViewById<FrameLayout>(R.id.header)
+
+    collapsedHeaderBinding =
+        NowPlayingHeaderCollapsedBinding.inflate(inflater, headerContainer, false)
+    collapsedHeaderBinding.callbacks = this
+    collapsedHeaderBinding.executePendingBindings()
+    collapsedHeaderScene = Scene(headerContainer, collapsedHeaderBinding.root)
+
+    expandedHeaderBinding =
+        NowPlayingHeaderExpandedBinding.inflate(inflater, headerContainer, false)
+    expandedHeaderBinding.callbacks = this
+    expandedHeaderBinding.executePendingBindings()
+    expandedHeaderScene = Scene(headerContainer, expandedHeaderBinding.root)
 
     val shared = TransitionSet()
     shared.addTarget("logo")
@@ -50,6 +65,9 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
     fade.excludeTarget("logo", true)
     transitions = TransitionSet()
     transitions.addTransition(shared).addTransition(fade)
+
+    // Start off with the collapsed header, no animation.
+    headerContainer.addView(collapsedHeaderBinding.root)
 
     setBackgroundColor(Color.WHITE)
   }
@@ -65,16 +83,17 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
         if (lastState == BottomSheetBehavior.STATE_SETTLING
             || lastState == BottomSheetBehavior.STATE_DRAGGING) {
           if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-            TransitionManager.go(expandedScene, transitions)
+            TransitionManager.go(expandedHeaderScene, transitions)
           } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-            TransitionManager.go(collapsedScene, transitions)
+            TransitionManager.go(collapsedHeaderScene, transitions)
           }
         }
         lastState = newState
       }
 
       override fun onSlide(bottomSheet: View, slideOffset: Float) {
-        // Called when the bottom sheet is being dragged
+        val opacity = Math.abs(slideOffset)
+        findViewById<ImageView>(R.id.large_podcast_logo).alpha = opacity
       }
     })
   }
@@ -98,15 +117,19 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
       currMetadata = metadata
 
       if (metadata != null) {
-        collapsedBinding.metadata = metadata
-        collapsedBinding.albumArtUri =
-            metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)
-        collapsedBinding.executePendingBindings()
+        val albumArtUri = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)
 
-        expandedBinding.metadata = metadata
-        expandedBinding.albumArtUri =
-            metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)
-        expandedBinding.executePendingBindings()
+        sheetBinding.metadata = metadata
+        sheetBinding.albumArtUri = albumArtUri
+        sheetBinding.executePendingBindings()
+
+        collapsedHeaderBinding.metadata = metadata
+        collapsedHeaderBinding.albumArtUri = albumArtUri
+        collapsedHeaderBinding.executePendingBindings()
+
+        expandedHeaderBinding.metadata = metadata
+        expandedHeaderBinding.albumArtUri = albumArtUri
+        expandedHeaderBinding.executePendingBindings()
       }
     }
 
