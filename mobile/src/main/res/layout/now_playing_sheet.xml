@@ -45,13 +45,52 @@
       android:layout_margin="16dp"
       tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pretium consequat aliquet. Aliquam scelerisque lectus a turpis varius feugiat. Phasellus hendrerit nulla a auctor euismod. Quisque nisi sem, feugiat sed pellentesque ornare, lobortis ac lectus. Nunc commodo ipsum eget ligula porttitor, sed ullamcorper velit porta. Donec lacinia eros eget mattis lacinia. Vivamus fermentum efficitur augue, sed porta magna tempor ac." />
 
-    <au.com.codeka.podcreep.app.views.PlayPauseButton
-      android:id="@+id/play_pause"
-      android:layout_width="64dp"
-      android:layout_height="64dp"
-      android:scaleType="center"
-      android:background="?attr/selectableItemBackgroundBorderless"
-      android:onClick="@{() -> callbacks.onPlayPauseClick()}" />
+    <View
+      android:id="@+id/shadow"
+      android:layout_width="match_parent"
+      android:layout_height="16dp"
+      android:background="@drawable/top_shadow" />
+
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <ImageView
+        android:id="@+id/rewind"
+        android:contentDescription="@string/contentdesc_rewind_10"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_toStartOf="@id/play_pause"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_rewind_10_24dp"
+        android:scaleType="center"
+        android:onClick="@{() -> callbacks.onSkipBackClick()}" />
+
+      <au.com.codeka.podcreep.app.views.PlayPauseButton
+        android:id="@+id/play_pause"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:scaleType="fitCenter"
+        android:layout_centerHorizontal="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:onClick="@{() -> callbacks.onPlayPauseClick()}" />
+
+      <ImageView
+        android:id="@+id/skip_forward"
+        android:contentDescription="@string/contentdesc_forward_30"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_toEndOf="@id/play_pause"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_forward_30_24dp"
+        android:scaleType="center"
+        android:onClick="@{() -> callbacks.onSkipForwardClick()}" />
+
+    </RelativeLayout>
 
   </LinearLayout>
 </layout>

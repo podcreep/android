@@ -97,7 +97,6 @@ class MediaService : MediaBrowserServiceCompat() {
       notificationManager.startForeground()
 
       mediaManager.play(podcast, episode)
-
     }
 
     override fun onSkipToQueueItem(queueId: Long) {}
@@ -117,11 +116,11 @@ class MediaService : MediaBrowserServiceCompat() {
     }
 
     override fun onSkipToNext() {
-      Log.i("DEANH", "onSkipToNext")
+      mediaManager.skipForward()
     }
 
     override fun onSkipToPrevious() {
-      Log.i("DEANH", "onSkipToPrevious")
+      mediaManager.skipBack()
     }
 
     override fun onCustomAction(action: String?, extras: Bundle?) {

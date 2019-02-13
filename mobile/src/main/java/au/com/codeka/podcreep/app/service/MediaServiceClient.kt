@@ -80,6 +80,16 @@ class MediaServiceClient {
     mediaController?.transportControls?.pause()
   }
 
+  fun skipForward() {
+    // TODO: make these custom actions.
+    mediaController?.transportControls?.skipToNext()
+  }
+
+  fun skipBack() {
+    // TODO: make these custom actions.
+    mediaController?.transportControls?.skipToPrevious()
+  }
+
   private var controllerCallback = object : MediaControllerCompat.Callback() {
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
       Log.i("DEANH", "metadata changed")

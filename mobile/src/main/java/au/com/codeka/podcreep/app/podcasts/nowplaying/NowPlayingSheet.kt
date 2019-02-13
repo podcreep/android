@@ -112,6 +112,14 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
     }
   }
 
+  override fun onSkipBackClick() {
+    MediaServiceClient.i.skipBack()
+  }
+
+  override fun onSkipForwardClick() {
+    MediaServiceClient.i.skipForward()
+  }
+
   private val mediaCallback = object : MediaControllerCompat.Callback() {
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
       currMetadata = metadata

@@ -59,6 +59,18 @@ class MediaManager(
     updateState()
   }
 
+  fun skipForward() {
+    var currPos = _mediaPlayer?.currentPosition!!
+    currPos += 30 * 1000
+    _mediaPlayer?.seekTo(currPos)
+  }
+
+  fun skipBack() {
+    var currPos = _mediaPlayer?.currentPosition!!
+    currPos -= 10 * 1000
+    _mediaPlayer?.seekTo(currPos)
+  }
+
   private fun updateState() {
     _playbackState.setActions(PlaybackStateCompat.ACTION_PLAY or
         PlaybackStateCompat.ACTION_PAUSE or
