@@ -29,7 +29,6 @@ class DetailsScreen(
 
     layout = DetailsLayout(context.activity, podcast, taskRunner, object : DetailsLayout.Callbacks {
       override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
-
         MediaServiceClient.i.play(podcast, episode)
       }
     })

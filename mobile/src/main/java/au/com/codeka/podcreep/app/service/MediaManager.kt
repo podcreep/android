@@ -36,12 +36,18 @@ class MediaManager(
     _currPodcast = podcast
     _currEpisode = episode
 
+    var offset = 0
+    if (podcast.subscription != null && podcast.subscription.positions[episode.id] != null) {
+      offset = podcast.subscription.positions.getValue(episode.id)
+    }
+
     // TODO: obviously we should do better than this!
     val uri = Uri.parse(episode.mediaUrl)
     _mediaPlayer = MediaPlayer().apply {
       setAudioStreamType(AudioManager.STREAM_MUSIC)
       setDataSource(service, uri)
       prepare()
+      seekTo(offset * 1000)
       start()
     }
     mediaSession.isActive = true
