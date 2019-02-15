@@ -1,10 +1,17 @@
 package au.com.codeka.podcreep.app.podcasts.details
 
-import android.util.Log
 import au.com.codeka.podcreep.model.Episode
 import au.com.codeka.podcreep.model.Podcast
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DetailsRowViewModel(val podcast: Podcast, val episode: Episode) {
+  private val epDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+  private val displayDateFormat = SimpleDateFormat("dd'\n'MMM", Locale.US)
+
+  fun getDate(): String {
+    return displayDateFormat.format(epDateFormat.parse(episode.pubDate))
+  }
 
   fun isInProgress(): Boolean {
     if (podcast.subscription == null) {
@@ -12,7 +19,6 @@ class DetailsRowViewModel(val podcast: Podcast, val episode: Episode) {
     }
 
     val pos = podcast.subscription.positions[episode.id]
-    Log.i("DEANH", String.format("ep=%d pos=%d", episode.id, pos))
     return (pos != null && pos > 0)
   }
 
