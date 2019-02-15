@@ -5,5 +5,5 @@ data class Podcast(
     val title: String,
     val description: String,
     val imageUrl: String,
-    val episodes: List<Episode>?)
-
+    val episodes: List<Episode>?,
+    val subscription: Subscription?)

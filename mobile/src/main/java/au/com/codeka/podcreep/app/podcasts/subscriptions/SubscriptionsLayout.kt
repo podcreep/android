@@ -70,7 +70,7 @@ class SubscriptionsLayout(
       binding.executePendingBindings()
       binding.root.setOnClickListener {
         run {
-          callbacks.onViewPodcastClick(subscription.podcast)
+          callbacks.onViewPodcastClick(subscription.podcast!!)
         }
       }
     }

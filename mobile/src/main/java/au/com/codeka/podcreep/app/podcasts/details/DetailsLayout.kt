@@ -70,8 +70,7 @@ class DetailsLayout(
 
     fun bind(podcast: Podcast, episode: Episode) {
       binding.callbacks = callbacks
-      binding.podcast = podcast
-      binding.episode = episode
+      binding.vm = DetailsRowViewModel(podcast, episode)
       binding.executePendingBindings()
     }
   }
