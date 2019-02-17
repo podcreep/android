@@ -26,10 +26,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
  * display more details.
  */
 class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
-  : FrameLayout(context, attributeSet), NowPlayingCallbacks {
+  : FrameLayout(context, attributeSet) {
 
-  private var currPlaybackState: PlaybackStateCompat? = null
-  private var currMetadata: MediaMetadataCompat? = null
+  private val vm: NowPlayingViewModel = NowPlayingViewModel(null, null)
 
   private val transitions: TransitionSet
   private val sheetBinding: NowPlayingSheetBinding
@@ -42,20 +41,20 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   init {
     val inflater = LayoutInflater.from(context)
     sheetBinding = NowPlayingSheetBinding.inflate(inflater, this, true)
-    sheetBinding.callbacks = this
+    sheetBinding.vm = vm
     sheetBinding.executePendingBindings()
 
     val headerContainer = sheetBinding.root.findViewById<FrameLayout>(R.id.header)
 
     collapsedHeaderBinding =
         NowPlayingHeaderCollapsedBinding.inflate(inflater, headerContainer, false)
-    collapsedHeaderBinding.callbacks = this
+    collapsedHeaderBinding.vm = vm
     collapsedHeaderBinding.executePendingBindings()
     collapsedHeaderScene = Scene(headerContainer, collapsedHeaderBinding.root)
 
     expandedHeaderBinding =
         NowPlayingHeaderExpandedBinding.inflate(inflater, headerContainer, false)
-    expandedHeaderBinding.callbacks = this
+    expandedHeaderBinding.vm = vm
     expandedHeaderBinding.executePendingBindings()
     expandedHeaderScene = Scene(headerContainer, expandedHeaderBinding.root)
 
@@ -104,45 +103,29 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
     MediaServiceClient.i.removeCallback(mediaCallback)
   }
 
-  override fun onPlayPauseClick() {
-    if (currPlaybackState?.state == PlaybackStateCompat.STATE_PLAYING) {
-      MediaServiceClient.i.pause()
-    } else {
-      MediaServiceClient.i.play()
-    }
-  }
-
-  override fun onSkipBackClick() {
-    MediaServiceClient.i.skipBack()
-  }
-
-  override fun onSkipForwardClick() {
-    MediaServiceClient.i.skipForward()
-  }
-
   private val mediaCallback = object : MediaControllerCompat.Callback() {
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-      currMetadata = metadata
+      vm.metadata = metadata
 
       if (metadata != null) {
-        val albumArtUri = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)
-
-        sheetBinding.metadata = metadata
-        sheetBinding.albumArtUri = albumArtUri
+        sheetBinding.vm = vm
         sheetBinding.executePendingBindings()
-
-        collapsedHeaderBinding.metadata = metadata
-        collapsedHeaderBinding.albumArtUri = albumArtUri
+        collapsedHeaderBinding.vm = vm
         collapsedHeaderBinding.executePendingBindings()
-
-        expandedHeaderBinding.metadata = metadata
-        expandedHeaderBinding.albumArtUri = albumArtUri
+        expandedHeaderBinding.vm = vm
         expandedHeaderBinding.executePendingBindings()
       }
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      currPlaybackState = state
+      vm.playbackState = state
+
+      sheetBinding.vm = vm
+      sheetBinding.executePendingBindings()
+      collapsedHeaderBinding.vm = vm
+      collapsedHeaderBinding.executePendingBindings()
+      expandedHeaderBinding.vm = vm
+      expandedHeaderBinding.executePendingBindings()
     }
   }
 }

@@ -6,79 +6,73 @@
 
   <data>
     <variable
-      name="metadata"
-      type="android.support.v4.media.MediaMetadataCompat" />
-    <variable
-      name="albumArtUri"
-      type="String" />
-    <variable
-      name="callbacks"
-      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingCallbacks" />
+      name="vm"
+      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
   </data>
 
-  <LinearLayout
+  <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="64dp">
 
-    <RelativeLayout
+    <ImageView
+      android:id="@+id/podcast_logo"
+      android:transitionName="logo"
+      android:contentDescription="@string/contentdesc_podcast_logo"
+      android:layout_width="64dp"
+      android:layout_height="64dp"
+      android:layout_alignParentStart="true"
+      app:imageUrl="@{vm.albumArtUri}"
+      tools:src="@drawable/podcreep" />
+
+    <TextView
+      android:id="@+id/title"
       android:layout_width="match_parent"
-      android:layout_height="64dp">
+      android:layout_height="32dp"
+      android:layout_toStartOf="@+id/play_pause"
+      android:layout_toEndOf="@+id/podcast_logo"
+      android:layout_marginStart="8dp"
+      android:gravity="bottom"
+      android:textStyle="bold"
+      android:text="@{vm.metadata.description.title}"
+      android:maxLines="1"
+      android:ellipsize="end"
+      tools:text="Podcast title" />
 
-      <ImageView
-        android:id="@+id/podcast_logo"
-        android:transitionName="logo"
-        android:contentDescription="@string/contentdesc_podcast_logo"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_alignParentStart="true"
-        app:imageUrl="@{albumArtUri}"
-        tools:src="@drawable/podcreep" />
-
-      <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_toStartOf="@+id/play_pause"
-        android:layout_toEndOf="@+id/podcast_logo"
-        android:gravity="bottom"
-        android:textStyle="bold"
-        android:text="@{metadata.description.title}"
-        android:maxLines="1"
-        android:ellipsize="end"
-        tools:text="Podcast title" />
-
-      <TextView
-        android:id="@+id/subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_toStartOf="@+id/play_pause"
-        android:layout_toEndOf="@+id/podcast_logo"
-        android:layout_alignParentBottom="true"
-        android:gravity="top"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:text="@{metadata.description.subtitle}"
-        tools:text="Episode title" />
-
-      <au.com.codeka.podcreep.app.views.PlayPauseButton
-        android:id="@+id/play_pause"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_alignParentEnd="true"
-        android:scaleType="center"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:onClick="@{() -> callbacks.onPlayPauseClick()}" />
-
-    </RelativeLayout>
-
-    <View
-      android:id="@+id/title_extra"
+    <TextView
+      android:id="@+id/subtitle"
       android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
-      android:gravity="center_vertical" />
+      android:layout_height="32dp"
+      android:layout_toStartOf="@+id/play_pause"
+      android:layout_toEndOf="@+id/podcast_logo"
+      android:layout_alignParentBottom="true"
+      android:layout_marginStart="8dp"
+      android:gravity="top"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:text="@{vm.metadata.description.subtitle}"
+      tools:text="Episode title" />
 
-  </LinearLayout>
+    <au.com.codeka.podcreep.app.views.PlayPauseButton
+      android:id="@+id/play_pause"
+      android:layout_width="64dp"
+      android:layout_height="64dp"
+      android:layout_alignParentEnd="true"
+      android:scaleType="center"
+      android:background="?attr/selectableItemBackgroundBorderless"
+      android:onClick="@{() -> vm.onPlayPauseClick()}" />
+
+    <ProgressBar
+      style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+      android:id="@+id/progress"
+      android:layout_width="match_parent"
+      android:layout_height="4dp"
+      android:layout_toEndOf="@id/podcast_logo"
+      tools:progress="33"
+      tools:max="100"
+      android:max="@{vm.duration}"
+      android:progress="@{vm.progress}"/>
+
+  </RelativeLayout>
+
 </layout>
 

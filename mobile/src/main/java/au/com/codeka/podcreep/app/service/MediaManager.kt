@@ -3,6 +3,7 @@ package au.com.codeka.podcreep.app.service
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -24,6 +25,8 @@ class MediaManager(
 
   private var _currPodcast: Podcast? = null
   private var _currEpisode: Episode? = null
+
+  private val handler = Handler()
 
   val playbackState: PlaybackStateCompat.Builder
     get() = _playbackState
@@ -108,7 +111,10 @@ class MediaManager(
       _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, _currPodcast!!.title)
       _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, _currEpisode!!.title)
       _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, _currPodcast!!.imageUrl)
+      _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, _mediaPlayer!!.duration.toLong())
       mediaSession.setMetadata(_metadata.build())
     }
+
+    handler.postDelayed({ updateState() }, 1000)
   }
 }
