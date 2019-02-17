@@ -27,7 +27,7 @@ class MediaManager(
     private val taskRunner: TaskRunner) {
 
   companion object {
-    private val SERVER_UPDATE_FREQUENCY_SECONDS = 20
+    private const val SERVER_UPDATE_FREQUENCY_SECONDS = 20
   }
 
   private var _playbackState = PlaybackStateCompat.Builder()
@@ -37,6 +37,7 @@ class MediaManager(
   private var _currPodcast: Podcast? = null
   private var _currEpisode: Episode? = null
   private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
+  private var _updateQueued = false
 
   private val handler = Handler()
 
@@ -130,15 +131,23 @@ class MediaManager(
     }
 
     if (updateServer) {
+      Log.i("DEANH", "forcing update of server")
       updateServerState()
     } else {
       _timeToServerUpdate --
+      Log.i("DEANH", "timeToServerUpdate=$_timeToServerUpdate")
       if (_timeToServerUpdate <= 0) {
         updateServerState()
       }
     }
 
-    handler.postDelayed({ updateState(false) }, 1000)
+    if (!_updateQueued) {
+      handler.postDelayed({
+        _updateQueued = false
+        updateState(false)
+      }, 1000)
+      _updateQueued = true
+    }
   }
 
   private fun updateServerState() {

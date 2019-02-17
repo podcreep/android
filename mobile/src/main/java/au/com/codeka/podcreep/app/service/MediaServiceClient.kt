@@ -108,7 +108,6 @@ class MediaServiceClient {
 
   private val mediaBrowserConnectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
     override fun onConnected() {
-      Log.i("DEANH", "onConnected")
       if (activity == null) {
         // Activity was finished before we connected.
         return

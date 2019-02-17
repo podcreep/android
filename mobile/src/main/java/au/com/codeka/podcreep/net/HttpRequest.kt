@@ -1,6 +1,5 @@
 package au.com.codeka.podcreep.net
 
-import android.util.Log
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import okio.BufferedSource
@@ -8,8 +7,6 @@ import okio.Okio
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.Charset
-
 /**
  * Simple wrapper around [HttpURLConnection] that lets us make HTTP requests more easily.
  */
@@ -54,7 +51,6 @@ class HttpRequest private constructor(
       }
 
       val buff = Okio.buffer(Okio.source(conn.inputStream))
-      Log.i("DEANH", "got response: " + Okio.buffer(buff.buffer().clone() as okio.Source).readString(Charset.defaultCharset()))
       return buff
     } catch (e: HttpException) {
       for (errorHandler in globalErrorHandlers) {
