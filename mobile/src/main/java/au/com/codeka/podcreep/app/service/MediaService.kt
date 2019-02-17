@@ -7,6 +7,7 @@ import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.KeyEvent
+import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.model.Episode
 import au.com.codeka.podcreep.model.Podcast
 import com.squareup.moshi.KotlinJsonAdapterFactory
@@ -32,8 +33,10 @@ class MediaService : MediaBrowserServiceCompat() {
         MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
-    Log.i("DEANH", "MediaService.onCreate")
-    mediaManager = MediaManager(this, session)
+    // TODO: add this to the application context or something.
+    val taskRunner = TaskRunner()
+
+    mediaManager = MediaManager(this, session, taskRunner)
     notificationManager = NotificationManager(this)
   }
 

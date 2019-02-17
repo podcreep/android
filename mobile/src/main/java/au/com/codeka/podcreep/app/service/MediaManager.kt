@@ -9,15 +9,26 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import au.com.codeka.podcreep.concurrency.TaskRunner
+import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.Episode
+import au.com.codeka.podcreep.model.PlaybackState
 import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.Subscription
+import au.com.codeka.podcreep.net.HttpRequest
+import au.com.codeka.podcreep.net.Server
 
 /**
  * MediaManager manages the actual playback of the media.
  */
 class MediaManager(
     private val service: MediaService,
-    private val mediaSession: MediaSessionCompat) {
+    private val mediaSession: MediaSessionCompat,
+    private val taskRunner: TaskRunner) {
+
+  companion object {
+    private val SERVER_UPDATE_FREQUENCY_SECONDS = 20
+  }
 
   private var _playbackState = PlaybackStateCompat.Builder()
   private var _metadata = MediaMetadataCompat.Builder()
@@ -25,6 +36,7 @@ class MediaManager(
 
   private var _currPodcast: Podcast? = null
   private var _currEpisode: Episode? = null
+  private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
 
   private val handler = Handler()
 
@@ -32,7 +44,7 @@ class MediaManager(
     get() = _playbackState
 
   init {
-    updateState()
+    updateState(false)
   }
 
   fun play(podcast: Podcast, episode: Episode) {
@@ -55,32 +67,34 @@ class MediaManager(
     }
     mediaSession.isActive = true
 
-    updateState()
+    updateState(false)
   }
 
   fun play() {
     _mediaPlayer?.start()
-    updateState()
+    updateState(false)
   }
 
   fun pause() {
     _mediaPlayer?.pause()
-    updateState()
+    updateState(true)
   }
 
   fun skipForward() {
     var currPos = _mediaPlayer?.currentPosition!!
     currPos += 30 * 1000
     _mediaPlayer?.seekTo(currPos)
+    updateState(true)
   }
 
   fun skipBack() {
     var currPos = _mediaPlayer?.currentPosition!!
     currPos -= 10 * 1000
     _mediaPlayer?.seekTo(currPos)
+    updateState(true)
   }
 
-  private fun updateState() {
+  private fun updateState(updateServer: Boolean) {
     _playbackState.setActions(PlaybackStateCompat.ACTION_PLAY or
         PlaybackStateCompat.ACTION_PAUSE or
         PlaybackStateCompat.ACTION_PLAY_PAUSE)
@@ -115,6 +129,34 @@ class MediaManager(
       mediaSession.setMetadata(_metadata.build())
     }
 
-    handler.postDelayed({ updateState() }, 1000)
+    if (updateServer) {
+      updateServerState()
+    } else {
+      _timeToServerUpdate --
+      if (_timeToServerUpdate <= 0) {
+        updateServerState()
+      }
+    }
+
+    handler.postDelayed({ updateState(false) }, 1000)
+  }
+
+  private fun updateServerState() {
+    _timeToServerUpdate = SERVER_UPDATE_FREQUENCY_SECONDS
+
+    taskRunner.runTask({
+      val podcastID = _currPodcast?.id ?: return@runTask
+      val episodeID = _currEpisode?.id ?: return@runTask
+      val position = _mediaPlayer?.currentPosition ?: return@runTask
+      val state = PlaybackState(podcastID, episodeID, position / 1000)
+
+      val url = "/api/podcasts/$podcastID/episodes/$episodeID/playback-state"
+      val request = Server.request(url)
+          .method(HttpRequest.Method.PUT)
+          .body(state)
+          .build()
+      var subscription = request.execute<Subscription>()
+      // TODO: do something with subscription?
+    }, Threads.BACKGROUND)
   }
 }
