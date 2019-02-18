@@ -8,7 +8,6 @@ import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.Episode
@@ -131,11 +130,9 @@ class MediaManager(
     }
 
     if (updateServer) {
-      Log.i("DEANH", "forcing update of server")
       updateServerState()
     } else {
       _timeToServerUpdate --
-      Log.i("DEANH", "timeToServerUpdate=$_timeToServerUpdate")
       if (_timeToServerUpdate <= 0) {
         updateServerState()
       }
@@ -164,7 +161,7 @@ class MediaManager(
           .method(HttpRequest.Method.PUT)
           .body(state)
           .build()
-      var subscription = request.execute<Subscription>()
+      request.execute<Subscription>()
       // TODO: do something with subscription?
     }, Threads.BACKGROUND)
   }
