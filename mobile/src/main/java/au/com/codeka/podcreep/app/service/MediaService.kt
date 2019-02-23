@@ -18,10 +18,15 @@ import java.util.*
  * This is the main media service for Pod Creep. It handles playback and also
  */
 class MediaService : MediaBrowserServiceCompat() {
+  companion object {
+    private const val TAG = "MediaService"
+  }
 
   private lateinit var session: MediaSessionCompat
   private lateinit var mediaManager: MediaManager
   private lateinit var notificationManager: NotificationManager
+  private lateinit var browseTreeGenerator: BrowseTreeGenerator
+  private lateinit var audioFocusManager: AudioFocusManager
 
   override fun onCreate() {
     super.onCreate()
@@ -38,6 +43,9 @@ class MediaService : MediaBrowserServiceCompat() {
 
     mediaManager = MediaManager(this, session, taskRunner)
     notificationManager = NotificationManager(this)
+    audioFocusManager = AudioFocusManager(this, mediaManager)
+
+    browseTreeGenerator = BrowseTreeGenerator()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -67,9 +75,10 @@ class MediaService : MediaBrowserServiceCompat() {
     session.release()
   }
 
-  override fun onGetRoot(clientPackageName: String,
-                         clientUid: Int,
-                         rootHints: Bundle?): MediaBrowserServiceCompat.BrowserRoot? {
+  override fun onGetRoot(
+      clientPackageName: String,
+      clientUid: Int,
+      rootHints: Bundle?): MediaBrowserServiceCompat.BrowserRoot? {
     return MediaBrowserServiceCompat.BrowserRoot("root", null)
   }
 
@@ -79,17 +88,22 @@ class MediaService : MediaBrowserServiceCompat() {
 
   private inner class MediaSessionCallback : MediaSessionCompat.Callback() {
     override fun onPlay() {
-      Log.i("DEANH", "onPlay")
-      mediaManager.play()
+      Log.i(TAG, "onPlay")
+      if (audioFocusManager.request()) {
+        mediaManager.play()
+      } else {
+        Log.i(TAG, "We didn't get audio focus, not playing.")
+      }
     }
 
     override fun onPause() {
-      Log.i("DEANH", "onPause")
+      Log.i(TAG, "onPause")
       mediaManager.pause()
+      audioFocusManager.abandon()
     }
 
     override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
-      Log.i("DEANH", "onPlayFromMediaId($mediaId)")
+      Log.i(TAG, "onPlayFromMediaId($mediaId)")
 
       val pair = MediaIdBuilder().parse(mediaId!!)
       val podcast = pair!!.first
@@ -99,7 +113,11 @@ class MediaService : MediaBrowserServiceCompat() {
       notificationManager.refresh(podcast, episode, session.sessionToken)
       notificationManager.startForeground()
 
-      mediaManager.play(podcast, episode)
+      if (audioFocusManager.request()) {
+        mediaManager.play(podcast, episode)
+      } else {
+        Log.i(TAG, "We didn't get audio focus, not playing.")
+      }
     }
 
     override fun onSkipToQueueItem(queueId: Long) {}
@@ -109,12 +127,12 @@ class MediaService : MediaBrowserServiceCompat() {
     }
 
     override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
-      Log.i("DEANH", "onMediaButtonEvent($mediaButtonEvent)")
+      Log.i(TAG, "onMediaButtonEvent($mediaButtonEvent)")
       return super.onMediaButtonEvent(mediaButtonEvent)
     }
 
     override fun onStop() {
-      Log.i("DEANH", "onStop")
+      Log.i(TAG, "onStop")
       stopSelf()
     }
 
@@ -127,11 +145,11 @@ class MediaService : MediaBrowserServiceCompat() {
     }
 
     override fun onCustomAction(action: String?, extras: Bundle?) {
-      Log.i("DEANH", "onCustomAction($action)")
+      Log.i(TAG, "onCustomAction($action)")
     }
 
     override fun onPlayFromSearch(query: String?, extras: Bundle?) {
-      Log.i("DEANH", "onPlayFromSearch($query)")
+      Log.i(TAG, "onPlayFromSearch($query)")
     }
   }
 }
