@@ -83,7 +83,7 @@ class MediaService : MediaBrowserServiceCompat() {
   }
 
   override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {
-    result.sendResult(ArrayList())
+    browseTreeGenerator.onLoadChildren(parentId, result)
   }
 
   private inner class MediaSessionCallback : MediaSessionCompat.Callback() {
