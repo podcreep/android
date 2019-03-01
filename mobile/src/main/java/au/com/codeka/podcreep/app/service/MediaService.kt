@@ -45,7 +45,7 @@ class MediaService : MediaBrowserServiceCompat() {
     notificationManager = NotificationManager(this)
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
-    browseTreeGenerator = BrowseTreeGenerator()
+    browseTreeGenerator = BrowseTreeGenerator(taskRunner)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
