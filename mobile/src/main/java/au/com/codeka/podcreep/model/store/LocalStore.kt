@@ -9,8 +9,9 @@ import androidx.room.RoomDatabase
  */
 @Database(
     entities = [SubscriptionEntity::class, PodcastEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false)
 abstract class LocalStore : RoomDatabase() {
-  abstract fun subscriptionsDao(): SubscriptionsDao
+  abstract fun subscriptions(): SubscriptionsDao
+  abstract fun podcasts(): PodcastsDao
 }

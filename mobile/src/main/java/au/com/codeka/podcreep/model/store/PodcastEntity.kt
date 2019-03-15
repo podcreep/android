@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "podcast")
+@Entity(tableName = "podcasts")
 class PodcastEntity(
     @PrimaryKey var id: Long,
     var title: String,
