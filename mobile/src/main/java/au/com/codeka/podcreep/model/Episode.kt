@@ -2,6 +2,7 @@ package au.com.codeka.podcreep.model
 
 data class Episode(
     val id: Long,
+    val podcastID: Long,
     val title: String,
     val description: String,
     val mediaUrl: String,

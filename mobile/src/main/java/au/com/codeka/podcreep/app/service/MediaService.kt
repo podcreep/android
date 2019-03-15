@@ -6,13 +6,11 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem
 import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import android.view.KeyEvent
-import au.com.codeka.podcreep.concurrency.TaskRunner
+import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.model.Episode
 import au.com.codeka.podcreep.model.Podcast
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
-import java.util.*
 
 /**
  * This is the main media service for Pod Creep. It handles playback and also
@@ -38,14 +36,11 @@ class MediaService : MediaBrowserServiceCompat() {
         MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
-    // TODO: add this to the application context or something.
-    val taskRunner = TaskRunner()
-
-    mediaManager = MediaManager(this, session, taskRunner)
+    mediaManager = MediaManager(this, session, App.i.taskRunner)
     notificationManager = NotificationManager(this)
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
-    browseTreeGenerator = BrowseTreeGenerator(taskRunner)
+    browseTreeGenerator = BrowseTreeGenerator(App.i.taskRunner)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -107,7 +102,7 @@ class MediaService : MediaBrowserServiceCompat() {
 
       val pair = MediaIdBuilder().parse(mediaId!!)
       val podcast = pair!!.first
-      var episode = pair.second
+      val episode = pair.second
 
       // Display the notification and place the service in the foreground
       notificationManager.refresh(podcast, episode, session.sessionToken)

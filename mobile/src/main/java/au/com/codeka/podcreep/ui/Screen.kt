@@ -7,6 +7,9 @@ import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 
 import java.util.Random
 
@@ -19,9 +22,10 @@ import java.util.Random
  * and destroyed. Once created, it can be shown and hidden multiple times (for example as you
  * navigate the backstack, it might be hidden and then shown again).
  */
-abstract class Screen {
+abstract class Screen : LifecycleOwner {
   //private static final Log log = new Log("Screen");
 
+  private lateinit var lifecycleRegistry: LifecycleRegistry
   private var container: ViewGroup? = null
 
   /**
@@ -36,25 +40,41 @@ abstract class Screen {
   @CallSuper
   open fun onCreate(context: ScreenContext, container: ViewGroup) {
     this.container = container
+
+    lifecycleRegistry = LifecycleRegistry(this)
+    lifecycleRegistry.currentState = Lifecycle.State.CREATED
   }
 
   /**
    * Called when the screen is shown. Returns the view we should add to the contain (can be null,
    * however, in which case the contain will be empty).
    */
+  @CallSuper
   open fun onShow(): View? {
+    lifecycleRegistry.currentState = Lifecycle.State.STARTED
     return null
   }
 
-  open fun onHide() {}
+  open fun onHide() {
+  }
 
-  open fun onDestroy() {}
+  @CallSuper
+  open fun onDestroy() {
+    lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+  }
 
   /**
    * Get the [ScreenOptions] for this screen. By default, just returns the default options.
    */
   open val options: ScreenOptions
     get() = ScreenOptions()
+
+  /**
+   * Gets a {@link Lifecycle} for this screen.
+   */
+  override fun getLifecycle(): Lifecycle {
+    return lifecycleRegistry
+  }
 
   /**
    * Performs the "show". Calls [.onShow] to get the view, then creates a [Scene] (if

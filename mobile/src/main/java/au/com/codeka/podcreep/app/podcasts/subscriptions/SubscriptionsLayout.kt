@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.podcreep.R
@@ -16,8 +18,9 @@ import kotlinx.android.synthetic.main.subscriptions.view.*
 
 class SubscriptionsLayout(
     context: Context,
-    taskRunner: TaskRunner,
-    var callbacks: Callbacks)
+    private val screen: SubscriptionsScreen,
+    private val subscriptionsLiveData: LiveData<List<Subscription>>,
+    private var callbacks: Callbacks)
   : RelativeLayout(context) {
 
   private val adapter: Adapter
@@ -32,10 +35,16 @@ class SubscriptionsLayout(
     subscriptions.adapter = adapter
   }
 
-  fun refresh(subscriptions: List<Subscription>) {
-    adapter.refresh(subscriptions)
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    val data = subscriptionsLiveData.value
+    if (data != null) {
+      adapter.refresh(data)
+    }
+    subscriptionsLiveData.observe(screen, Observer {
+      data -> adapter.refresh(data)
+    })
   }
-
 
   class Adapter(private val callbacks: Callbacks)
     : RecyclerView.Adapter<ViewHolder>() {

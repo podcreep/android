@@ -27,6 +27,7 @@ class DiscoverScreen(private val taskRunner: TaskRunner): Screen() {
   }
 
   override fun onShow(): View? {
+    super.onShow()
     return layout
   }
 }

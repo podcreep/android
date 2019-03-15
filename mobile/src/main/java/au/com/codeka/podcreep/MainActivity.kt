@@ -52,18 +52,15 @@ class MainActivity : AppCompatActivity() {
     actionBarHeight = actionbarSizeTypedArray.getDimension(0, 0f).toInt()
     actionbarSizeTypedArray.recycle()
 
-    Threads.UI.setThread(Thread.currentThread(), Handler())
-    var taskRunner = TaskRunner()
-
     MediaServiceClient.i.setup(this)
 
     val ss = ScreenStack(this, content)
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
     ss.register<WelcomeScreen> { _: ScreenContext, _: Array<Any>? -> WelcomeScreen() }
-    ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(taskRunner) }
-    ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(taskRunner) }
+    ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
+    ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner) }
     ss.register<DetailsScreen> {
-      _: ScreenContext, params: Array<Any>? -> DetailsScreen(taskRunner, params?.get(0) as Podcast)
+      _: ScreenContext, params: Array<Any>? -> DetailsScreen(App.i.taskRunner, params?.get(0) as Podcast)
     }
     screenStack = ss
 
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity() {
       Server.updateCookie(s.getString(Settings.COOKIE))
 
       // TODO: go back to the screen you were on.
-      ss.push(DiscoverScreen(taskRunner))
+      ss.push(DiscoverScreen(App.i.taskRunner))
     } else {
       ss.push(WelcomeScreen())
     }
@@ -80,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     HttpRequest.addGlobalErrorHandler(object : HttpRequest.ErrorHandler{
       override fun onError(e: HttpException) {
         if (e.statusCode == 401) {
-          taskRunner.runTask({
+          App.i.taskRunner.runTask({
             ss.home()
             ss.push(WelcomeScreen())
           }, Threads.UI)
@@ -92,12 +89,12 @@ class MainActivity : AppCompatActivity() {
       when (it.itemId) {
         R.id.nav_subscriptions -> {
           ss.home()
-          ss.push(SubscriptionsScreen(taskRunner))
+          ss.push(SubscriptionsScreen(App.i.store))
           true
         }
         R.id.nav_discover -> {
           ss.home()
-          ss.push(DiscoverScreen(taskRunner))
+          ss.push(DiscoverScreen(App.i.taskRunner))
           true
         }
         else -> false
