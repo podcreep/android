@@ -51,12 +51,11 @@ abstract class Screen : LifecycleOwner {
    */
   @CallSuper
   open fun onShow(): View? {
-    lifecycleRegistry.currentState = Lifecycle.State.STARTED
+    lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     return null
   }
 
-  open fun onHide() {
-  }
+  open fun onHide() {}
 
   @CallSuper
   open fun onDestroy() {

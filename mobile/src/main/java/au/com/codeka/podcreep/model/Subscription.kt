@@ -8,7 +8,7 @@ import java.util.*
 data class Subscription(
     val id: Long,
     val podcastID: Long,
-    val podcast: Podcast?,
+    var podcast: Podcast?,
     val oldestUnlistenedEpisodeID: Long,
     val positions: Map<Long, Int>) {
 

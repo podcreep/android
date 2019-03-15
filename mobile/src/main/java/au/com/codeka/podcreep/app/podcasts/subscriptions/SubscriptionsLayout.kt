@@ -1,6 +1,7 @@
 package au.com.codeka.podcreep.app.podcasts.subscriptions
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,8 +42,12 @@ class SubscriptionsLayout(
     if (data != null) {
       adapter.refresh(data)
     }
+    Log.i("DEANH", "observing...")
     subscriptionsLiveData.observe(screen, Observer {
-      data -> adapter.refresh(data)
+      data -> run {
+          Log.i("DEANH", "observer updated, refreshing ($data)")
+          adapter.refresh(data)
+        }
     })
   }
 

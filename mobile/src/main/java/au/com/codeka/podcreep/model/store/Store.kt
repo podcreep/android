@@ -1,20 +1,18 @@
 package au.com.codeka.podcreep.model.store
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.room.Room
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.model.Podcast
 import au.com.codeka.podcreep.model.Subscription
 import au.com.codeka.podcreep.model.toEntity
 import au.com.codeka.podcreep.model.SubscriptionList
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.room.migration.Migration
-
-
 
 /**
  * Store is a class we use for local storage of subscriptions, episode details, and all that stuff.
@@ -45,7 +43,7 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
       for (s in resp.subscriptions) {
         val p = s.podcast
         if (p != null) {
-          podcasts.add(s.podcast.toEntity())
+          podcasts.add(p.toEntity())
         }
       }
       localStore.podcasts().insert(*podcasts.toTypedArray())
@@ -53,7 +51,23 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
     }, Threads.BACKGROUND)
 
     val converter = MediatorLiveData<List<Subscription>>()
-    converter.addSource(subscriptions) { Subscription.fromEntity(it) }
+    converter.addSource(subscriptions) {
+      val subs = Subscription.fromEntity(it)
+      taskRunner.runTask({
+        val podcasts = localStore.podcasts().getSync()
+        for (s in subs) {
+          for (p in podcasts) {
+            if (s.podcastID == p.id) {
+              s.podcast = Podcast.fromEntity(p)
+              break
+            }
+          }
+        }
+        taskRunner.runTask({
+          converter.value = subs
+        }, Threads.UI)
+      }, Threads.BACKGROUND)
+    }
     return converter
   }
 }

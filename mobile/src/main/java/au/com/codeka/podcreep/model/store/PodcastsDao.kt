@@ -8,6 +8,9 @@ interface PodcastsDao {
   @Query("SELECT * FROM podcasts")
   fun get(): LiveData<List<PodcastEntity>>
 
+  @Query("SELECT * FROM podcasts")
+  fun getSync(): List<PodcastEntity>
+
   @Delete
   fun delete(vararg podcasts: PodcastEntity)
 
