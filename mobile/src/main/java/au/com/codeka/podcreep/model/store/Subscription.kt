@@ -1,19 +1,21 @@
 package au.com.codeka.podcreep.model.store
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity(tableName = "subscriptions",
     foreignKeys = [ForeignKey(
-        entity = PodcastEntity::class,
+        entity = Podcast::class,
         onDelete = ForeignKey.CASCADE,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("podcastID"))],
     indices = [Index("podcastID")])
-class SubscriptionEntity(
+class Subscription(
     @PrimaryKey val id: Long,
     val podcastID: Long,
+    @Ignore var podcast: Podcast? = null,
     val oldestUnlistenedEpisodeID: Long,
-    val positionsJson: ByteArray)
+    val positionsJson: ByteArray) {
+
+  constructor(id: Long, podcastID: Long, oldestUnlistenedEpisodeID: Long, positionsJson: ByteArray)
+      : this(id, podcastID, null, oldestUnlistenedEpisodeID, positionsJson)
+}

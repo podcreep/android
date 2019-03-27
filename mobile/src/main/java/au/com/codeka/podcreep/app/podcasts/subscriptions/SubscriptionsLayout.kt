@@ -11,10 +11,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.podcreep.R
-import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.databinding.SubscriptionsRowBinding
-import au.com.codeka.podcreep.model.Podcast
-import au.com.codeka.podcreep.model.Subscription
+import au.com.codeka.podcreep.model.store.Podcast
+import au.com.codeka.podcreep.model.store.Subscription
 import kotlinx.android.synthetic.main.subscriptions.view.*
 
 class SubscriptionsLayout(

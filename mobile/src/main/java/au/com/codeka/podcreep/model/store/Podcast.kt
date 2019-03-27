@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "podcasts")
-class PodcastEntity(
+class Podcast(
     @PrimaryKey var id: Long,
     var title: String,
     var description: String,

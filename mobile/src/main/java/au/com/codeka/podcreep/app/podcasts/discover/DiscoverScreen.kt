@@ -2,10 +2,9 @@ package au.com.codeka.podcreep.app.podcasts.discover
 
 import android.view.View
 import android.view.ViewGroup
-import au.com.codeka.podcreep.app.podcasts.details.DetailsLayout
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.sync.PodcastOld
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
 import au.com.codeka.podcreep.ui.ScreenOptions
@@ -20,7 +19,7 @@ class DiscoverScreen(private val taskRunner: TaskRunner): Screen() {
     super.onCreate(context, container)
 
     layout = DiscoverLayout(context.activity, taskRunner, object : DiscoverLayout.Callbacks {
-      override fun onViewPodcastClick(podcast: Podcast) {
+      override fun onViewPodcastClick(podcast: PodcastOld) {
         context.pushScreen<DetailsScreen>(podcast)
       }
     })

@@ -6,7 +6,7 @@
   <data>
     <variable
       name="podcast"
-      type="au.com.codeka.podcreep.model.Podcast" />
+      type="au.com.codeka.podcreep.model.sync.PodcastOld" />
   </data>
 
   <RelativeLayout

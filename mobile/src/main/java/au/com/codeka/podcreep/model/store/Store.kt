@@ -1,16 +1,15 @@
 package au.com.codeka.podcreep.model.store
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.room.Room
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.Podcast
-import au.com.codeka.podcreep.model.Subscription
-import au.com.codeka.podcreep.model.toEntity
-import au.com.codeka.podcreep.model.SubscriptionList
+import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.SubscriptionOld
+import au.com.codeka.podcreep.model.sync.toEntity
+import au.com.codeka.podcreep.model.sync.SubscriptionListOld
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 
@@ -29,42 +28,26 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
       .build()
 
   /**
-   * Gets a list of the subscriptions the user has subscribed to.
+   * Gets a list of the subscriptions the user has subscribed to. We'll also keep the podcast within the subscription
+   * updated as well.
    */
   fun subscriptions(): LiveData<List<Subscription>> {
     val subscriptions = localStore.subscriptions().get()
 
-    taskRunner.runTask({
-      val request = Server.request("/api/subscriptions")
-          .method(HttpRequest.Method.GET)
-          .build()
-      val resp = request.execute<SubscriptionList>()
-      val podcasts = ArrayList<PodcastEntity>()
-      for (s in resp.subscriptions) {
-        val p = s.podcast
-        if (p != null) {
-          podcasts.add(p.toEntity())
-        }
-      }
-      localStore.podcasts().insert(*podcasts.toTypedArray())
-      localStore.subscriptions().updateAll(resp.subscriptions.toEntity())
-    }, Threads.BACKGROUND)
-
     val converter = MediatorLiveData<List<Subscription>>()
     converter.addSource(subscriptions) {
-      val subs = Subscription.fromEntity(it)
       taskRunner.runTask({
         val podcasts = localStore.podcasts().getSync()
-        for (s in subs) {
+        for (s in it) {
           for (p in podcasts) {
             if (s.podcastID == p.id) {
-              s.podcast = Podcast.fromEntity(p)
+              s.podcast = p
               break
             }
           }
         }
         taskRunner.runTask({
-          converter.value = subs
+          converter.value = it
         }, Threads.UI)
       }, Threads.BACKGROUND)
     }

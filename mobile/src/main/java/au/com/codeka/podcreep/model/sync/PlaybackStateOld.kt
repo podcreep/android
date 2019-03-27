@@ -1,6 +1,6 @@
-package au.com.codeka.podcreep.model
+package au.com.codeka.podcreep.model.sync
 
-data class PlaybackState(
+data class PlaybackStateOld(
     val podcastID: Long,
     val episodeID: Long,
     val position: Int)

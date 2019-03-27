@@ -3,14 +3,13 @@ package au.com.codeka.podcreep.app.podcasts.discover
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.databinding.DiscoverTrendingRowBinding
-import au.com.codeka.podcreep.model.Podcast
-import au.com.codeka.podcreep.model.PodcastList
+import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastListOld
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 
@@ -30,7 +29,7 @@ class TrendingTabLayout(
       val request = Server.request("/api/podcasts")
           .method(HttpRequest.Method.GET)
           .build()
-      var resp = request.execute<PodcastList>()
+      var resp = request.execute<PodcastListOld>()
       taskRunner.runTask({
         adapter = Adapter(resp.podcasts, callbacks)
       }, Threads.UI)
@@ -38,7 +37,7 @@ class TrendingTabLayout(
   }
 
   class Adapter(
-      private val dataset: List<Podcast>,
+      private val dataset: List<PodcastOld>,
       private val callbacks: DiscoverLayout.Callbacks)
     : RecyclerView.Adapter<ViewHolder>() {
 
@@ -60,7 +59,7 @@ class TrendingTabLayout(
   class ViewHolder(val binding: DiscoverTrendingRowBinding, val callbacks: DiscoverLayout.Callbacks)
     : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(podcast: Podcast) {
+    fun bind(podcast: PodcastOld) {
       binding.podcast = podcast
       binding.executePendingBindings()
       binding.root.setOnClickListener {

@@ -10,10 +10,10 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.Episode
-import au.com.codeka.podcreep.model.PlaybackState
-import au.com.codeka.podcreep.model.Podcast
-import au.com.codeka.podcreep.model.Subscription
+import au.com.codeka.podcreep.model.sync.EpisodeOld
+import au.com.codeka.podcreep.model.sync.PlaybackStateOld
+import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.SubscriptionOld
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 
@@ -33,8 +33,8 @@ class MediaManager(
   private var _metadata = MediaMetadataCompat.Builder()
   private var _mediaPlayer: MediaPlayer? = null
 
-  private var _currPodcast: Podcast? = null
-  private var _currEpisode: Episode? = null
+  private var _currPodcast: PodcastOld? = null
+  private var _currEpisode: EpisodeOld? = null
   private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
   private var _updateQueued = false
 
@@ -47,7 +47,7 @@ class MediaManager(
     updateState(false)
   }
 
-  fun play(podcast: Podcast, episode: Episode) {
+  fun play(podcast: PodcastOld, episode: EpisodeOld) {
     _currPodcast = podcast
     _currEpisode = episode
 
@@ -154,14 +154,14 @@ class MediaManager(
       val podcastID = _currPodcast?.id ?: return@runTask
       val episodeID = _currEpisode?.id ?: return@runTask
       val position = _mediaPlayer?.currentPosition ?: return@runTask
-      val state = PlaybackState(podcastID, episodeID, position / 1000)
+      val state = PlaybackStateOld(podcastID, episodeID, position / 1000)
 
       val url = "/api/podcasts/$podcastID/episodes/$episodeID/playback-state"
       val request = Server.request(url)
           .method(HttpRequest.Method.PUT)
           .body(state)
           .build()
-      request.execute<Subscription>()
+      request.execute<SubscriptionOld>()
       // TODO: do something with subscription?
     }, Threads.BACKGROUND)
   }

@@ -1,11 +1,11 @@
 package au.com.codeka.podcreep.app.podcasts.details
 
-import au.com.codeka.podcreep.model.Episode
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.sync.EpisodeOld
+import au.com.codeka.podcreep.model.sync.PodcastOld
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DetailsRowViewModel(val podcast: Podcast, val episode: Episode) {
+class DetailsRowViewModel(val podcast: PodcastOld, val episode: EpisodeOld) {
   private val epDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
   private val displayDateFormat = SimpleDateFormat("dd'\n'MMM", Locale.US)
 

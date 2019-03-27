@@ -1,6 +1,6 @@
-package au.com.codeka.podcreep.model
+package au.com.codeka.podcreep.model.sync
 
-data class Episode(
+data class EpisodeOld(
     val id: Long,
     val podcastID: Long,
     val title: String,

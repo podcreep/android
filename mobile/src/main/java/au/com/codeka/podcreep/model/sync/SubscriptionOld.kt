@@ -1,19 +1,19 @@
-package au.com.codeka.podcreep.model
+package au.com.codeka.podcreep.model.sync
 
-import au.com.codeka.podcreep.model.store.SubscriptionEntity
+import au.com.codeka.podcreep.model.store.Subscription
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.util.*
 
-data class Subscription(
+data class SubscriptionOld(
     val id: Long,
     val podcastID: Long,
-    var podcast: Podcast?,
+    var podcast: PodcastOld?,
     val oldestUnlistenedEpisodeID: Long,
     val positions: Map<Long, Int>) {
 
   companion object {
-    fun fromEntity(entity: SubscriptionEntity): Subscription {
+    fun fromEntity(entity: Subscription): SubscriptionOld {
       val moshi = Moshi.Builder()
           .add(KotlinJsonAdapterFactory())
           .build()
@@ -23,11 +23,11 @@ data class Subscription(
       if (positions == null) {
         positions = TreeMap()
       }
-      return Subscription(entity.id, entity.podcastID, null, entity.oldestUnlistenedEpisodeID, positions)
+      return SubscriptionOld(entity.id, entity.podcastID, null, entity.oldestUnlistenedEpisodeID, positions)
     }
 
-    fun fromEntity(entities: List<SubscriptionEntity>): List<Subscription> {
-      val list = ArrayList<Subscription>()
+    fun fromEntity(entities: List<Subscription>): List<SubscriptionOld> {
+      val list = ArrayList<SubscriptionOld>()
       for (e in entities) {
         list.add(fromEntity(e))
       }
@@ -35,7 +35,7 @@ data class Subscription(
     }
   }
 
-  fun toEntity(): SubscriptionEntity {
+  fun toEntity(): Subscription {
     val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
@@ -44,13 +44,13 @@ data class Subscription(
         .toJson(positions)
         .toByteArray(Charsets.UTF_8)
 
-    return SubscriptionEntity(
+    return Subscription(
         this.id, this.podcastID, this.oldestUnlistenedEpisodeID, positionsJson)
   }
 }
 
-fun List<Subscription>.toEntity(): List<SubscriptionEntity> {
-  val list = ArrayList<SubscriptionEntity>()
+fun List<SubscriptionOld>.toEntity(): List<Subscription> {
+  val list = ArrayList<Subscription>()
   for (s in this) {
     list.add(s.toEntity())
   }

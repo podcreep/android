@@ -6,14 +6,14 @@ import androidx.room.*
 @Dao
 interface PodcastsDao {
   @Query("SELECT * FROM podcasts")
-  fun get(): LiveData<List<PodcastEntity>>
+  fun get(): LiveData<List<Podcast>>
 
   @Query("SELECT * FROM podcasts")
-  fun getSync(): List<PodcastEntity>
+  fun getSync(): List<Podcast>
 
   @Delete
-  fun delete(vararg podcasts: PodcastEntity)
+  fun delete(vararg podcasts: Podcast)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(vararg podcasts: PodcastEntity)
+  fun insert(vararg podcasts: Podcast)
 }

@@ -2,25 +2,24 @@ package au.com.codeka.podcreep.model.store
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import au.com.codeka.podcreep.model.Subscription
 import androidx.room.Transaction
 
 @Dao
 interface SubscriptionsDao {
   @Query("SELECT * FROM subscriptions")
-  fun get(): LiveData<List<SubscriptionEntity>>
+  fun get(): LiveData<List<Subscription>>
 
   @Delete
-  fun delete(vararg subscriptions: SubscriptionEntity)
+  fun delete(vararg subscriptions: Subscription)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(vararg subscriptions: SubscriptionEntity)
+  fun insert(vararg subscriptions: Subscription)
 
   @Transaction
-  fun updateAll(subscriptions: List<SubscriptionEntity>) {
+  fun updateAll(subscriptions: List<Subscription>) {
     val existing = get().value
 
-    val toDelete = ArrayList<SubscriptionEntity>()
+    val toDelete = ArrayList<Subscription>()
     existing?.forEach {
       if (!subscriptions.contains(it)) {
         toDelete.add(it)

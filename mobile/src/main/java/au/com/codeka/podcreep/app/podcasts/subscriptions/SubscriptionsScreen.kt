@@ -3,7 +3,7 @@ package au.com.codeka.podcreep.app.podcasts.subscriptions
 import android.view.View
 import android.view.ViewGroup
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext

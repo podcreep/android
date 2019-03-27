@@ -17,8 +17,8 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import au.com.codeka.podcreep.MainActivity
 import au.com.codeka.podcreep.R
-import au.com.codeka.podcreep.model.Episode
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.sync.EpisodeOld
+import au.com.codeka.podcreep.model.sync.PodcastOld
 
 /**
  * NotificationManager manages our playback notification. It keeps it updated, makes sure it's
@@ -51,7 +51,7 @@ class NotificationManager(private val service: MediaService) {
     service.startForeground(NOTIFICATION_ID, builder.build())
   }
 
-  fun refresh(podcast: Podcast, episode: Episode, sessionToken: MediaSessionCompat.Token) {
+  fun refresh(podcast: PodcastOld, episode: EpisodeOld, sessionToken: MediaSessionCompat.Token) {
     _builder.apply {
       // Add the metadata for the currently playing episode.
       setContentTitle(podcast.title)

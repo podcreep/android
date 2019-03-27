@@ -1,7 +1,6 @@
 package au.com.codeka.podcreep
 
 import android.os.Bundle
-import android.os.Handler
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -10,16 +9,14 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
-import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import au.com.codeka.podcreep.R.layout.activity
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.app.service.MediaServiceClient
-import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.sync.PodcastOld
 import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
@@ -60,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
     ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner) }
     ss.register<DetailsScreen> {
-      _: ScreenContext, params: Array<Any>? -> DetailsScreen(App.i.taskRunner, params?.get(0) as Podcast)
+      _: ScreenContext, params: Array<Any>? -> DetailsScreen(App.i.taskRunner, params?.get(0) as PodcastOld)
     }
     screenStack = ss
 

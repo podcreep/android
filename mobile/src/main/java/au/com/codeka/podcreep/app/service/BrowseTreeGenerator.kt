@@ -7,8 +7,7 @@ import java.util.ArrayList
 import android.support.v4.media.MediaDescriptionCompat
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.Podcast
-import au.com.codeka.podcreep.model.SubscriptionList
+import au.com.codeka.podcreep.model.sync.SubscriptionListOld
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 
@@ -66,7 +65,7 @@ class BrowseTreeGenerator(private val taskRunner: TaskRunner) {
       val request = Server.request("/api/subscriptions")
           .method(HttpRequest.Method.GET)
           .build()
-      var resp = request.execute<SubscriptionList>()
+      var resp = request.execute<SubscriptionListOld>()
       taskRunner.runTask({
         val items = ArrayList<MediaBrowserCompat.MediaItem>()
         for (sub in resp.subscriptions) {

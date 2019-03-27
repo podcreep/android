@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.sync.PodcastOld
 import kotlinx.android.synthetic.main.discover.view.*
 
 class DiscoverLayout(
@@ -15,7 +15,7 @@ class DiscoverLayout(
   : RelativeLayout(context) {
 
   interface Callbacks {
-    fun onViewPodcastClick(podcast: Podcast)
+    fun onViewPodcastClick(podcast: PodcastOld)
   }
 
   init {

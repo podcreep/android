@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
  * server.
  */
 @Database(
-    entities = [SubscriptionEntity::class, PodcastEntity::class],
+    entities = [Subscription::class, Podcast::class],
     version = 2,
     exportSchema = false)
 abstract class LocalStore : RoomDatabase() {

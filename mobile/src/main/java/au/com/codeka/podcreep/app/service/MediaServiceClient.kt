@@ -1,16 +1,14 @@
 package au.com.codeka.podcreep.app.service
 
 import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import au.com.codeka.podcreep.MainActivity
-import au.com.codeka.podcreep.model.Episode
-import au.com.codeka.podcreep.model.Podcast
+import au.com.codeka.podcreep.model.sync.EpisodeOld
+import au.com.codeka.podcreep.model.sync.PodcastOld
 
 /**
  * MediaServiceClient is a helper class that uses the media browser/media session API to talk
@@ -66,7 +64,7 @@ class MediaServiceClient {
     callbacks.remove(callback)
   }
 
-  fun play(podcast: Podcast, episode: Episode) {
+  fun play(podcast: PodcastOld, episode: EpisodeOld) {
     val mediaIdBuilder = MediaIdBuilder()
     mediaController?.transportControls?.playFromMediaId(
         mediaIdBuilder.getMediaId(podcast, episode), null)
