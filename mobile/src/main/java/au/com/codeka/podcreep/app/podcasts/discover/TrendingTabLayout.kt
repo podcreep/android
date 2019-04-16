@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.databinding.DiscoverTrendingRowBinding
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.model.sync.PodcastListOld
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
@@ -37,7 +37,7 @@ class TrendingTabLayout(
   }
 
   class Adapter(
-      private val dataset: List<PodcastOld>,
+      private val dataset: List<PodcastInfo>,
       private val callbacks: DiscoverLayout.Callbacks)
     : RecyclerView.Adapter<ViewHolder>() {
 
@@ -59,7 +59,7 @@ class TrendingTabLayout(
   class ViewHolder(val binding: DiscoverTrendingRowBinding, val callbacks: DiscoverLayout.Callbacks)
     : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(podcast: PodcastOld) {
+    fun bind(podcast: PodcastInfo) {
       binding.podcast = podcast
       binding.executePendingBindings()
       binding.root.setOnClickListener {

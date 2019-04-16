@@ -16,6 +16,8 @@
   <!-- Drawer items -->
   <string name="subscriptions">Subscriptions</string>
   <string name="discover">Discover</string>
+  <string name="refresh">Refresh</string>
+  <string name="refreshing">Refreshing...</string>
 
   <!-- Podcasts screen -->
   <string name="trending">Trending</string>

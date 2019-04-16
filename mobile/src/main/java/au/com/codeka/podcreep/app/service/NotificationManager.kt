@@ -1,9 +1,7 @@
 package au.com.codeka.podcreep.app.service
 
-import android.app.Notification
-import android.app.NotificationChannel
+import android.app.*
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -18,24 +16,24 @@ import androidx.media.app.NotificationCompat.MediaStyle
 import au.com.codeka.podcreep.MainActivity
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 
 /**
- * NotificationManager manages our playback notification. It keeps it updated, makes sure it's
- * displaying the correct state, handles button presses and so on.
+ * NotificationManager manages our various notifications. It keeps it updated, makes sure it's displaying the correct
+ * state, handles button presses and so on.
  */
-class NotificationManager(private val service: MediaService) {
-
-  companion object {
-    val NOTIFICATION_ID = 1234
-  }
+class NotificationManager(
+    private val service: Service,
+    private val notificationId: Int,
+    channelName: String,
+    channelDesc: String /* TODO: make this a resource */) {
 
   private val _builder: NotificationCompat.Builder
 
   init {
     val channelId =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          createNotificationChannel("media_service", "Playback Service")
+          createNotificationChannel(channelName, channelDesc)
         } else {
           // If earlier version channel ID is not used
           ""
@@ -48,10 +46,22 @@ class NotificationManager(private val service: MediaService) {
     get() = _builder
 
   fun startForeground() {
-    service.startForeground(NOTIFICATION_ID, builder.build())
+    service.startForeground(notificationId, builder.build())
   }
 
-  fun refresh(podcast: PodcastOld, episode: EpisodeOld, sessionToken: MediaSessionCompat.Token) {
+  fun stopService() {
+    service.stopSelf()
+  }
+
+  fun refresh(title: String) {
+    _builder.apply {
+      setContentTitle(title)
+      setSmallIcon(R.drawable.ic_refresh_black_24dp)
+      color = ContextCompat.getColor(service, R.color.colorPrimaryDark)
+    }
+  }
+
+  fun refresh(podcast: PodcastInfo, episode: EpisodeOld, sessionToken: MediaSessionCompat.Token) {
     _builder.apply {
       // Add the metadata for the currently playing episode.
       setContentTitle(podcast.title)

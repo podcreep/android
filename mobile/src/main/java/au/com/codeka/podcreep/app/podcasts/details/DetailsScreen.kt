@@ -6,7 +6,7 @@ import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
@@ -14,7 +14,7 @@ import au.com.codeka.podcreep.ui.ScreenContext
 
 class DetailsScreen(
     private val taskRunner: TaskRunner,
-    private val podcast: PodcastOld)
+    private val podcast: PodcastInfo)
   : Screen() {
 
   private var layout: DetailsLayout? = null
@@ -23,7 +23,7 @@ class DetailsScreen(
     super.onCreate(context, container)
 
     layout = DetailsLayout(context.activity, podcast, taskRunner, object : DetailsLayout.Callbacks {
-      override fun onEpisodePlay(podcast: PodcastOld, episode: EpisodeOld) {
+      override fun onEpisodePlay(podcast: PodcastInfo, episode: EpisodeOld) {
         MediaServiceClient.i.play(podcast, episode)
       }
     })
@@ -32,7 +32,7 @@ class DetailsScreen(
       val request = Server.request("/api/podcasts/" + podcast.id)
           .method(HttpRequest.Method.GET)
           .build()
-      var podcast = request.execute<PodcastOld>()
+      var podcast = request.execute<PodcastInfo>()
       taskRunner.runTask({
         layout?.refresh(podcast)
       }, Threads.UI)

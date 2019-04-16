@@ -5,15 +5,15 @@ import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.util.*
 
-data class SubscriptionOld(
+data class SubscriptionInfo(
     val id: Long,
     val podcastID: Long,
-    var podcast: PodcastOld?,
+    var podcast: PodcastInfo?,
     val oldestUnlistenedEpisodeID: Long,
     val positions: Map<Long, Int>) {
 
   companion object {
-    fun fromEntity(entity: Subscription): SubscriptionOld {
+    fun fromEntity(entity: Subscription): SubscriptionInfo {
       val moshi = Moshi.Builder()
           .add(KotlinJsonAdapterFactory())
           .build()
@@ -23,11 +23,11 @@ data class SubscriptionOld(
       if (positions == null) {
         positions = TreeMap()
       }
-      return SubscriptionOld(entity.id, entity.podcastID, null, entity.oldestUnlistenedEpisodeID, positions)
+      return SubscriptionInfo(entity.id, entity.podcastID, null, entity.oldestUnlistenedEpisodeID, positions)
     }
 
-    fun fromEntity(entities: List<Subscription>): List<SubscriptionOld> {
-      val list = ArrayList<SubscriptionOld>()
+    fun fromEntity(entities: List<Subscription>): List<SubscriptionInfo> {
+      val list = ArrayList<SubscriptionInfo>()
       for (e in entities) {
         list.add(fromEntity(e))
       }
@@ -47,12 +47,4 @@ data class SubscriptionOld(
     return Subscription(
         this.id, this.podcastID, this.oldestUnlistenedEpisodeID, positionsJson)
   }
-}
-
-fun List<SubscriptionOld>.toEntity(): List<Subscription> {
-  val list = ArrayList<Subscription>()
-  for (s in this) {
-    list.add(s.toEntity())
-  }
-  return list
 }

@@ -5,16 +5,16 @@ import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.util.*
 
-data class PodcastOld(
+data class PodcastInfo(
     var id: Long,
     var title: String,
     var description: String,
     var imageUrl: String,
     val episodes: List<EpisodeOld>?,
-    val subscription: SubscriptionOld?) {
+    val subscription: SubscriptionInfo?) {
 
   companion object {
-    fun fromEntity(entity: Podcast): PodcastOld {
+    fun fromEntity(entity: Podcast): PodcastInfo {
       val moshi = Moshi.Builder()
           .add(KotlinJsonAdapterFactory())
           .build()
@@ -24,7 +24,7 @@ data class PodcastOld(
       if (episodes == null) {
         episodes = ArrayList()
       }
-      return PodcastOld(entity.id, entity.title, entity.description, entity.imageUrl, episodes, null)
+      return PodcastInfo(entity.id, entity.title, entity.description, entity.imageUrl, episodes, null)
     }
   }
 

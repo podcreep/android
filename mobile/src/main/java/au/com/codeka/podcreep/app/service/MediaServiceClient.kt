@@ -8,7 +8,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import au.com.codeka.podcreep.MainActivity
 import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 
 /**
  * MediaServiceClient is a helper class that uses the media browser/media session API to talk
@@ -64,7 +64,7 @@ class MediaServiceClient {
     callbacks.remove(callback)
   }
 
-  fun play(podcast: PodcastOld, episode: EpisodeOld) {
+  fun play(podcast: PodcastInfo, episode: EpisodeOld) {
     val mediaIdBuilder = MediaIdBuilder()
     mediaController?.transportControls?.playFromMediaId(
         mediaIdBuilder.getMediaId(podcast, episode), null)
@@ -97,7 +97,6 @@ class MediaServiceClient {
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      Log.i("DEANH", "playback state changed")
       callbacks.forEach {
         it.onPlaybackStateChanged(state)
       }

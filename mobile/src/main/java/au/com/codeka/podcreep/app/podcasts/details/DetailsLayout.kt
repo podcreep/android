@@ -11,12 +11,12 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.databinding.DetailsBinding
 import au.com.codeka.podcreep.databinding.DetailsEpisodeRowBinding
 import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 
 
 class DetailsLayout(
     context: Context,
-    podcast: PodcastOld,
+    podcast: PodcastInfo,
     taskRunner: TaskRunner,
     private val callbacks: Callbacks)
   : FrameLayout(context) {
@@ -24,7 +24,7 @@ class DetailsLayout(
   val binding: DetailsBinding
 
   interface Callbacks {
-    fun onEpisodePlay(podcast: PodcastOld, episode: EpisodeOld)
+    fun onEpisodePlay(podcast: PodcastInfo, episode: EpisodeOld)
   }
 
   init {
@@ -37,7 +37,7 @@ class DetailsLayout(
     refresh(podcast)
   }
 
-  fun refresh(podcast: PodcastOld) {
+  fun refresh(podcast: PodcastInfo) {
     binding.podcast = podcast
     binding.executePendingBindings()
 
@@ -46,7 +46,7 @@ class DetailsLayout(
   }
 
   class Adapter(
-      private val podcast: PodcastOld,
+      private val podcast: PodcastInfo,
       private val callbacks: Callbacks)
     : RecyclerView.Adapter<ViewHolder>() {
 
@@ -68,7 +68,7 @@ class DetailsLayout(
   class ViewHolder(val binding: DetailsEpisodeRowBinding, val callbacks: Callbacks)
     : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(podcast: PodcastOld, episode: EpisodeOld) {
+    fun bind(podcast: PodcastInfo, episode: EpisodeOld) {
       binding.callbacks = callbacks
       binding.vm = DetailsRowViewModel(podcast, episode)
       binding.executePendingBindings()

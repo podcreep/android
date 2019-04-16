@@ -12,8 +12,8 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.sync.EpisodeOld
 import au.com.codeka.podcreep.model.sync.PlaybackStateOld
-import au.com.codeka.podcreep.model.sync.PodcastOld
-import au.com.codeka.podcreep.model.sync.SubscriptionOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
+import au.com.codeka.podcreep.model.sync.SubscriptionInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
 
@@ -33,7 +33,7 @@ class MediaManager(
   private var _metadata = MediaMetadataCompat.Builder()
   private var _mediaPlayer: MediaPlayer? = null
 
-  private var _currPodcast: PodcastOld? = null
+  private var _currPodcast: PodcastInfo? = null
   private var _currEpisode: EpisodeOld? = null
   private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
   private var _updateQueued = false
@@ -47,7 +47,7 @@ class MediaManager(
     updateState(false)
   }
 
-  fun play(podcast: PodcastOld, episode: EpisodeOld) {
+  fun play(podcast: PodcastInfo, episode: EpisodeOld) {
     _currPodcast = podcast
     _currEpisode = episode
 
@@ -161,7 +161,7 @@ class MediaManager(
           .method(HttpRequest.Method.PUT)
           .body(state)
           .build()
-      request.execute<SubscriptionOld>()
+      request.execute<SubscriptionInfo>()
       // TODO: do something with subscription?
     }, Threads.BACKGROUND)
   }

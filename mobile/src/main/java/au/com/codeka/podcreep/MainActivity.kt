@@ -1,10 +1,10 @@
 package au.com.codeka.podcreep
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
@@ -16,7 +16,7 @@ import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
@@ -26,6 +26,7 @@ import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
+import au.com.codeka.podcreep.app.service.SyncService
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
 import com.google.android.material.navigation.NavigationView
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
     ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner) }
     ss.register<DetailsScreen> {
-      _: ScreenContext, params: Array<Any>? -> DetailsScreen(App.i.taskRunner, params?.get(0) as PodcastOld)
+      _: ScreenContext, params: Array<Any>? -> DetailsScreen(App.i.taskRunner, params?.get(0) as PodcastInfo)
     }
     screenStack = ss
 
@@ -92,6 +93,10 @@ class MainActivity : AppCompatActivity() {
         R.id.nav_discover -> {
           ss.home()
           ss.push(DiscoverScreen(App.i.taskRunner))
+          true
+        }
+        R.id.nav_refresh -> {
+          startService(Intent(this, SyncService::class.java))
           true
         }
         else -> false
@@ -148,7 +153,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      Log.i("DEANH", "Playback state: " + state?.state)
       // If we're not stopped, then set ourselves visible.
       var contentMarginPx = 0
       if (state?.state != PlaybackStateCompat.STATE_STOPPED &&

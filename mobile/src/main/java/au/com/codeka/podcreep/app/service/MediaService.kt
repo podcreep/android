@@ -8,7 +8,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastOld
+import au.com.codeka.podcreep.model.sync.PodcastInfo
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 
@@ -37,7 +37,7 @@ class MediaService : MediaBrowserServiceCompat() {
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
     mediaManager = MediaManager(this, session, App.i.taskRunner)
-    notificationManager = NotificationManager(this)
+    notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
     browseTreeGenerator = BrowseTreeGenerator(App.i.taskRunner)
@@ -53,7 +53,7 @@ class MediaService : MediaBrowserServiceCompat() {
       val moshi = Moshi.Builder()
           .add(KotlinJsonAdapterFactory())
           .build()
-      val podcast = moshi.adapter<PodcastOld>(PodcastOld::class.java).fromJson(podcastStr)!!
+      val podcast = moshi.adapter<PodcastInfo>(PodcastInfo::class.java).fromJson(podcastStr)!!
       val episode = moshi.adapter<EpisodeOld>(EpisodeOld::class.java).fromJson(episodeStr)!!
 
       // Display the notification and place the service in the foreground

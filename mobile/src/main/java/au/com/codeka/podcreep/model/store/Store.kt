@@ -6,12 +6,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.room.Room
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.sync.PodcastOld
-import au.com.codeka.podcreep.model.sync.SubscriptionOld
-import au.com.codeka.podcreep.model.sync.toEntity
-import au.com.codeka.podcreep.model.sync.SubscriptionListOld
-import au.com.codeka.podcreep.net.HttpRequest
-import au.com.codeka.podcreep.net.Server
 
 /**
  * Store is a class we use for local storage of subscriptions, episode details, and all that stuff.
