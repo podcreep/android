@@ -15,6 +15,7 @@ interface SubscriptionsDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insert(vararg subscriptions: Subscription)
 
+  /*
   @Transaction
   fun updateAll(subscriptions: List<Subscription>) {
     val existing = get().value
@@ -30,4 +31,5 @@ interface SubscriptionsDao {
     }
     insert(*subscriptions.toTypedArray())
   }
+  */
 }

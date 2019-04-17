@@ -3,6 +3,7 @@ package au.com.codeka.podcreep.app.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.concurrency.TaskRunner
@@ -21,6 +22,10 @@ class SyncService : Service() {
   private lateinit var taskRunner: TaskRunner
   private lateinit var notificationManager: NotificationManager
 
+  companion object {
+    const val TAG = "SyncService"
+  }
+
   override fun onBind(p0: Intent?): IBinder? {
     // No binder, we're single-purpose.
     return null
@@ -33,14 +38,13 @@ class SyncService : Service() {
     notificationManager = NotificationManager(this, 1235, "refresh", "Refreshing service")
   }
 
-
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val id = super.onStartCommand(intent, flags, startId)
 
     notificationManager.refresh("Refreshing...")
     notificationManager.startForeground()
 
-    val syncer = StoreSyncer()
+    val syncer = StoreSyncer(App.i.store)
 
     taskRunner.runTask({
       val request = Server.request("/api/subscriptions/sync")
@@ -51,8 +55,10 @@ class SyncService : Service() {
         val resp = request.execute<SubscriptionsSyncPostResponse>()
         syncer.sync(resp)
       } catch (e: HttpException) {
+        Log.e(TAG, "Error", e)
         notifyToast(e.message!!)
       } catch (e: Exception) {
+        Log.e(TAG, "Error", e)
         notifyToast(e.toString())
       }
 

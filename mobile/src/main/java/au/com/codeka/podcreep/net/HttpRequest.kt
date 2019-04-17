@@ -1,5 +1,7 @@
 package au.com.codeka.podcreep.net
 
+import android.util.Log
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import okio.BufferedSource
@@ -20,6 +22,8 @@ class HttpRequest private constructor(
   }
 
   companion object {
+    const val TAG = "HttpRequest"
+
     private val globalErrorHandlers = ArrayList<ErrorHandler>()
 
     fun addGlobalErrorHandler(handler: ErrorHandler) {
@@ -50,8 +54,7 @@ class HttpRequest private constructor(
         throw HttpException(conn.responseCode, conn.responseMessage)
       }
 
-      val buff = Okio.buffer(Okio.source(conn.inputStream))
-      return buff
+      return Okio.buffer(Okio.source(conn.inputStream))
     } catch (e: HttpException) {
       for (errorHandler in globalErrorHandlers) {
         errorHandler.onError(e)
@@ -68,12 +71,20 @@ class HttpRequest private constructor(
   }
 
   inline fun <reified T> execute(): T {
-    val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-    return moshi
-        .adapter(T::class.java)
-        .fromJson(execute())!!
+    val resp = execute()
+    val json = resp.readString(Charsets.UTF_8)
+
+    try {
+      val moshi = Moshi.Builder()
+          .add(KotlinJsonAdapterFactory())
+          .build()
+      return moshi
+          .adapter(T::class.java)
+          .fromJson(json)!!
+    } catch(e: JsonDataException) {
+      Log.e(TAG, json)
+      throw e
+    }
   }
 
   class Builder {

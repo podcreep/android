@@ -14,7 +14,10 @@ import au.com.codeka.podcreep.concurrency.Threads
  * data.
  */
 class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
-  private val localStore: LocalStore = Room
+  /**
+   * This is exposed mostly for the sync code to access directly. Don't use it in normal code.
+   */
+  val localStore: LocalStore = Room
       .databaseBuilder(applicationContext, LocalStore::class.java, "local-store")
       // We'll just allow database upgrades to drop the data store, since it's just a cache of the server
       // anyway, it shouldn't be a big deal.
