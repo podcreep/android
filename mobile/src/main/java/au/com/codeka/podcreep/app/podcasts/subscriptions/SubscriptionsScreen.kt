@@ -2,6 +2,7 @@ package au.com.codeka.podcreep.app.podcasts.subscriptions
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
@@ -23,7 +24,7 @@ class SubscriptionsScreen(private val store: Store): Screen() {
         this,
         store.subscriptions(),
         object : SubscriptionsLayout.Callbacks {
-          override fun onViewPodcastClick(podcast: Podcast) {
+          override fun onViewPodcastClick(podcast: LiveData<Podcast>) {
             context.pushScreen<DetailsScreen>(podcast)
           }
         })

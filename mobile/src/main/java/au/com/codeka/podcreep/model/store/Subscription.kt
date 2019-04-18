@@ -1,5 +1,6 @@
 package au.com.codeka.podcreep.model.store
 
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
 @Entity(tableName = "subscriptions",
@@ -12,10 +13,10 @@ import androidx.room.*
 class Subscription(
     @PrimaryKey val id: Long,
     val podcastID: Long,
-    @Ignore var podcast: Podcast? = null,
+    @Ignore var podcast: MutableLiveData<Podcast>,
     val oldestUnlistenedEpisodeID: Long,
     val positionsJson: ByteArray) {
 
   constructor(id: Long, podcastID: Long, oldestUnlistenedEpisodeID: Long, positionsJson: ByteArray)
-      : this(id, podcastID, null, oldestUnlistenedEpisodeID, positionsJson)
+      : this(id, podcastID, MutableLiveData(), oldestUnlistenedEpisodeID, positionsJson)
 }

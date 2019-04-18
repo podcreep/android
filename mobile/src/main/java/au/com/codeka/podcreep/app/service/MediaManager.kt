@@ -10,9 +10,9 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.sync.EpisodeOld
+import au.com.codeka.podcreep.model.store.Episode
+import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.sync.PlaybackStateOld
-import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.model.sync.SubscriptionInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
@@ -33,8 +33,8 @@ class MediaManager(
   private var _metadata = MediaMetadataCompat.Builder()
   private var _mediaPlayer: MediaPlayer? = null
 
-  private var _currPodcast: PodcastInfo? = null
-  private var _currEpisode: EpisodeOld? = null
+  private var _currPodcast: Podcast? = null
+  private var _currEpisode: Episode? = null
   private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
   private var _updateQueued = false
 
@@ -47,14 +47,11 @@ class MediaManager(
     updateState(false)
   }
 
-  fun play(podcast: PodcastInfo, episode: EpisodeOld) {
+  fun play(podcast: Podcast, episode: Episode) {
     _currPodcast = podcast
     _currEpisode = episode
 
-    var offset = 0
-    if (podcast.subscription != null && podcast.subscription.positions[episode.id] != null) {
-      offset = podcast.subscription.positions.getValue(episode.id)
-    }
+    val offset = episode.position ?: 0
 
     // TODO: obviously we should do better than this!
     val uri = Uri.parse(episode.mediaUrl)

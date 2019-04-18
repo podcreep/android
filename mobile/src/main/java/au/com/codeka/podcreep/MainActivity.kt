@@ -16,7 +16,6 @@ import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
@@ -25,8 +24,10 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
+import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.app.service.SyncService
+import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
 import com.google.android.material.navigation.NavigationView
@@ -58,7 +59,12 @@ class MainActivity : AppCompatActivity() {
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
     ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner) }
     ss.register<DetailsScreen> {
-      _: ScreenContext, params: Array<Any>? -> DetailsScreen(App.i.taskRunner, params?.get(0) as PodcastInfo)
+      _: ScreenContext,
+      params: Array<Any>? -> {
+        @Suppress("UNCHECKED_CAST")
+        val podcast = params?.get(0) as LiveData<Podcast>
+        DetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
+      }()
     }
     screenStack = ss
 
@@ -67,7 +73,7 @@ class MainActivity : AppCompatActivity() {
       Server.updateCookie(s.getString(Settings.COOKIE))
 
       // TODO: go back to the screen you were on.
-      ss.push(DiscoverScreen(App.i.taskRunner))
+      ss.push(SubscriptionsScreen(App.i.store))
     } else {
       ss.push(WelcomeScreen())
     }

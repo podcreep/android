@@ -15,8 +15,8 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import au.com.codeka.podcreep.MainActivity
 import au.com.codeka.podcreep.R
-import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastInfo
+import au.com.codeka.podcreep.model.store.Episode
+import au.com.codeka.podcreep.model.store.Podcast
 
 /**
  * NotificationManager manages our various notifications. It keeps it updated, makes sure it's displaying the correct
@@ -61,7 +61,7 @@ class NotificationManager(
     }
   }
 
-  fun refresh(podcast: PodcastInfo, episode: EpisodeOld, sessionToken: MediaSessionCompat.Token) {
+  fun refresh(podcast: Podcast, episode: Episode, sessionToken: MediaSessionCompat.Token) {
     _builder.apply {
       // Add the metadata for the currently playing episode.
       setContentTitle(podcast.title)
@@ -119,7 +119,6 @@ class NotificationManager(
           )
       )
     }
-
   }
 
   @RequiresApi(Build.VERSION_CODES.O)

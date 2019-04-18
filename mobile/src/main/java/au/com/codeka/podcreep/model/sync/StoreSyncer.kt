@@ -57,9 +57,12 @@ class StoreSyncer(s: Store) {
               title = ep.title,
               description = ep.description,
               mediaUrl = ep.mediaUrl,
-              pubDate = pubDateFmt.parse(ep.pubDate)))
+              pubDate = pubDateFmt.parse(ep.pubDate),
+              position = sub.positions[ep.id]))
         }
       }
+
+      // TODO: any positions that aren't in podcasts.episodes, update those
     }
   }
 }

@@ -26,7 +26,7 @@ class SubscriptionsLayout(
   private val adapter: Adapter
 
   interface Callbacks {
-    fun onViewPodcastClick(podcast: Podcast)
+    fun onViewPodcastClick(podcast: LiveData<Podcast>)
   }
   init {
     View.inflate(context, R.layout.subscriptions, this)
@@ -79,11 +79,11 @@ class SubscriptionsLayout(
     : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(subscription: Subscription) {
-      binding.podcast = subscription.podcast
+      binding.podcast = subscription.podcast.value
       binding.executePendingBindings()
       binding.root.setOnClickListener {
         run {
-          callbacks.onViewPodcastClick(subscription.podcast!!)
+          callbacks.onViewPodcastClick(subscription.podcast)
         }
       }
     }

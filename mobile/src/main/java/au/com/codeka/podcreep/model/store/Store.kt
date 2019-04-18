@@ -3,6 +3,7 @@ package au.com.codeka.podcreep.model.store
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
@@ -38,7 +39,9 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
         for (s in it) {
           for (p in podcasts) {
             if (s.podcastID == p.id) {
-              s.podcast = p
+              taskRunner.runTask({
+                s.podcast.value = p
+              }, Threads.UI)
               break
             }
           }
@@ -49,5 +52,9 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
       }, Threads.BACKGROUND)
     }
     return converter
+  }
+
+  fun episodes(podcastID: Long): LiveData<List<Episode>> {
+    return localStore.episodes().get(podcastID)
   }
 }

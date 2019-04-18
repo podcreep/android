@@ -1,33 +1,24 @@
 package au.com.codeka.podcreep.app.podcasts.details
 
-import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastInfo
+import au.com.codeka.podcreep.model.store.Episode
+import au.com.codeka.podcreep.model.store.Podcast
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DetailsRowViewModel(val podcast: PodcastInfo, val episode: EpisodeOld) {
-  private val epDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+class DetailsRowViewModel(val podcast: Podcast, val episode: Episode) {
   private val displayDateFormat = SimpleDateFormat("dd'\n'MMM", Locale.US)
 
   fun getDate(): String {
-    return displayDateFormat.format(epDateFormat.parse(episode.pubDate))
+    return displayDateFormat.format(episode.pubDate)
   }
 
   fun isInProgress(): Boolean {
-    if (podcast.subscription == null) {
-      return false
-    }
-
-    val pos = podcast.subscription.positions[episode.id]
+    val pos = episode.position
     return (pos != null && pos > 0)
   }
 
   fun getProgressDisplay(): String {
-    if (podcast.subscription == null) {
-      return "--:--"
-    }
-
-    val pos = podcast.subscription.positions.get(episode.id)
+    val pos = episode.position
     if (pos == null || pos <= 0) {
       return "--:--"
     }

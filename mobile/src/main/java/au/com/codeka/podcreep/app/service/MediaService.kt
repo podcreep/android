@@ -7,6 +7,8 @@ import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import au.com.codeka.podcreep.App
+import au.com.codeka.podcreep.model.store.Episode
+import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.sync.EpisodeOld
 import au.com.codeka.podcreep.model.sync.PodcastInfo
 import com.squareup.moshi.KotlinJsonAdapterFactory
@@ -53,8 +55,8 @@ class MediaService : MediaBrowserServiceCompat() {
       val moshi = Moshi.Builder()
           .add(KotlinJsonAdapterFactory())
           .build()
-      val podcast = moshi.adapter<PodcastInfo>(PodcastInfo::class.java).fromJson(podcastStr)!!
-      val episode = moshi.adapter<EpisodeOld>(EpisodeOld::class.java).fromJson(episodeStr)!!
+      val podcast = moshi.adapter<Podcast>(PodcastInfo::class.java).fromJson(podcastStr)!!
+      val episode = moshi.adapter<Episode>(EpisodeOld::class.java).fromJson(episodeStr)!!
 
       // Display the notification and place the service in the foreground
       notificationManager.refresh(podcast, episode, session.sessionToken)
@@ -73,8 +75,8 @@ class MediaService : MediaBrowserServiceCompat() {
   override fun onGetRoot(
       clientPackageName: String,
       clientUid: Int,
-      rootHints: Bundle?): MediaBrowserServiceCompat.BrowserRoot? {
-    return MediaBrowserServiceCompat.BrowserRoot("root", null)
+      rootHints: Bundle?): BrowserRoot? {
+    return BrowserRoot("root", null)
   }
 
   override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {

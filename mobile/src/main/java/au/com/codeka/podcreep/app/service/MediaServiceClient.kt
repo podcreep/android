@@ -7,6 +7,8 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import au.com.codeka.podcreep.MainActivity
+import au.com.codeka.podcreep.model.store.Episode
+import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.sync.EpisodeOld
 import au.com.codeka.podcreep.model.sync.PodcastInfo
 
@@ -64,7 +66,7 @@ class MediaServiceClient {
     callbacks.remove(callback)
   }
 
-  fun play(podcast: PodcastInfo, episode: EpisodeOld) {
+  fun play(podcast: Podcast, episode: Episode) {
     val mediaIdBuilder = MediaIdBuilder()
     mediaController?.transportControls?.playFromMediaId(
         mediaIdBuilder.getMediaId(podcast, episode), null)

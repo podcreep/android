@@ -1,7 +1,7 @@
 package au.com.codeka.podcreep.app.service
 
-import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastInfo
+import au.com.codeka.podcreep.model.store.Episode
+import au.com.codeka.podcreep.model.store.Podcast
 import java.util.*
 
 /**
@@ -10,14 +10,14 @@ import java.util.*
 class MediaIdBuilder {
 
   companion object {
-    private val mapping: TreeMap<String, Pair<PodcastInfo, EpisodeOld>> = TreeMap()
+    private val mapping: TreeMap<String, Pair<Podcast, Episode>> = TreeMap()
   }
 
-  fun parse(mediaId: String): Pair<PodcastInfo, EpisodeOld>? {
+  fun parse(mediaId: String): Pair<Podcast, Episode>? {
     return mapping[mediaId]
   }
 
-  fun getMediaId(podcast: PodcastInfo, episode: EpisodeOld): String {
+  fun getMediaId(podcast: Podcast, episode: Episode): String {
     val id = Random().nextInt().toString()
     mapping[id] = Pair(podcast, episode)
     return id
