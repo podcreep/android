@@ -5,9 +5,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.databinding.DiscoverTrendingRowBinding
+import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.model.sync.PodcastListOld
 import au.com.codeka.podcreep.net.HttpRequest
@@ -24,6 +27,7 @@ class TrendingTabLayout(
   init {
     setHasFixedSize(true)
     layoutManager = _layoutManager
+
 
     taskRunner.runTask({
       val request = Server.request("/api/podcasts")
@@ -64,7 +68,9 @@ class TrendingTabLayout(
       binding.executePendingBindings()
       binding.root.setOnClickListener {
         run {
-          callbacks.onViewPodcastClick(podcast)
+          val ld = MutableLiveData<Podcast>()
+          ld.value = Podcast(id = podcast.id, title = podcast.title, description = podcast.description, imageUrl = podcast.imageUrl)
+          callbacks.onViewPodcastClick(ld)
         }
       }
     }

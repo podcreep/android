@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
     ss.register<WelcomeScreen> { _: ScreenContext, _: Array<Any>? -> WelcomeScreen() }
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
-    ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner) }
+    ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner, App.i.store) }
     ss.register<DetailsScreen> {
       _: ScreenContext,
       params: Array<Any>? -> {
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         }
         R.id.nav_discover -> {
           ss.home()
-          ss.push(DiscoverScreen(App.i.taskRunner))
+          ss.push(DiscoverScreen(App.i.taskRunner, App.i.store))
           true
         }
         R.id.nav_refresh -> {
