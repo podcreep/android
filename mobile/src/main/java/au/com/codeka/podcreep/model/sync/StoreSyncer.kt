@@ -10,6 +10,9 @@ import com.squareup.moshi.Moshi
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * StoreSyncer is used to sync our local store with the server.
+ */
 class StoreSyncer(s: Store) {
   companion object {
     const val TAG = "StoreSyncer"
@@ -46,8 +49,7 @@ class StoreSyncer(s: Store) {
           id = sub.id,
           podcastID = sub.podcastID,
           oldestUnlistenedEpisodeID = sub.oldestUnlistenedEpisodeID,
-          positionsJson = positionsJson
-      ))
+          positionsJson = positionsJson))
 
       if (podcast.episodes != null) {
         for (ep in podcast.episodes) {

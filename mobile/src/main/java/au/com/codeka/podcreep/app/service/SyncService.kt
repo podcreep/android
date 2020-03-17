@@ -15,8 +15,9 @@ import au.com.codeka.podcreep.net.Server
 import java.lang.Exception
 
 /**
- * SyncService's job is to synchronize the local database with the server. We'll also notify the user of any new
- * episodes for podcasts they've asked to be notified about, and download the media file for any as well.
+ * SyncService's job is to synchronize the local database with the server. We'll also notify the
+ * user of any new episodes for podcasts they've asked to be notified about, and download the media
+ * file for any as well.
  */
 class SyncService : Service() {
   private lateinit var taskRunner: TaskRunner

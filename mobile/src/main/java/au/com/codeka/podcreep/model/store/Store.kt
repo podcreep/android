@@ -3,7 +3,6 @@ package au.com.codeka.podcreep.model.store
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads

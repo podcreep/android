@@ -1,5 +1,6 @@
 package au.com.codeka.podcreep.app.service
 
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
@@ -38,6 +39,12 @@ class MediaManager(
   private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
   private var _updateQueued = false
 
+  // We update the metadata at the same time as playback state, but we don't want to update the
+  // metadata over and over if nothing changes, so this keeps track of the last podcast/episode
+  // that we updated the metadata for.
+  private var _lastPodcast: Podcast? = null
+  private var _lastEpisode: Episode? = null
+
   private val handler = Handler()
 
   val playbackState: PlaybackStateCompat.Builder
@@ -56,7 +63,10 @@ class MediaManager(
     // TODO: obviously we should do better than this!
     val uri = Uri.parse(episode.mediaUrl)
     _mediaPlayer = MediaPlayer().apply {
-      setAudioStreamType(AudioManager.STREAM_MUSIC)
+      setAudioAttributes(AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_MEDIA)
+          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .build())
       setDataSource(service, uri)
       prepare()
       seekTo(offset * 1000)
@@ -96,6 +106,26 @@ class MediaManager(
         PlaybackStateCompat.ACTION_PAUSE or
         PlaybackStateCompat.ACTION_PLAY_PAUSE)
 
+    if (_currEpisode != _lastEpisode && _currPodcast != _lastPodcast) {
+      if (_currEpisode != null && _currPodcast != null) {
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, _currPodcast!!.title)
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, _currPodcast!!.title)
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, _currEpisode!!.title)
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, _currPodcast!!.imageUrl)
+        _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, _mediaPlayer!!.duration.toLong())
+      } else {
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, "")
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "")
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "")
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "")
+        _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+      }
+      mediaSession.setMetadata(_metadata.build())
+
+      _lastEpisode = _currEpisode
+      _lastPodcast = _currPodcast
+    }
+
     if (_mediaPlayer == null) {
       _playbackState.setState(
           PlaybackStateCompat.STATE_NONE, 0, 1.0f, SystemClock.elapsedRealtime())
@@ -116,15 +146,6 @@ class MediaManager(
       }
     }
     mediaSession.setPlaybackState(_playbackState.build())
-
-    if (_currEpisode != null && _currPodcast != null) {
-      _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, _currPodcast!!.title)
-      _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, _currPodcast!!.title)
-      _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, _currEpisode!!.title)
-      _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, _currPodcast!!.imageUrl)
-      _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, _mediaPlayer!!.duration.toLong())
-      mediaSession.setMetadata(_metadata.build())
-    }
 
     if (updateServer) {
       updateServerState()
