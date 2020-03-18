@@ -18,7 +18,7 @@ class Settings(context: Context) {
   private var preferences: SharedPreferences = context.getSharedPreferences("prefs", 0)
 
   fun getString(key: Key): String {
-    return preferences.getString(key.name(), "")
+    return preferences.getString(key.name(), "")!!
   }
 
   fun putString(key: Key, value: String) {

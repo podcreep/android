@@ -5,18 +5,21 @@ import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
 import java.util.ArrayList
 import android.support.v4.media.MediaDescriptionCompat
-import au.com.codeka.podcreep.concurrency.TaskRunner
-import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.model.sync.SubscriptionInfo
-import au.com.codeka.podcreep.net.HttpRequest
-import au.com.codeka.podcreep.net.Server
+import android.util.Log
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import au.com.codeka.podcreep.model.store.Store
+import au.com.codeka.podcreep.model.store.Subscription
+import au.com.codeka.podcreep.util.observeOnce
 
+class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: LifecycleOwner) {
+  private val subscriptions = store.subscriptions()
 
-class BrowseTreeGenerator(private val taskRunner: TaskRunner) {
   fun onLoadChildren(
       parentId: String,
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
 
+    Log.i("DEANH", "onLoadChildren($parentId)")
     val parts = parentId.split(':')
     when (parts[0]) {
       "root" -> {
@@ -26,13 +29,16 @@ class BrowseTreeGenerator(private val taskRunner: TaskRunner) {
         onLoadSubscriptionsChildren(result)
       }
       "sub" -> {
-        if (parts.size == 1) {
-          onLoadSubscriptionChildren(parts[1], result)
+        if (parts.size == 2) {
+          onLoadSubscriptionChildren(parts[1].toLong(), result)
         } else {
           // TODO: handle error
+          Log.i("DEANH", "parts.size != 1 $parentId")
+          result.sendResult(ArrayList())
         }
       } else -> {
         // TODO: this is actually an error.
+        Log.i("DEANH", "Unknown parentId: $parentId")
         result.sendResult(ArrayList())
       }
     }
@@ -60,31 +66,55 @@ class BrowseTreeGenerator(private val taskRunner: TaskRunner) {
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
     result.detach()
 
-    // TODO: this should be stored locally, etc etc.
-    taskRunner.runTask({
-      val request = Server.request("/api/subscriptions")
-          .method(HttpRequest.Method.GET)
+    subscriptions.observeOnce(lifecycleOwner, Observer {
+      subscriptions -> run {
+        Log.i("DEANH", "subscriptions() observed... and updated!")
+        populateSubscriptionsResult(result, subscriptions)
+      }
+    })
+  }
+
+  private fun populateSubscriptionsResult(
+      result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>,
+      subscriptions: List<Subscription>) {
+    val items = ArrayList<MediaBrowserCompat.MediaItem>()
+    for (sub in subscriptions) {
+      val desc = MediaDescriptionCompat.Builder()
+          .setMediaId("sub:${sub.id}")
+          .setTitle(sub.podcast.value?.title)
+          .setIconUri(Uri.parse(sub.podcast.value?.imageUrl))
           .build()
-      var resp = request.execute<List<SubscriptionInfo>>()
-      taskRunner.runTask({
-        val items = ArrayList<MediaBrowserCompat.MediaItem>()
-        for (sub in resp) {
-          val desc = MediaDescriptionCompat.Builder()
-              .setMediaId("sub:${sub.id}")
-              .setTitle(sub.podcast?.title)
-              .setIconUri(Uri.parse(sub.podcast?.imageUrl))
-              .build()
-          items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE))
-        }
-        result.sendResult(items)
-      }, Threads.UI)
-    }, Threads.BACKGROUND)
+      items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE))
+    }
+    result.sendResult(items)
   }
 
   private fun onLoadSubscriptionChildren(
-      subscriptionId: String,
+      subscriptionId: Long,
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
-    // TODO: get the subscription, and get the items.
-    result.sendResult(ArrayList())
+    result.detach()
+    subscriptions.observeOnce(lifecycleOwner, Observer {
+      subscriptions -> run {
+        for (sub in subscriptions) {
+          if (sub.id == subscriptionId) {
+            store.episodes(sub.podcastID).observeOnce(lifecycleOwner, Observer {
+              episodes -> run {
+                val items = ArrayList<MediaBrowserCompat.MediaItem>()
+                for (ep in episodes) {
+                  val podcast = sub.podcast.value!!
+                  val desc = MediaDescriptionCompat.Builder()
+                      .setMediaId(MediaIdBuilder().getMediaId(podcast, ep))
+                      .setTitle(ep.title)
+                      .setIconUri(Uri.parse(podcast.imageUrl))
+                      .build()
+                  items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+                }
+                result.sendResult(items)
+              }
+            })
+          }
+        }
+      }
+    })
   }
 }

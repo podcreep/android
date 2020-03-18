@@ -6,6 +6,9 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem
 import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -17,7 +20,7 @@ import com.squareup.moshi.Moshi
 /**
  * This is the main media service for Pod Creep. It handles playback and also
  */
-class MediaService : MediaBrowserServiceCompat() {
+class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
   companion object {
     private const val TAG = "MediaService"
   }
@@ -27,6 +30,7 @@ class MediaService : MediaBrowserServiceCompat() {
   private lateinit var notificationManager: NotificationManager
   private lateinit var browseTreeGenerator: BrowseTreeGenerator
   private lateinit var audioFocusManager: AudioFocusManager
+  private var lifecycle = LifecycleRegistry(this)
 
   override fun onCreate() {
     super.onCreate()
@@ -42,7 +46,9 @@ class MediaService : MediaBrowserServiceCompat() {
     notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
-    browseTreeGenerator = BrowseTreeGenerator(App.i.taskRunner)
+    browseTreeGenerator = BrowseTreeGenerator(App.i.store, this)
+
+    lifecycle.currentState = Lifecycle.State.RESUMED
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -69,6 +75,7 @@ class MediaService : MediaBrowserServiceCompat() {
   }
 
   override fun onDestroy() {
+    lifecycle.currentState = Lifecycle.State.DESTROYED
     session.release()
   }
 
@@ -148,5 +155,9 @@ class MediaService : MediaBrowserServiceCompat() {
     override fun onPlayFromSearch(query: String?, extras: Bundle?) {
       Log.i(TAG, "onPlayFromSearch($query)")
     }
+  }
+
+  override fun getLifecycle(): Lifecycle {
+    return lifecycle
   }
 }

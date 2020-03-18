@@ -51,5 +51,4 @@ class PlayPauseButton(context: Context, attrs: AttributeSet) : ImageView(context
     val animatedVector = ContextCompat.getDrawable(context, mode.drawableRes)
     this.setImageDrawable(animatedVector)
   }
-
 }

@@ -1,6 +1,7 @@
 package au.com.codeka.podcreep.model.store
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.room.Room
@@ -19,25 +20,27 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
    */
   val localStore: LocalStore = Room
       .databaseBuilder(applicationContext, LocalStore::class.java, "local-store")
-      // We'll just allow database upgrades to drop the data store, since it's just a cache of the server
-      // anyway, it shouldn't be a big deal.
+      // We'll just allow database upgrades to drop the data store, since it's just a cache of the
+      // server anyway, it shouldn't be a big deal.
       .fallbackToDestructiveMigration()
       .build()
 
   /**
-   * Gets a list of the subscriptions the user has subscribed to. We'll also keep the podcast within the subscription
-   * updated as well.
+   * Gets a list of the subscriptions the user has subscribed to. We'll also keep the podcast within
+   * the subscription updated as well.
    */
   fun subscriptions(): LiveData<List<Subscription>> {
     val subscriptions = localStore.subscriptions().get()
 
     val converter = MediatorLiveData<List<Subscription>>()
     converter.addSource(subscriptions) {
+      Log.i("DEANH", "subscriptions() got an updating, adding the podcast details...")
       taskRunner.runTask({
         val podcasts = localStore.podcasts().getSync()
         for (s in it) {
           for (p in podcasts) {
             if (s.podcastID == p.id) {
+              Log.i("DEANH", "Setting podcast: ${p.title}")
               taskRunner.runTask({
                 s.podcast.value = p
               }, Threads.UI)
@@ -46,6 +49,7 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
           }
         }
         taskRunner.runTask({
+          Log.i("DEANH", "setting value to $it")
           converter.value = it
         }, Threads.UI)
       }, Threads.BACKGROUND)

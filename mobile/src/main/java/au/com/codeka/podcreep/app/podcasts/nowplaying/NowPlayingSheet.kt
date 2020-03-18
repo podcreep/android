@@ -20,6 +20,7 @@ import au.com.codeka.podcreep.databinding.NowPlayingHeaderCollapsedBinding
 import au.com.codeka.podcreep.databinding.NowPlayingHeaderExpandedBinding
 import au.com.codeka.podcreep.databinding.NowPlayingSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlin.math.abs
 
 /**
  * The {@link NowPlayingSheet} is displayed at the bottom of the screen, you can drag it up to
@@ -77,7 +78,7 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
     MediaServiceClient.i.addCallback(mediaCallback)
 
     val behavior = BottomSheetBehavior.from(this)
-    behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+    behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
       override fun onStateChanged(bottomSheet: View, newState: Int) {
         if (lastState == BottomSheetBehavior.STATE_SETTLING
             || lastState == BottomSheetBehavior.STATE_DRAGGING) {
@@ -91,7 +92,7 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
       }
 
       override fun onSlide(bottomSheet: View, slideOffset: Float) {
-        val opacity = Math.abs(slideOffset)
+        val opacity = abs(slideOffset)
         findViewById<ImageView>(R.id.large_podcast_logo).alpha = opacity
       }
     })
