@@ -42,7 +42,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
         MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
-    mediaManager = MediaManager(this, session, App.i.taskRunner)
+    mediaManager = MediaManager(this, session, App.i.taskRunner, App.i.store)
     notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
     audioFocusManager = AudioFocusManager(this, mediaManager)
 

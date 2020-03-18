@@ -60,4 +60,8 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
   fun episodes(podcastID: Long): LiveData<List<Episode>> {
     return localStore.episodes().get(podcastID)
   }
+
+  fun episode(podcastID: Long, episodeID: Long): LiveData<Episode> {
+    return localStore.episodes().get(podcastID, episodeID)
+  }
 }

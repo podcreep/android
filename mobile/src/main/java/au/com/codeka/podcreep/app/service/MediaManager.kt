@@ -13,10 +13,12 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
+import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.model.sync.PlaybackStateOld
 import au.com.codeka.podcreep.model.sync.SubscriptionInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
+import au.com.codeka.podcreep.util.observeOnce
 
 /**
  * MediaManager manages the actual playback of the media.
@@ -24,7 +26,8 @@ import au.com.codeka.podcreep.net.Server
 class MediaManager(
     private val service: MediaService,
     private val mediaSession: MediaSessionCompat,
-    private val taskRunner: TaskRunner) {
+    private val taskRunner: TaskRunner,
+    private val store: Store) {
 
   companion object {
     private const val SERVER_UPDATE_FREQUENCY_SECONDS = 20
@@ -106,12 +109,14 @@ class MediaManager(
         PlaybackStateCompat.ACTION_PAUSE or
         PlaybackStateCompat.ACTION_PLAY_PAUSE)
 
-    if (_currEpisode != _lastEpisode && _currPodcast != _lastPodcast) {
-      if (_currEpisode != null && _currPodcast != null) {
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, _currPodcast!!.title)
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, _currPodcast!!.title)
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, _currEpisode!!.title)
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, _currPodcast!!.imageUrl)
+    val currPodcast = _currPodcast
+    val currEpisode = _currEpisode
+    if (currEpisode != _lastEpisode && currPodcast != _lastPodcast) {
+      if (currEpisode != null && currPodcast != null) {
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currPodcast.title)
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currPodcast.title)
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currEpisode.title)
+        _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, currPodcast.imageUrl)
         _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, _mediaPlayer!!.duration.toLong())
       } else {
         _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, "")
@@ -122,8 +127,8 @@ class MediaManager(
       }
       mediaSession.setMetadata(_metadata.build())
 
-      _lastEpisode = _currEpisode
-      _lastPodcast = _currPodcast
+      _lastEpisode = currEpisode
+      _lastPodcast = currPodcast
     }
 
     if (_mediaPlayer == null) {
@@ -154,6 +159,12 @@ class MediaManager(
       if (_timeToServerUpdate <= 0) {
         updateServerState()
       }
+    }
+
+    // Update our internal store of the position.
+    if (currPodcast != null && currEpisode != null) {
+      currEpisode.position = _mediaPlayer!!.currentPosition / 1000
+      taskRunner.runTask({ store.localStore.episodes().insert(currEpisode) }, Threads.BACKGROUND)
     }
 
     if (!_updateQueued) {

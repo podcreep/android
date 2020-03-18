@@ -29,6 +29,7 @@ class StoreSyncer(s: Store) {
 
   fun sync(resp: SubscriptionsSyncPostResponse) {
     Log.i(TAG, "Beginning sync")
+    Log.i(TAG, moshi.adapter(SubscriptionsSyncPostResponse::class.java).toJson(resp))
 
     for (sub in resp.subscriptions) {
       Log.i(TAG, "Syncing subscription '${sub.podcast?.title}'")
