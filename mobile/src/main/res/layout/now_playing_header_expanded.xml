@@ -22,7 +22,7 @@
       android:contentDescription="@string/contentdesc_podcast_logo"
       android:layout_width="64dp"
       android:layout_height="64dp"
-      android:layout_below="@id/progress"
+      android:layout_alignParentTop="true"
       android:layout_alignParentStart="true"
       android:layout_marginEnd="8dp"
       app:imageUrl="@{vm.albumArtUri}"
