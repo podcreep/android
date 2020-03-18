@@ -66,6 +66,10 @@ class StoreSyncer(s: Store) {
       }
 
       // TODO: any positions that aren't in podcasts.episodes, update those
+
+      // TODO: we should compare our position with the servers and only take the latest value
+      // (currently we don't store when the position was changed, but if the android client is
+      // offline while we're listening, for example, we don't update the server).
     }
   }
 }
