@@ -24,6 +24,7 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
+import android.widget.TextView
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.app.service.SyncService
@@ -31,6 +32,8 @@ import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.drawer_header.view.*
+import kotlinx.android.synthetic.main.now_playing_sheet.view.*
 
 
 /** The main, in fact one-and-only activity. */
@@ -89,7 +92,7 @@ class MainActivity : AppCompatActivity() {
       }
     })
 
-    findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener {
+    nav_view.setNavigationItemSelectedListener {
       when (it.itemId) {
         R.id.nav_subscriptions -> {
           ss.home()
@@ -108,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         else -> false
       }
     }
+    nav_view.getHeaderView(0).app_version.text = String.format("v%s", BuildConfig.VERSION_NAME)
 
     MediaServiceClient.i.addCallback(mediaCallback)
   }
