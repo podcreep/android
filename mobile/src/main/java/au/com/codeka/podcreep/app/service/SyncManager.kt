@@ -91,6 +91,10 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
 
   private fun enqueueWorker() {
     val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS)
+        .setConstraints(Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresStorageNotLow(true)
+            .build())
         .build()
     WorkManager.getInstance(context).enqueue(workRequest).result.get()
     Log.i(TAG, String.format("New worker enqueued, ID: %s", workRequest.id.toString()))
