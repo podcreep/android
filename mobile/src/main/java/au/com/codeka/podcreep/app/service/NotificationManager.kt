@@ -19,8 +19,8 @@ import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 
 /**
- * NotificationManager manages our various notifications. It keeps it updated, makes sure it's displaying the correct
- * state, handles button presses and so on.
+ * NotificationManager manages our various notifications. It keeps it updated, makes sure it's
+ * displaying the correct state, handles button presses and so on.
  */
 class NotificationManager(
     private val service: Service,

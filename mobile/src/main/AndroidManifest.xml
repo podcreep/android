@@ -44,12 +44,5 @@
         <action android:name="android.media.browse.MediaBrowserService" />
       </intent-filter>
     </service>
-
-    <!--
-     Sync service handles syncing the database with the server, and also downloading new episodes as needed.
-    -->
-    <service
-        android:name=".app.service.SyncService"
-        android:exported="false" />
   </application>
 </manifest>

@@ -16,6 +16,7 @@ class Settings(context: Context) {
   companion object Keys {
     var COOKIE = Key("cookie", ValueType.STRING)
     var LAST_SYNC_TIME = Key("last_sync_type", ValueType.DATE)
+    var SYNC_WORK_ID = Key("sync_work_id", ValueType.STRING)
   }
 
   private var preferences: SharedPreferences = context.getSharedPreferences("prefs", 0)

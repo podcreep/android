@@ -1,6 +1,5 @@
 package au.com.codeka.podcreep
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -24,16 +23,13 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
-import android.widget.TextView
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
-import au.com.codeka.podcreep.app.service.SyncService
+import au.com.codeka.podcreep.app.service.SyncManager
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
-import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.drawer_header.view.*
-import kotlinx.android.synthetic.main.now_playing_sheet.view.*
 
 
 /** The main, in fact one-and-only activity. */
@@ -50,8 +46,11 @@ class MainActivity : AppCompatActivity() {
     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-    // Perform a server refresh, if we haven't done one for a while.
-    SyncService.maybeSync(this)
+    // Make sure the sync worker is set up to periodically sync with the server. Also, do a sync now
+    // if we haven't done one in a while.
+    val syncManager = SyncManager(this, App.i.taskRunner)
+    syncManager.maybeEnqueue()
+    syncManager.maybeSync()
 
     val actionbarSizeTypedArray = obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
     actionBarHeight = actionbarSizeTypedArray.getDimension(0, 0f).toInt()
@@ -108,7 +107,7 @@ class MainActivity : AppCompatActivity() {
           true
         }
         R.id.nav_refresh -> {
-          SyncService.sync(this)
+          SyncManager(this, App.i.taskRunner).sync()
           true
         }
         else -> false
