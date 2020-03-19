@@ -50,6 +50,9 @@ class MainActivity : AppCompatActivity() {
     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+    // Perform a server refresh, if we haven't done one for a while.
+    SyncService.maybeSync(this)
+
     val actionbarSizeTypedArray = obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
     actionBarHeight = actionbarSizeTypedArray.getDimension(0, 0f).toInt()
     actionbarSizeTypedArray.recycle()
@@ -105,7 +108,7 @@ class MainActivity : AppCompatActivity() {
           true
         }
         R.id.nav_refresh -> {
-          startService(Intent(this, SyncService::class.java))
+          SyncService.sync(this)
           true
         }
         else -> false

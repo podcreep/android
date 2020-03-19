@@ -83,6 +83,11 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
       clientPackageName: String,
       clientUid: Int,
       rootHints: Bundle?): BrowserRoot? {
+
+    // If someone's getting our root node, we'll do a sync now so we'll be ready when they request
+    // our non-root nodes.
+    SyncService.maybeSync(this)
+
     return BrowserRoot("root", null)
   }
 

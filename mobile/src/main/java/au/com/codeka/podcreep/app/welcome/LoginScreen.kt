@@ -39,7 +39,7 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
               .build()
           val resp = request.execute<LoginResponse>()
           val s = Settings(context.activity)
-          s.putString(Settings.COOKIE, resp.cookie)
+          s.put(Settings.COOKIE, resp.cookie)
           Server.updateCookie(resp.cookie)
 
           taskRunner.runTask({
