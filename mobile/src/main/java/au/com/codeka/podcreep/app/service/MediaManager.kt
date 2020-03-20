@@ -16,7 +16,8 @@ import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
-import au.com.codeka.podcreep.model.sync.PlaybackStateOld
+import au.com.codeka.podcreep.model.sync.PlaybackState
+import au.com.codeka.podcreep.model.sync.PlaybackStateSyncer
 import au.com.codeka.podcreep.model.sync.SubscriptionInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
@@ -216,19 +217,10 @@ class MediaManager(
   private fun updateServerState() {
     _timeToServerUpdate = SERVER_UPDATE_FREQUENCY_SECONDS
 
-    taskRunner.runTask({
-      val podcastID = _currPodcast?.id ?: return@runTask
-      val episodeID = _currEpisode?.id ?: return@runTask
-      val position = _mediaPlayer?.currentPosition ?: return@runTask
-      val state = PlaybackStateOld(podcastID, episodeID, position / 1000)
-
-      val url = "/api/podcasts/$podcastID/episodes/$episodeID/playback-state"
-      val request = Server.request(url)
-          .method(HttpRequest.Method.PUT)
-          .body(state)
-          .build()
-      request.execute<SubscriptionInfo>()
-      // TODO: do something with subscription?
-    }, Threads.BACKGROUND)
+    val podcastID = _currPodcast?.id ?: return
+    val episodeID = _currEpisode?.id ?: return
+    val position = _mediaPlayer?.currentPosition ?: return
+    val state = PlaybackState(podcastID, episodeID, position / 1000)
+    PlaybackStateSyncer(service, taskRunner).sync(state)
   }
 }

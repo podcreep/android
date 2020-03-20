@@ -8,11 +8,7 @@ import au.com.codeka.podcreep.Settings
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.sync.StoreSyncer
-import au.com.codeka.podcreep.model.sync.SubscriptionsSyncPostRequest
-import au.com.codeka.podcreep.model.sync.SubscriptionsSyncPostResponse
 import au.com.codeka.podcreep.net.HttpException
-import au.com.codeka.podcreep.net.HttpRequest
-import au.com.codeka.podcreep.net.Server
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -28,7 +24,7 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
 
     /** Actually performs the sync, assumes we're running on some kind of background thread. */
     private fun performSync(context: Context): Boolean {
-      val syncer = StoreSyncer(App.i.store)
+      val syncer = StoreSyncer(context, App.i.store)
 
       try {
         syncer.sync()

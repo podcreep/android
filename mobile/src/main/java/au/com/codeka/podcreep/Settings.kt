@@ -14,9 +14,23 @@ class Settings(context: Context) {
   }
 
   companion object Keys {
-    var COOKIE = Key("cookie", ValueType.STRING)
-    var LAST_SYNC_TIME = Key("last_sync_type", ValueType.DATE)
-    var SYNC_WORK_ID = Key("sync_work_id", ValueType.STRING)
+    /** Our cookie that we use to authenticate with the server. */
+    val COOKIE = Key("cookie", ValueType.STRING)
+
+    /** The last time we sync'd with the server. */
+    val LAST_SYNC_TIME = Key("last_sync_type", ValueType.DATE)
+
+    /**
+     * The WorkItemID for our worker that syncs. We keep track of this to ensure our work item
+     * is always properly scheduled.
+     */
+    val SYNC_WORK_ID = Key("sync_work_id", ValueType.STRING)
+
+    /**
+     * The playback state that we have stored and not yet synced to the server. Once it's synced to
+     * the server, we'll remove it from here. {@see PlaybackStateSyncer}.
+     */
+    val PLAYBACK_STATE_TO_SYNC = Key("playback_state_to_sync", ValueType.STRING)
   }
 
   private var preferences: SharedPreferences = context.getSharedPreferences("prefs", 0)

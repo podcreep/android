@@ -1,5 +1,6 @@
 package au.com.codeka.podcreep.model.sync
 
+import android.content.Context
 import android.util.Log
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -15,7 +16,7 @@ import java.util.*
 /**
  * StoreSyncer is used to sync our local store with the server.
  */
-class StoreSyncer(s: Store) {
+class StoreSyncer(private val context: Context, s: Store) {
   companion object {
     const val TAG = "StoreSyncer"
   }
@@ -31,6 +32,9 @@ class StoreSyncer(s: Store) {
 
   fun sync() {
     Log.i(TAG, "Beginning sync")
+
+    // Attempt to save all our pending playback state, if we have any.
+    PlaybackStateSyncer(context, null).syncPending()
 
     val request = Server.request("/api/subscriptions/sync")
         .method(HttpRequest.Method.POST)
@@ -73,10 +77,6 @@ class StoreSyncer(s: Store) {
       }
 
       // TODO: any positions that aren't in podcasts.episodes, update those
-
-      // TODO: we should compare our position with the servers and only take the latest value
-      // (currently we don't store when the position was changed, but if the android client is
-      // offline while we're listening, for example, we don't update the server).
     }
   }
 }
