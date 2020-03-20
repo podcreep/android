@@ -5,6 +5,7 @@ import android.os.Handler
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.store.Store
+import au.com.codeka.podcreep.net.Server
 
 class App : Application() {
   companion object {
@@ -21,6 +22,11 @@ class App : Application() {
     _taskRunner = TaskRunner()
     _store = Store(this, taskRunner)
     i = this
+
+    val s = Settings(this)
+    if (s.getString(Settings.COOKIE) != "") {
+      Server.updateCookie(s.getString(Settings.COOKIE))
+    }
   }
 
   val taskRunner: TaskRunner

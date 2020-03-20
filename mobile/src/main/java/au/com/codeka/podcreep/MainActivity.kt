@@ -75,8 +75,6 @@ class MainActivity : AppCompatActivity() {
 
     val s = Settings(this)
     if (s.getString(Settings.COOKIE) != "") {
-      Server.updateCookie(s.getString(Settings.COOKIE))
-
       // TODO: go back to the screen you were on.
       ss.push(SubscriptionsScreen(App.i.store))
     } else {
