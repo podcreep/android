@@ -34,13 +34,11 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
 
     val converter = MediatorLiveData<List<Subscription>>()
     converter.addSource(subscriptions) {
-      Log.i("DEANH", "subscriptions() got an updating, adding the podcast details...")
       taskRunner.runTask({
         val podcasts = localStore.podcasts().getSync()
         for (s in it) {
           for (p in podcasts) {
             if (s.podcastID == p.id) {
-              Log.i("DEANH", "Setting podcast: ${p.title}")
               taskRunner.runTask({
                 s.podcast.value = p
               }, Threads.UI)
@@ -49,7 +47,6 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
           }
         }
         taskRunner.runTask({
-          Log.i("DEANH", "setting value to $it")
           converter.value = it
         }, Threads.UI)
       }, Threads.BACKGROUND)

@@ -92,7 +92,6 @@ class MediaServiceClient {
 
   private var controllerCallback = object : MediaControllerCompat.Callback() {
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-      Log.i("DEANH", "metadata changed")
       callbacks.forEach {
         it.onMetadataChanged(metadata)
       }

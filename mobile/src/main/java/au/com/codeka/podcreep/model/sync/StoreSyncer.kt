@@ -5,6 +5,8 @@ import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.model.store.Subscription
+import au.com.codeka.podcreep.net.HttpRequest
+import au.com.codeka.podcreep.net.Server
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.text.SimpleDateFormat
@@ -27,9 +29,14 @@ class StoreSyncer(s: Store) {
   // pubDate will be in a format like: 2019-04-14T03:00:00-07:00
   private val pubDateFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US)
 
-  fun sync(resp: SubscriptionsSyncPostResponse) {
+  fun sync() {
     Log.i(TAG, "Beginning sync")
-    Log.i(TAG, moshi.adapter(SubscriptionsSyncPostResponse::class.java).toJson(resp))
+
+    val request = Server.request("/api/subscriptions/sync")
+        .method(HttpRequest.Method.POST)
+        .body(SubscriptionsSyncPostRequest(false))
+        .build()
+    val resp = request.execute<SubscriptionsSyncPostResponse>()
 
     for (sub in resp.subscriptions) {
       Log.i(TAG, "Syncing subscription '${sub.podcast?.title}'")

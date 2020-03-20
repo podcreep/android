@@ -30,13 +30,8 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
     private fun performSync(context: Context): Boolean {
       val syncer = StoreSyncer(App.i.store)
 
-      val request = Server.request("/api/subscriptions/sync")
-          .method(HttpRequest.Method.POST)
-          .body(SubscriptionsSyncPostRequest(false))
-          .build()
       try {
-        val resp = request.execute<SubscriptionsSyncPostResponse>()
-        syncer.sync(resp)
+        syncer.sync()
       } catch (e: HttpException) {
         Log.e(TAG, "Error", e)
         return false

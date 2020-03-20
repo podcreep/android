@@ -41,10 +41,8 @@ class SubscriptionsLayout(
     if (data != null) {
       adapter.refresh(data)
     }
-    Log.i("DEANH", "observing...")
     subscriptionsLiveData.observe(screen, Observer {
       data -> run {
-          Log.i("DEANH", "observer updated, refreshing ($data)")
           adapter.refresh(data)
         }
     })

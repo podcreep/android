@@ -14,7 +14,6 @@ class TabPagerAdapter(
   : PagerAdapter() {
 
   override fun instantiateItem(container: ViewGroup, position: Int): Any {
-    Log.i("DEANH", "instantiating item for position $position")
     val tab = Tabs.values()[position]
     val view = tab.layoutClass.constructors.first().call(context, taskRunner, callback)
     container.addView(view)
@@ -22,7 +21,6 @@ class TabPagerAdapter(
   }
 
   override fun destroyItem(collection: ViewGroup, position: Int, view: Any) {
-    Log.i("DEANH", "destroying item for position $position")
     collection.removeView(view as View)
   }
 
@@ -35,7 +33,6 @@ class TabPagerAdapter(
   }
 
   override fun getPageTitle(position: Int): CharSequence? {
-    Log.i("DEANH", "getting title for position $position")
     val tab = Tabs.values()[position]
     return context.getString(tab.titleResId)
   }

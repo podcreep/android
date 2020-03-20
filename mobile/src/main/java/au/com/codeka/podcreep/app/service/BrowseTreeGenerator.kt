@@ -19,7 +19,6 @@ class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: 
       parentId: String,
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
 
-    Log.i("DEANH", "onLoadChildren($parentId)")
     val parts = parentId.split(':')
     when (parts[0]) {
       "root" -> {
@@ -33,12 +32,10 @@ class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: 
           onLoadSubscriptionChildren(parts[1].toLong(), result)
         } else {
           // TODO: handle error
-          Log.i("DEANH", "parts.size != 1 $parentId")
           result.sendResult(ArrayList())
         }
       } else -> {
         // TODO: this is actually an error.
-        Log.i("DEANH", "Unknown parentId: $parentId")
         result.sendResult(ArrayList())
       }
     }
@@ -68,7 +65,6 @@ class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: 
 
     subscriptions.observeOnce(lifecycleOwner, Observer {
       subscriptions -> run {
-        Log.i("DEANH", "subscriptions() observed... and updated!")
         populateSubscriptionsResult(result, subscriptions)
       }
     })
