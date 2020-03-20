@@ -25,6 +25,8 @@
 
   <!-- Episodes screens -->
   <string name="play">Play</string>
+  <string name="skip_forward_30">Skip forward</string>
+  <string name="skip_back_10">Skip back</string>
 
   <!-- Notification controls -->
   <string name="pause">Pause</string>

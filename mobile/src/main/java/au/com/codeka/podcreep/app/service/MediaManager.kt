@@ -1,14 +1,16 @@
 package au.com.codeka.podcreep.app.service
 
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
+import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.store.Episode
@@ -18,7 +20,6 @@ import au.com.codeka.podcreep.model.sync.PlaybackStateOld
 import au.com.codeka.podcreep.model.sync.SubscriptionInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
-import au.com.codeka.podcreep.util.observeOnce
 
 /**
  * MediaManager manages the actual playback of the media.
@@ -30,7 +31,12 @@ class MediaManager(
     private val store: Store) {
 
   companion object {
+    private const val TAG = "MediaManager"
+
     private const val SERVER_UPDATE_FREQUENCY_SECONDS = 20
+
+    private const val CUSTOM_ACTION_SKIP_FORWARD = "skip_forward_30"
+    private const val CUSTOM_ACTION_SKIP_BACK = "skip_back_30"
   }
 
   private var _playbackState = PlaybackStateCompat.Builder()
@@ -54,6 +60,19 @@ class MediaManager(
     get() = _playbackState
 
   init {
+    _playbackState.addCustomAction(
+        PlaybackStateCompat.CustomAction.Builder(
+                CUSTOM_ACTION_SKIP_BACK,
+                service.resources.getString(R.string.skip_back_10),
+                R.drawable.ic_rewind_10_24dp)
+            .build())
+    _playbackState.addCustomAction(
+        PlaybackStateCompat.CustomAction.Builder(
+                CUSTOM_ACTION_SKIP_FORWARD,
+                service.resources.getString(R.string.skip_forward_30),
+                R.drawable.ic_forward_30_24dp)
+        .build())
+
     updateState(false)
   }
 
@@ -104,11 +123,15 @@ class MediaManager(
     updateState(true)
   }
 
-  private fun updateState(updateServer: Boolean) {
-    _playbackState.setActions(PlaybackStateCompat.ACTION_PLAY or
-        PlaybackStateCompat.ACTION_PAUSE or
-        PlaybackStateCompat.ACTION_PLAY_PAUSE)
+  fun customAction(action: String?, extras: Bundle?) {
+    when(action) {
+      CUSTOM_ACTION_SKIP_FORWARD -> skipForward()
+      CUSTOM_ACTION_SKIP_BACK -> skipBack()
+      else -> Log.i(TAG, "Unknown custom action: $action")
+    }
+  }
 
+  private fun updateState(updateServer: Boolean) {
     val currPodcast = _currPodcast
     val currEpisode = _currEpisode
     if (currEpisode != _lastEpisode && currPodcast != _lastPodcast) {
@@ -131,11 +154,13 @@ class MediaManager(
       _lastPodcast = currPodcast
     }
 
-    if (_mediaPlayer == null) {
+    val mediaPlayer = _mediaPlayer
+    if (mediaPlayer == null) {
       _playbackState.setState(
           PlaybackStateCompat.STATE_NONE, 0, 1.0f, SystemClock.elapsedRealtime())
+      _playbackState.setActions(getSupportedActions(false))
     } else {
-      val mediaPlayer = _mediaPlayer!!
+      _playbackState.setActions(getSupportedActions(mediaPlayer.isPlaying))
       if (mediaPlayer.isPlaying) {
         _playbackState.setState(
             PlaybackStateCompat.STATE_PLAYING,
@@ -174,6 +199,18 @@ class MediaManager(
       }, 1000)
       _updateQueued = true
     }
+  }
+
+  @PlaybackStateCompat.Actions
+  private fun getSupportedActions(isPlaying: Boolean): Long {
+    val playbackState = PlaybackStateCompat.ACTION_PLAY or
+        PlaybackStateCompat.ACTION_PAUSE or
+        PlaybackStateCompat.ACTION_PLAY_PAUSE or
+        PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
+        PlaybackStateCompat.ACTION_FAST_FORWARD or
+        PlaybackStateCompat.ACTION_REWIND
+
+    return playbackState
   }
 
   private fun updateServerState() {

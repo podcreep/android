@@ -155,6 +155,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
 
     override fun onCustomAction(action: String?, extras: Bundle?) {
       Log.i(TAG, "onCustomAction($action)")
+      mediaManager.customAction(action, extras)
     }
 
     override fun onPlayFromSearch(query: String?, extras: Bundle?) {
