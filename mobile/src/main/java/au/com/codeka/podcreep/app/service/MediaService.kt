@@ -3,12 +3,12 @@ package au.com.codeka.podcreep.app.service
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
-import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import androidx.media.MediaBrowserServiceCompat
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -150,6 +150,22 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
     }
 
     override fun onSkipToPrevious() {
+      mediaManager.skipBack()
+    }
+
+    /**
+     * We pretend fast forward is skip forward. We'll get these events e.g. via steering wheel
+     * buttons in Android Auto.
+     */
+    override fun onFastForward() {
+      mediaManager.skipForward()
+    }
+
+    /**
+     * We pretend rewind is skip backward. We'll get these events e.g. via steering wheel buttons
+     * in Android Auto.
+     */
+    override fun onRewind() {
       mediaManager.skipBack()
     }
 
