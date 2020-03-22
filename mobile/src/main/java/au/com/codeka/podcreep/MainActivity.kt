@@ -119,7 +119,13 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        drawer_layout.openDrawer(GravityCompat.START)
+        if (screenStack?.depth ?: 0 > 1) {
+          // If you're deeper in the screen stack, the home back is "back".
+          screenStack?.pop()
+        } else {
+          // TODO: animate some kind of transition or something?
+          drawer_layout.openDrawer(GravityCompat.START)
+        }
         true
       }
       else -> super.onOptionsItemSelected(item)
@@ -128,6 +134,14 @@ class MainActivity : AppCompatActivity() {
 
   private fun onScreensUpdated(prev: Screen?, current: Screen?) {
     enableActionBar(current?.options?.enableActionBar ?: false)
+
+    // Change the home button to a back button if we're deep in the hierarchy.
+    // TODO: animate the transition
+    if (screenStack!!.depth > 1) {
+      supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp)
+    } else {
+      supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp)
+    }
   }
 
   private fun enableActionBar(enabled: Boolean) {
@@ -163,7 +177,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      // If we're not stopped, then set ourselves visible.
+      // If we're not stopped, then set the now playing control visible.
       var contentMarginPx = 0
       if (state?.state != PlaybackStateCompat.STATE_STOPPED &&
           state?.state != PlaybackStateCompat.STATE_NONE) {

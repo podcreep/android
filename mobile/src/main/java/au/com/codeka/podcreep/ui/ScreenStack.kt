@@ -33,6 +33,10 @@ class ScreenStack(
   val top: Screen?
     get() = if (screens.empty()) null else screens.peek().screen
 
+  /** The number of screens deep in the hierarchy we are. */
+  val depth: Int
+    get() = screens.size
+
   /**
    * Push the given [Screen] onto the stack. The currently visible screen (if any) will
    * become hidden (though not destroyed).
