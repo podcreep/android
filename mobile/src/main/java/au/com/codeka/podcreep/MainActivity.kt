@@ -15,7 +15,6 @@ import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.Threads
-import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
 import au.com.codeka.podcreep.ui.ScreenStack
