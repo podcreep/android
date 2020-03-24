@@ -60,10 +60,10 @@ class StoreSyncer(private val context: Context, s: Store) {
       store.subscriptions().insert(Subscription(
           id = sub.id,
           podcastID = sub.podcastID,
-          oldestUnlistenedEpisodeID = sub.oldestUnlistenedEpisodeID,
           positionsJson = positionsJson))
 
       if (podcast.episodes != null) {
+        Log.i(TAG, "  adding '${podcast.episodes.size}' episodes.")
         for (ep in podcast.episodes) {
           store.episodes().insert(Episode(
               id = ep.id,
@@ -74,6 +74,8 @@ class StoreSyncer(private val context: Context, s: Store) {
               pubDate = pubDateFmt.parse(ep.pubDate),
               position = sub.positions[ep.id]))
         }
+      } else {
+        Log.i(TAG, "  no episodes?")
       }
 
       // TODO: any positions that aren't in podcasts.episodes, update those

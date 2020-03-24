@@ -6,23 +6,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.TaskRunner
-import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
-import au.com.codeka.podcreep.model.sync.EpisodeOld
-import au.com.codeka.podcreep.model.sync.PodcastInfo
-import au.com.codeka.podcreep.net.HttpRequest
-import au.com.codeka.podcreep.net.Server
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
 
 class DetailsScreen(
-    private val taskRunner: TaskRunner,
-    private val store: Store,
-    private val podcastID: Long,
-    private var podcast: LiveData<Podcast>)
-  : Screen() {
+      private val taskRunner: TaskRunner,
+      private val store: Store,
+      private val podcastID: Long,
+      private var podcast: LiveData<Podcast>)
+    : Screen() {
 
   private var layout: DetailsLayout? = null
 

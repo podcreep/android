@@ -23,8 +23,10 @@ import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
 import androidx.lifecycle.LiveData
+import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.app.service.SyncManager
+import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
@@ -61,13 +63,25 @@ class MainActivity : AppCompatActivity() {
     ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
     ss.register<WelcomeScreen> { _: ScreenContext, _: Array<Any>? -> WelcomeScreen() }
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
-    ss.register<DiscoverScreen> { _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner, App.i.store) }
+    ss.register<DiscoverScreen> {
+      _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner, App.i.store)
+    }
     ss.register<DetailsScreen> {
       _: ScreenContext,
       params: Array<Any>? -> {
         @Suppress("UNCHECKED_CAST")
         val podcast = params?.get(0) as LiveData<Podcast>
         DetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
+      }()
+    }
+    ss.register<EpisodeDetailsScreen> {
+      _: ScreenContext,
+      params: Array<Any>? -> {
+        @Suppress("UNCHECKED_CAST")
+        val podcast = params?.get(0) as LiveData<Podcast>
+        @Suppress("UNCHECKED_CAST")
+        val episode = params[0] as LiveData<Episode>
+        EpisodeDetailsScreen(App.i.taskRunner, App.i.store, podcast, episode)
       }()
     }
     screenStack = ss

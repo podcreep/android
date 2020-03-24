@@ -1,7 +1,6 @@
 package au.com.codeka.podcreep.model.store
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.room.Room

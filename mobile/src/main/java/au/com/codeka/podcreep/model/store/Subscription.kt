@@ -14,9 +14,8 @@ class Subscription(
     @PrimaryKey val id: Long,
     val podcastID: Long,
     @Ignore var podcast: MutableLiveData<Podcast>,
-    val oldestUnlistenedEpisodeID: Long,
     val positionsJson: ByteArray) {
 
-  constructor(id: Long, podcastID: Long, oldestUnlistenedEpisodeID: Long, positionsJson: ByteArray)
-      : this(id, podcastID, MutableLiveData(), oldestUnlistenedEpisodeID, positionsJson)
+  constructor(id: Long, podcastID: Long, positionsJson: ByteArray)
+      : this(id, podcastID, MutableLiveData(), positionsJson)
 }
