@@ -13,6 +13,7 @@ import android.util.Log
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.model.cache.EpisodeMediaCache
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
@@ -30,6 +31,7 @@ class MediaManager(
     private val service: MediaService,
     private val mediaSession: MediaSessionCompat,
     private val taskRunner: TaskRunner,
+    private val mediaCache: EpisodeMediaCache,
     private val store: Store) {
 
   companion object {
@@ -84,14 +86,15 @@ class MediaManager(
 
     val offset = episode.position ?: 0
 
-    // TODO: obviously we should do better than this!
-    val uri = Uri.parse(episode.mediaUrl)
+    // TODO: if we haven't downloaded the media yet, instead of just using the live one, we should
+    // start downloading it now and then play from there.
+    val uri = mediaCache.getUri(podcast, episode) ?: Uri.parse(episode.mediaUrl)
     _mediaPlayer = MediaPlayer().apply {
       setAudioAttributes(AudioAttributes.Builder()
           .setUsage(AudioAttributes.USAGE_MEDIA)
           .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
           .build())
-      setDataSource(service, uri)
+      setDataSource(service, uri!!)
       prepare()
       seekTo(offset * 1000)
       start()

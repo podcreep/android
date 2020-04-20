@@ -1,12 +1,14 @@
 package au.com.codeka.podcreep.app.service
 
 import android.net.Uri
+import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
 import java.util.ArrayList
 import android.support.v4.media.MediaDescriptionCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import au.com.codeka.podcreep.model.cache.EpisodeMediaCache
 import au.com.codeka.podcreep.model.cache.PodcastIconCache
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -15,6 +17,7 @@ import au.com.codeka.podcreep.model.store.Subscription
 import au.com.codeka.podcreep.util.observeOnce
 
 class BrowseTreeGenerator(private val store: Store, private val iconCache: PodcastIconCache,
+                          private val mediaCache: EpisodeMediaCache,
                           private val lifecycleOwner: LifecycleOwner) {
   private val subscriptions = store.subscriptions()
 
@@ -143,11 +146,7 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
 
         val items = ArrayList<MediaBrowserCompat.MediaItem>()
         for (ep in episodes) {
-          val desc = MediaDescriptionCompat.Builder()
-              .setMediaId(MediaIdBuilder().getMediaId(podcasts[ep.podcastID]!!, ep))
-              .setTitle(ep.title)
-              .setIconUri(iconCache.getRemoteUri(podcasts[ep.podcastID]!!))
-              .build()
+          val desc = populateEpisode(podcasts[ep.podcastID]!!, ep)
           items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
         }
         result.sendResult(items)
@@ -168,11 +167,7 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
                 val items = ArrayList<MediaBrowserCompat.MediaItem>()
                 for (ep in episodes) {
                   val podcast = sub.podcast.value!!
-                  val desc = MediaDescriptionCompat.Builder()
-                      .setMediaId(MediaIdBuilder().getMediaId(podcast, ep))
-                      .setTitle(ep.title)
-                      .setIconUri(iconCache.getRemoteUri(podcast))
-                      .build()
+                  val desc = populateEpisode(podcast, ep)
                   items.add(
                       MediaBrowserCompat.MediaItem(
                           desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
@@ -188,5 +183,23 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
         }
       }
     })
+  }
+
+  private fun populateEpisode(podcast: Podcast, episode: Episode): MediaDescriptionCompat {
+    val extras = Bundle()
+
+    val downloadStatus = when (mediaCache.getStatus(podcast, episode)) {
+      EpisodeMediaCache.Status.Downloaded -> MediaDescriptionCompat.STATUS_DOWNLOADED
+      EpisodeMediaCache.Status.InProgress -> MediaDescriptionCompat.STATUS_DOWNLOADING
+      EpisodeMediaCache.Status.NotDownloaded -> MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
+    }
+    extras.putLong(MediaDescriptionCompat.EXTRA_DOWNLOAD_STATUS, downloadStatus)
+
+    return MediaDescriptionCompat.Builder()
+        .setMediaId(MediaIdBuilder().getMediaId(podcast, episode))
+        .setTitle(episode.title)
+        .setIconUri(iconCache.getRemoteUri(podcast))
+        .setExtras(extras)
+        .build()
   }
 }

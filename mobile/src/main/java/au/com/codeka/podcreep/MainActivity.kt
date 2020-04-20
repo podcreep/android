@@ -22,11 +22,12 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
+import android.view.Menu
+import android.view.MenuInflater
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.app.service.SyncManager
-import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
@@ -78,10 +79,9 @@ class MainActivity : AppCompatActivity() {
       _: ScreenContext,
       params: Array<Any>? -> {
         @Suppress("UNCHECKED_CAST")
-        val podcast = params?.get(0) as LiveData<Podcast>
-        @Suppress("UNCHECKED_CAST")
-        val episode = params[0] as LiveData<Episode>
-        EpisodeDetailsScreen(App.i.taskRunner, App.i.store, podcast, episode)
+        val data = params?.get(0) as EpisodeDetailsScreen.Data
+        EpisodeDetailsScreen(
+            App.i.taskRunner, App.i.store, App.i.mediaCache, data.podcast, data.episode)
       }()
     }
     screenStack = ss
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
     return when (item.itemId) {
       android.R.id.home -> {
         if (screenStack?.depth ?: 0 > 1) {
-          // If you're deeper in the screen stack, the home back is "back".
+          // If you're deeper in the screen stack, the home button is "back".
           screenStack?.pop()
         } else {
           // TODO: animate some kind of transition or something?
@@ -141,12 +141,31 @@ class MainActivity : AppCompatActivity() {
         }
         true
       }
-      else -> super.onOptionsItemSelected(item)
+      else -> {
+        val handled = screenStack?.top?.onMenuItemSelected(item)
+        if (handled != null && handled) {
+          return true
+        }
+
+        super.onOptionsItemSelected(item)
+      }
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    val menuId = screenStack?.top?.options?.actionBarMenu
+    if (menuId == null) {
+      menu?.clear()
+    } else {
+      menuInflater.inflate(menuId, menu)
+    }
+
+    return true
   }
 
   private fun onScreensUpdated(prev: Screen?, current: Screen?) {
     enableActionBar(current?.options?.enableActionBar ?: false)
+    invalidateOptionsMenu()
 
     // Change the home button to a back button if we're deep in the hierarchy.
     // TODO: animate the transition

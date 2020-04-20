@@ -14,8 +14,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_new_episode_24dp" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/new_releases-24px.svg" />
+                            <entry key="outputName" value="ic_download_24dp" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/get_app-24px.svg" />
                           </map>
                         </option>
                       </PersistentState>

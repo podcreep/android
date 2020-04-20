@@ -29,6 +29,7 @@ class DetailsLayout(
 
   interface Callbacks {
     fun onEpisodePlay(podcast: Podcast, episode: Episode)
+    fun onEpisodeDetails(podcast: Podcast, episode: Episode)
   }
 
   init {

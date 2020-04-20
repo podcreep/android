@@ -21,6 +21,7 @@
       android:id="@+id/logo"
       android:layout_width="64dp"
       android:layout_height="64dp"
+      android:contentDescription="@{podcast.title}"
       app:imageUrl="@{iconCache.getLocalUri(podcast)}" />
 
     <TextView

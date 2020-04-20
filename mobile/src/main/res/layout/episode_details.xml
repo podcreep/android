@@ -8,6 +8,9 @@
         name="podcast"
         type="au.com.codeka.podcreep.model.store.Podcast" />
     <variable
+        name="episode"
+        type="au.com.codeka.podcreep.model.store.Episode" />
+    <variable
         name="iconCache"
         type="au.com.codeka.podcreep.model.cache.PodcastIconCache" />
   </data>
@@ -28,16 +31,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/logo"
-        android:text="@{podcast.title}"
-        tools:text="Podcast title" />
+        android:text="@{episode.title}"
+        tools:text="Episode title" />
 
     <TextView
         android:id="@+id/description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/logo"
-        android:text="@{podcast.description}"
-        tools:text="Podcast description" />
+        android:text="@{episode.description}"
+        tools:text="Episode description" />
 
   </RelativeLayout>
 </layout>

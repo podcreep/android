@@ -12,8 +12,8 @@ import au.com.codeka.podcreep.model.store.Podcast
 
 class EpisodeDetailsLayout (
     context: Context,
-    podcast: LiveData<Podcast>,
-    episode: LiveData<Episode>,
+    podcast: Podcast,
+    episode: Episode,
     taskRunner: TaskRunner,
     private val callbacks: Callbacks)
   : FrameLayout(context) {
@@ -28,8 +28,8 @@ class EpisodeDetailsLayout (
   init {
     val inflater = LayoutInflater.from(context)
     binding = EpisodeDetailsBinding.inflate(inflater, this, true)
-    binding.podcast = podcast.value
+    binding.podcast = podcast
+    binding.episode = episode
     binding.iconCache = App.i.iconCache
   }
-
 }

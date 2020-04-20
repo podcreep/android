@@ -27,6 +27,8 @@
   <string name="play">Play</string>
   <string name="skip_forward_30">Skip forward</string>
   <string name="skip_back_10">Skip back</string>
+  <string name="mark_done">Mark done</string>
+  <string name="download">Download</string>
 
   <!-- Notification controls -->
   <string name="pause">Pause</string>

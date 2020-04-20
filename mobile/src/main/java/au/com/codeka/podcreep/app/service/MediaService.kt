@@ -42,11 +42,11 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
         MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
-    mediaManager = MediaManager(this, session, App.i.taskRunner, App.i.store)
+    mediaManager = MediaManager(this, session, App.i.taskRunner, App.i.mediaCache, App.i.store)
     notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
-    browseTreeGenerator = BrowseTreeGenerator(App.i.store, App.i.iconCache, this)
+    browseTreeGenerator = BrowseTreeGenerator(App.i.store, App.i.iconCache, App.i.mediaCache, this)
 
     lifecycle.currentState = Lifecycle.State.RESUMED
   }

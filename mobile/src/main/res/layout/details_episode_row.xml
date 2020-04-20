@@ -16,6 +16,7 @@
   <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:onClick="@{() -> callbacks.onEpisodeDetails(vm.podcast, vm.episode)}"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView

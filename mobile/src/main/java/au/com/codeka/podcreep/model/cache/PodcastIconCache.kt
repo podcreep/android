@@ -58,56 +58,46 @@ class PodcastIconCache(private val appContext: Context, private val store: Store
   /** Refresh the cached icon of the given {@link Podcast}. */
   fun refresh(podcast: Podcast) {
     taskRunner.runTask({
+      Log.i(TAG, "Downloading icon for '${podcast.title}'")
+      val req = HttpRequest.Builder()
+          .url(podcast.imageUrl)
+          .method(HttpRequest.Method.GET)
+          .build()
+      val ins = req.execute().inputStream()
+      var bmp: Bitmap
       try {
-        Log.i(TAG, "Downloading icon for '${podcast.title}'")
-        val req = HttpRequest.Builder()
-            .url(podcast.imageUrl)
-            .method(HttpRequest.Method.GET)
-            .build()
-        val ins = req.execute().inputStream()
-        var bmp: Bitmap
-        try {
-          bmp = BitmapFactory.decodeStream(ins)
-        } finally {
-          ins.close()
-        }
-
-        Log.i(TAG, " - icon downloaded for '${podcast.title}': ${bmp.width}x${bmp.height}")
-
-        // TODO: Maybe don't load the whole bitmap just to resize it, we can decode the bounds
-        // then use sampling to downscale as wel load it. I think that would be more efficient?
-        if (bmp.width > MAX_SIZE || bmp.height > MAX_SIZE) {
-          var destWidth = MAX_SIZE
-          var destHeight = MAX_SIZE
-          if (bmp.width > bmp.height) {
-            destHeight = (bmp.height / bmp.width) * MAX_SIZE
-          } else if (bmp.height < bmp.width) {
-            destWidth = (bmp.width / bmp.height) * MAX_SIZE
-          }
-          Log.i(TAG, " - resizing '${podcast.title}' icon to: ${destWidth}x$destHeight")
-          val oldBmp = bmp
-          bmp = Bitmap.createScaledBitmap(bmp, destWidth, destHeight, true)
-          oldBmp.recycle()
-        }
-
-        val file = cacheFile(podcast)
-        Log.i(TAG, " - saving '${podcast.title}' icon to: ${file.absolutePath}")
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-      } catch (e: Throwable) {
-        Log.e(TAG, "Error downloading icon for '${podcast.title}'.", e)
+        bmp = BitmapFactory.decodeStream(ins)
+      } finally {
+        ins.close()
       }
+
+      Log.i(TAG, " - icon downloaded for '${podcast.title}': ${bmp.width}x${bmp.height}")
+
+      // TODO: Maybe don't load the whole bitmap just to resize it, we can decode the bounds
+      // then use sampling to downscale as wel load it. I think that would be more efficient?
+      if (bmp.width > MAX_SIZE || bmp.height > MAX_SIZE) {
+        var destWidth = MAX_SIZE
+        var destHeight = MAX_SIZE
+        if (bmp.width > bmp.height) {
+          destHeight = (bmp.height / bmp.width) * MAX_SIZE
+        } else if (bmp.height < bmp.width) {
+          destWidth = (bmp.width / bmp.height) * MAX_SIZE
+        }
+        Log.i(TAG, " - resizing '${podcast.title}' icon to: ${destWidth}x$destHeight")
+        val oldBmp = bmp
+        bmp = Bitmap.createScaledBitmap(bmp, destWidth, destHeight, true)
+        oldBmp.recycle()
+      }
+
+      val file = cacheFile(podcast)
+      Log.i(TAG, " - saving '${podcast.title}' icon to: ${file.absolutePath}")
+      bmp.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
     }, Threads.BACKGROUND)
   }
 
   private fun cacheFile(podcast: Podcast): File {
     val file = File(appContext.cacheDir, "podcasts/${podcast.id}/icon.png")
     file.parentFile?.mkdirs()
-
-    // TODO: delete this
-    if (file.isDirectory) {
-      file.delete()
-    }
-
     return file
   }
 }

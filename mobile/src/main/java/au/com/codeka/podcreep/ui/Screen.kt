@@ -5,6 +5,7 @@ import androidx.annotation.CallSuper
 import android.transition.Scene
 import android.transition.TransitionManager
 import android.transition.TransitionSet
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
@@ -53,6 +54,14 @@ abstract class Screen : LifecycleOwner {
   open fun onShow(): View? {
     lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     return null
+  }
+
+  /**
+   * Called when the user selects a menu item on the app bar. Return true if you handled the item or
+   * false if not.
+   */
+  open fun onMenuItemSelected(item: MenuItem): Boolean {
+    return false
   }
 
   open fun onHide() {}
