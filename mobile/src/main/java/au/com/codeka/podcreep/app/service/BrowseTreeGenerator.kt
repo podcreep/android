@@ -36,7 +36,7 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
       "new_episodes" -> {
         onLoadNewEpisodesChildren(result)
       }
-      "subscriptions" -> {
+      "sub_podcasts" -> {
         onLoadSubscriptionsChildren(result)
       }
       "sub" -> {
@@ -76,7 +76,7 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
     items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE))
 
     desc = MediaDescriptionCompat.Builder()
-        .setMediaId("subscriptions")
+        .setMediaId("sub_podcasts")
         .setTitle("Subscriptions")
         .setIconUri(iconUrl("ic_subscriptions_black_24dp"))
         .build()

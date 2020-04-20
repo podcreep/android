@@ -6,7 +6,7 @@ import androidx.room.Transaction
 
 @Dao
 interface SubscriptionsDao {
-  @Query("SELECT * FROM subscriptions")
+  @Query("SELECT * FROM sub_podcasts")
   fun get(): LiveData<List<Subscription>>
 
   @Delete
@@ -17,19 +17,19 @@ interface SubscriptionsDao {
 
   /*
   @Transaction
-  fun updateAll(subscriptions: List<Subscription>) {
+  fun updateAll(sub_podcasts: List<Subscription>) {
     val existing = get().value
 
     val toDelete = ArrayList<Subscription>()
     existing?.forEach {
-      if (!subscriptions.contains(it)) {
+      if (!sub_podcasts.contains(it)) {
         toDelete.add(it)
       }
     }
     if (toDelete.size > 0) {
       delete(*toDelete.toTypedArray())
     }
-    insert(*subscriptions.toTypedArray())
+    insert(*sub_podcasts.toTypedArray())
   }
   */
 }

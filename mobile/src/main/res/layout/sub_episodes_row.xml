@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+    <import type="android.view.View"/>
+    <variable
+        name="callbacks"
+        type="au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsLayout.Callbacks" />
+    <variable
+        name="vm"
+        type="au.com.codeka.podcreep.app.podcasts.subscriptions.EpisodeRowViewModel" />
+  </data>
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:onClick="@{() -> callbacks.onEpisodeDetails(vm.podcast, vm.episode)}"
+      android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:text="@{vm.getDate()}"
+        tools:text="14\nFeb"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/date"
+        android:layout_toStartOf="@+id/position"
+        android:layout_alignTop="@+id/play"
+        android:layout_alignBottom="@+id/play"
+        android:gravity="center_vertical"
+        android:text="@{vm.episode.title}"
+        tools:text="Episode title" />
+
+    <TextView
+        android:id="@+id/position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/play"
+        android:layout_centerVertical="true"
+        android:visibility="@{vm.isInProgress() ? View.VISIBLE : View.GONE}"
+        android:text="@{vm.getProgressDisplay()}"
+        tools:visibility="visible"
+        tools:text="--:--"/>
+
+    <ImageView
+        android:id="@+id/play"
+        android:contentDescription="@string/play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentEnd="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:scaleType="center"
+        android:onClick="@{() -> callbacks.onEpisodePlay(vm.podcast, vm.episode)}" />
+  </RelativeLayout>
+</layout>

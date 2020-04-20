@@ -8,7 +8,7 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 
 /**
- * Store is a class we use for local storage of subscriptions, episode details, and all that stuff.
+ * Store is a class we use for local storage of sub_podcasts, episode details, and all that stuff.
  * This class also manages requesting from the server for updates to this data as required. You
  * should use the {@link LiveData} methods to make sure you're always displaying the most up-to-date
  * data.
@@ -25,7 +25,7 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
       .build()
 
   /**
-   * Gets a list of the subscriptions the user has subscribed to. We'll also keep the podcast within
+   * Gets a list of the sub_podcasts the user has subscribed to. We'll also keep the podcast within
    * the subscription updated as well.
    */
   fun subscriptions(): LiveData<List<Subscription>> {

@@ -21,12 +21,13 @@ class SubscriptionsLayout(
   : RelativeLayout(context) {
 
   interface Callbacks {
-    fun onViewEpisodeClick(podcast: LiveData<Podcast>, episode: LiveData<Episode>)
+    fun onEpisodeDetails(podcast: Podcast, episode: Episode)
+    fun onEpisodePlay(podcast: Podcast, episode: Episode)
     fun onViewPodcastClick(podcast: LiveData<Podcast>)
   }
 
   init {
-    View.inflate(context, R.layout.discover, this)
+    View.inflate(context, R.layout.subscriptions, this)
     viewpager.adapter = TabPagerAdapter(context, lifecycleOwner, store, taskRunner, callbacks)
     tab_layout.setupWithViewPager(viewpager)
   }

@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
-import au.com.codeka.podcreep.databinding.SubscriptionsRowBinding
+import au.com.codeka.podcreep.databinding.SubPodcastsRowBinding
 import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.model.store.Subscription
-import kotlinx.android.synthetic.main.subscriptions.view.*
+import kotlinx.android.synthetic.main.sub_podcasts.view.*
 
 class PodcastsTabLayout(
     context: Context,
@@ -30,7 +30,7 @@ class PodcastsTabLayout(
   private val subscriptionsLiveData: LiveData<List<Subscription>>
 
   init {
-    View.inflate(context, R.layout.subscriptions, this)
+    View.inflate(context, R.layout.sub_podcasts, this)
     subscriptionsLiveData = store.subscriptions()
 
     adapter = Adapter(callbacks)
@@ -53,7 +53,7 @@ class PodcastsTabLayout(
 
   class Adapter(private val callbacks: SubscriptionsLayout.Callbacks)
     : RecyclerView.Adapter<ViewHolder>() {
-    var dataset: ArrayList<Subscription> = ArrayList()
+    private var dataset: ArrayList<Subscription> = ArrayList()
 
     fun refresh(subscriptions: List<Subscription>) {
       dataset.clear()
@@ -63,7 +63,7 @@ class PodcastsTabLayout(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
       val inflater = LayoutInflater.from(parent.context)
-      val binding = SubscriptionsRowBinding.inflate(inflater, parent, false)
+      val binding = SubPodcastsRowBinding.inflate(inflater, parent, false)
       return ViewHolder(binding, callbacks)
     }
 
@@ -77,7 +77,7 @@ class PodcastsTabLayout(
   }
 
   class ViewHolder(
-      val binding: SubscriptionsRowBinding, val callbacks: SubscriptionsLayout.Callbacks)
+      val binding: SubPodcastsRowBinding, val callbacks: SubscriptionsLayout.Callbacks)
     : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(subscription: Subscription) {
