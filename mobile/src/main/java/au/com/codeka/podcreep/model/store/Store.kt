@@ -53,10 +53,27 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
     return converter
   }
 
+  /**
+   * Fetches a list of in-progress episodes (that is, episodes that we have listened to a least
+   * some of).
+   */
+  fun inProgress(): LiveData<List<Episode>> {
+    return localStore.episodes().getInProgress()
+  }
+
+  /**
+   * Fetches a list of new episodes (that is, episodes that we have not listened to).
+   */
+  fun newEpisodes(): LiveData<List<Episode>> {
+    return localStore.episodes().getNewEpisodes()
+  }
+
+  /** Gets a list of the episodes for the given podcast. */
   fun episodes(podcastID: Long): LiveData<List<Episode>> {
     return localStore.episodes().get(podcastID)
   }
 
+  /** Gets a single list from the given podcast. */
   fun episode(podcastID: Long, episodeID: Long): LiveData<Episode> {
     return localStore.episodes().get(podcastID, episodeID)
   }
