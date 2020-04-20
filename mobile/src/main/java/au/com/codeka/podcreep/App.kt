@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Handler
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.model.cache.PodcastIconCache
 import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.net.Server
 
@@ -14,6 +15,7 @@ class App : Application() {
 
   private lateinit var _taskRunner: TaskRunner
   private lateinit var _store: Store
+  private lateinit var _iconCache : PodcastIconCache
 
   override fun onCreate() {
     super.onCreate()
@@ -21,6 +23,7 @@ class App : Application() {
 
     _taskRunner = TaskRunner()
     _store = Store(this, taskRunner)
+    _iconCache = PodcastIconCache(this, store, taskRunner)
     i = this
 
     val s = Settings(this)
@@ -34,4 +37,7 @@ class App : Application() {
 
   val store: Store
     get() = _store
+
+  val iconCache: PodcastIconCache
+    get() = _iconCache
 }

@@ -68,6 +68,11 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
     return localStore.episodes().getNewEpisodes()
   }
 
+  /** Get the podcast with the given ID. */
+  fun podcast(id: Long): LiveData<Podcast> {
+    return localStore.podcasts().get(id)
+  }
+
   /** Gets a list of the episodes for the given podcast. */
   fun episodes(podcastID: Long): LiveData<List<Episode>> {
     return localStore.episodes().get(podcastID)

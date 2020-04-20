@@ -46,7 +46,7 @@ class HttpRequest private constructor(
         conn.setRequestProperty(key, headers[key])
       }
       if (body != null) {
-        conn.setRequestProperty("Content-Length", Integer.toString(body.size))
+        conn.setRequestProperty("Content-Length", body.size.toString())
         conn.outputStream.write(body)
       }
 

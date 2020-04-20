@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.databinding.DetailsBinding
@@ -42,6 +43,7 @@ class DetailsLayout(
 
   fun refresh(podcast: Podcast, episodes: List<Episode>?) {
     binding.podcast = podcast
+    binding.iconCache = App.i.iconCache
     binding.executePendingBindings()
 
     val episodesList = findViewById<RecyclerView>(R.id.episodes)

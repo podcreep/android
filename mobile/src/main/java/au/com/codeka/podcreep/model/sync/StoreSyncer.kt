@@ -2,6 +2,7 @@ package au.com.codeka.podcreep.model.sync
 
 import android.content.Context
 import android.util.Log
+import au.com.codeka.podcreep.model.cache.PodcastIconCache
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
@@ -16,7 +17,7 @@ import java.util.*
 /**
  * StoreSyncer is used to sync our local store with the server.
  */
-class StoreSyncer(private val context: Context, s: Store) {
+class StoreSyncer(private val context: Context, s: Store, private val iconCache: PodcastIconCache) {
   companion object {
     const val TAG = "StoreSyncer"
   }
@@ -50,28 +51,29 @@ class StoreSyncer(private val context: Context, s: Store) {
           .toJson(sub.positions)
           .toByteArray(Charsets.UTF_8)
 
-      val podcast = sub.podcast!!
-      store.podcasts().insert(Podcast(
-          id = podcast.id,
-          title = podcast.title,
-          description = podcast.description,
-          imageUrl = podcast.imageUrl))
+      val podcast = Podcast(
+          id = sub.podcast!!.id,
+          title = sub.podcast!!.title,
+          description = sub.podcast!!.description,
+          imageUrl = sub.podcast!!.imageUrl)
+      store.podcasts().insert(podcast)
+      iconCache.refresh(podcast)
 
       store.subscriptions().insert(Subscription(
           id = sub.id,
           podcastID = sub.podcastID,
           positionsJson = positionsJson))
 
-      if (podcast.episodes != null) {
-        Log.i(TAG, "  adding '${podcast.episodes.size}' episodes.")
-        for (ep in podcast.episodes) {
+      if (sub.podcast!!.episodes != null) {
+        Log.i(TAG, "  adding '${sub.podcast!!.episodes!!.size}' episodes.")
+        for (ep in sub.podcast!!.episodes!!) {
           store.episodes().insert(Episode(
               id = ep.id,
               podcastID = podcast.id,
               title = ep.title,
               description = ep.description,
               mediaUrl = ep.mediaUrl,
-              pubDate = pubDateFmt.parse(ep.pubDate),
+              pubDate = pubDateFmt.parse(ep.pubDate)!!,
               position = sub.positions[ep.id]))
         }
       } else {

@@ -5,21 +5,18 @@ import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
 import java.util.ArrayList
 import android.support.v4.media.MediaDescriptionCompat
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import au.com.codeka.podcreep.model.cache.PodcastIconCache
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.model.store.Subscription
 import au.com.codeka.podcreep.util.observeOnce
 
-class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: LifecycleOwner) {
+class BrowseTreeGenerator(private val store: Store, private val iconCache: PodcastIconCache,
+                          private val lifecycleOwner: LifecycleOwner) {
   private val subscriptions = store.subscriptions()
-
-  companion object {
-    val MAX_RESULT_SIZE = 16
-  }
 
   fun onLoadChildren(
       parentId: String,
@@ -126,7 +123,7 @@ class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: 
       val desc = MediaDescriptionCompat.Builder()
           .setMediaId("sub:${sub.id}")
           .setTitle(sub.podcast.value?.title)
-          .setIconUri(Uri.parse(sub.podcast.value?.imageUrl))
+          .setIconUri(iconCache.getRemoteUri(sub.podcast.value!!))
           .build()
       items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE))
     }
@@ -149,13 +146,9 @@ class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: 
           val desc = MediaDescriptionCompat.Builder()
               .setMediaId(MediaIdBuilder().getMediaId(podcasts[ep.podcastID]!!, ep))
               .setTitle(ep.title)
-              .setIconUri(Uri.parse(podcasts[ep.podcastID]!!.imageUrl))
+              .setIconUri(iconCache.getRemoteUri(podcasts[ep.podcastID]!!))
               .build()
           items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
-
-          if (items.size > MAX_RESULT_SIZE) {
-            break;
-          }
         }
         result.sendResult(items)
       }
@@ -178,12 +171,14 @@ class BrowseTreeGenerator(private val store: Store, private val lifecycleOwner: 
                   val desc = MediaDescriptionCompat.Builder()
                       .setMediaId(MediaIdBuilder().getMediaId(podcast, ep))
                       .setTitle(ep.title)
-                      .setIconUri(Uri.parse(podcast.imageUrl))
+                      .setIconUri(iconCache.getRemoteUri(podcast))
                       .build()
-                  items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+                  items.add(
+                      MediaBrowserCompat.MediaItem(
+                          desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
 
-                  if (items.size > MAX_RESULT_SIZE) {
-                    break;
+                  if (items.size > 20) {
+                    break
                   }
                 }
                 result.sendResult(items)

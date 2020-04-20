@@ -21,6 +21,7 @@ import au.com.codeka.podcreep.model.sync.PlaybackStateSyncer
 import au.com.codeka.podcreep.model.sync.SubscriptionInfo
 import au.com.codeka.podcreep.net.HttpRequest
 import au.com.codeka.podcreep.net.Server
+import java.io.FileDescriptor
 
 /**
  * MediaManager manages the actual playback of the media.

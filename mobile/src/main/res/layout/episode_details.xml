@@ -7,6 +7,9 @@
     <variable
         name="podcast"
         type="au.com.codeka.podcreep.model.store.Podcast" />
+    <variable
+        name="iconCache"
+        type="au.com.codeka.podcreep.model.cache.PodcastIconCache" />
   </data>
 
   <RelativeLayout
@@ -18,7 +21,7 @@
         android:id="@+id/logo"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        app:imageUrl="@{podcast.imageUrl}" />
+        app:imageUrl="@{iconCache.getLocalUri(podcast)}" />
 
     <TextView
         android:id="@+id/title"

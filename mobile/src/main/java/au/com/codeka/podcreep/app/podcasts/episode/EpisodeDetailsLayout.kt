@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.lifecycle.LiveData
+import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.databinding.EpisodeDetailsBinding
 import au.com.codeka.podcreep.model.store.Episode
@@ -27,6 +28,8 @@ class EpisodeDetailsLayout (
   init {
     val inflater = LayoutInflater.from(context)
     binding = EpisodeDetailsBinding.inflate(inflater, this, true)
+    binding.podcast = podcast.value
+    binding.iconCache = App.i.iconCache
   }
 
 }

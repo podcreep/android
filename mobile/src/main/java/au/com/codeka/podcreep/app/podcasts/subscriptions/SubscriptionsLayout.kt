@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.databinding.SubscriptionsRowBinding
 import au.com.codeka.podcreep.model.store.Podcast
@@ -78,6 +79,7 @@ class SubscriptionsLayout(
 
     fun bind(subscription: Subscription) {
       binding.podcast = subscription.podcast.value
+      binding.iconCache = App.i.iconCache
       binding.executePendingBindings()
       binding.root.setOnClickListener {
         run {

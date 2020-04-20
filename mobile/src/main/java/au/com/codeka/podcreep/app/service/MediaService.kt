@@ -46,7 +46,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
     notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
-    browseTreeGenerator = BrowseTreeGenerator(App.i.store, this)
+    browseTreeGenerator = BrowseTreeGenerator(App.i.store, App.i.iconCache, this)
 
     lifecycle.currentState = Lifecycle.State.RESUMED
   }
