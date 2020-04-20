@@ -62,16 +62,16 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
 
     val items = ArrayList<MediaBrowserCompat.MediaItem>()
     var desc = MediaDescriptionCompat.Builder()
-        .setMediaId("in_progress")
-        .setTitle("In progress")
-        .setIconUri(iconUrl("ic_inprogress_24dp"))
+        .setMediaId("new_episodes")
+        .setTitle("New episodes")
+        .setIconUri(iconUrl("ic_new_episode_24dp"))
         .build()
     items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE))
 
     desc = MediaDescriptionCompat.Builder()
-        .setMediaId("new_episodes")
-        .setTitle("New episodes")
-        .setIconUri(iconUrl("ic_new_episode_24dp"))
+        .setMediaId("in_progress")
+        .setTitle("In progress")
+        .setIconUri(iconUrl("ic_inprogress_24dp"))
         .build()
     items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE))
 
