@@ -1,19 +1,15 @@
 package au.com.codeka.podcreep.app.podcasts.subscriptions
 
+import android.view.View
+import au.com.codeka.podcreep.R
+import au.com.codeka.podcreep.model.cache.EpisodeMediaCache
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-class EpisodeRowViewModel(val podcast: Podcast, val episode: Episode) {
-  private val displayDateFormat = SimpleDateFormat("dd'\n'MMM", Locale.US)
-
-  fun getDate(): String {
-    return displayDateFormat.format(episode.pubDate)
-  }
-
+class EpisodeRowViewModel(val podcast: Podcast, val episode: Episode,
+                          private val mediaCache: EpisodeMediaCache) {
   fun isInProgress(): Boolean {
     val pos = episode.position
     return (pos != null && pos > 0)
@@ -39,4 +35,24 @@ class EpisodeRowViewModel(val podcast: Podcast, val episode: Episode) {
     str += sec
     return str
   }
+
+  val statusIconResId: Int
+    get() = when (mediaCache.getStatus(podcast, episode)) {
+      EpisodeMediaCache.Status.Downloaded -> R.drawable.ic_download_24dp
+      EpisodeMediaCache.Status.InProgress -> R.drawable.ic_dots_horz_24dp
+      else -> R.drawable.ic_download_24dp // We'll be hidden anyway, so doesn't matter
+    }
+
+  val statusTextResId: Int
+    get() = when (mediaCache.getStatus(podcast, episode)) {
+      EpisodeMediaCache.Status.Downloaded -> R.string.status_downloaded
+      EpisodeMediaCache.Status.InProgress -> R.string.status_downloading
+      else -> R.string.status_downloaded // We'll be hidden anyway, so doesn't matter.
+    }
+
+  val statusIconVisibility: Int
+    get() = when(mediaCache.getStatus(podcast, episode)) {
+      EpisodeMediaCache.Status.NotDownloaded -> View.GONE
+      else -> View.VISIBLE
+    }
 }

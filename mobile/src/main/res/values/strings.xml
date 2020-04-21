@@ -34,6 +34,8 @@
   <string name="skip_back_10">Skip back</string>
   <string name="mark_done">Mark done</string>
   <string name="download">Download</string>
+  <string name="status_downloaded">Downloaded</string>
+  <string name="status_downloading">Downloading...</string>
 
   <!-- Notification controls -->
   <string name="pause">Pause</string>
