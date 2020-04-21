@@ -17,7 +17,7 @@
 
   <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
+      android:layout_height="match_parent"
       android:background="?android:attr/selectableItemBackground">
 
     <ImageView
@@ -34,13 +34,13 @@
         android:text="@{episode.title}"
         tools:text="Episode title" />
 
-    <TextView
+    <WebView
         android:id="@+id/description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/logo"
-        android:text="@{episode.description}"
-        tools:text="Episode description" />
+        tools:text="Episode description"
+        app:html="@{episode.description}" />
 
   </RelativeLayout>
 </layout>
