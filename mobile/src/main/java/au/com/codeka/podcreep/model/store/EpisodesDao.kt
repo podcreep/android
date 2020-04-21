@@ -6,7 +6,7 @@ import androidx.room.*
 @Dao
 interface EpisodesDao {
   companion object {
-    const val MAX_RESULT_SIZE = 16
+    const val MAX_RESULT_SIZE = 100
   }
 
   @Query("SELECT * FROM episodes WHERE podcastID=:podcastID ORDER BY pubDate DESC")

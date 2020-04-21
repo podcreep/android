@@ -1,7 +1,6 @@
 package au.com.codeka.podcreep.app.podcasts.subscriptions
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -14,26 +13,33 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.databinding.SubEpisodesBinding
+import au.com.codeka.podcreep.databinding.SubEpisodesDateRowBinding
 import au.com.codeka.podcreep.databinding.SubEpisodesRowBinding
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Subscription
+import java.lang.RuntimeException
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.HashMap
 
 open class BaseEpisodeListTabLayout(
     context: Context,
-    private val lifecyleOwner: LifecycleOwner,
-    private val subscriptions: LiveData<List<Subscription>>,
-    private val episodes: LiveData<List<Episode>>,
-    private val callbacks: SubscriptionsLayout.Callbacks)
+    lifecyleOwner: LifecycleOwner,
+    subscriptions: LiveData<List<Subscription>>,
+    episodes: LiveData<List<Episode>>,
+    callbacks: SubscriptionsLayout.Callbacks)
   : FrameLayout(context) {
+
+  companion object {
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM, yyyy")
+  }
 
   val model: Model
   val binding: SubEpisodesBinding
   val adapter: Adapter
-
-  // We'll keep track of all the episodes we're displaying. If we get an update and nothing's
-  // changed then we can skip refreshing it.
-  var visibleEpisodes: List<Episode>? = null
 
   init {
     val inflater = LayoutInflater.from(context)
@@ -78,44 +84,108 @@ open class BaseEpisodeListTabLayout(
   class Adapter(private val callbacks: SubscriptionsLayout.Callbacks)
     : RecyclerView.Adapter<ViewHolder>() {
 
-    private var podcasts: HashMap<Long, LiveData<Podcast>>? = null
-    private var episodes: List<Episode>? = null
+    private val rows: ArrayList<Row> = ArrayList()
 
     fun refresh(podcasts: HashMap<Long, LiveData<Podcast>>, episodes: List<Episode>) {
-      this.podcasts = podcasts
-      this.episodes = episodes
+      var lastDate: ZonedDateTime? = null
+      for (ep in episodes) {
+        val epDt = ep.pubDate.toInstant().atZone(ZoneOffset.systemDefault())
+        if (lastDate == null || epDt.year != lastDate.year || epDt.dayOfYear != lastDate.dayOfYear) {
+          rows.add(Row(epDt))
+          lastDate = epDt
+        }
+
+        val podcast = podcasts[ep.podcastID]
+        if (podcast == null || podcast.value == null) {
+          continue
+        }
+        rows.add(Row(podcast.value!!, ep))
+      }
       notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
       val inflater = LayoutInflater.from(parent.context)
-      val binding = SubEpisodesRowBinding.inflate(inflater, parent, false)
-
-      return ViewHolder(binding, podcasts!!, callbacks)
+      return when (viewType) {
+        0 -> {
+          val binding = SubEpisodesDateRowBinding.inflate(inflater, parent, false)
+          ViewHolder(binding, callbacks)
+        }
+        1 -> {
+          val binding = SubEpisodesRowBinding.inflate(inflater, parent, false)
+          ViewHolder(binding, callbacks)
+        }
+        else -> {
+          throw RuntimeException("Unexpected viewType: $viewType")
+        }
+      }
     }
 
     override fun getItemCount(): Int {
-      if (podcasts == null) {
-        return 0
-      }
-      return episodes?.size ?: 0
+      return rows.size
+    }
+
+    override fun getItemViewType(position: Int): Int {
+      return rows[position].viewType
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-      holder.bind(episodes!![position])
+      holder.bind(rows[position])
     }
   }
 
-  class ViewHolder(
-      val binding: SubEpisodesRowBinding, val podcasts: HashMap<Long, LiveData<Podcast>>,
-      val callbacks: SubscriptionsLayout.Callbacks)
-    : RecyclerView.ViewHolder(binding.root) {
+  class ViewHolder : RecyclerView.ViewHolder {
 
-    fun bind(episode: Episode) {
-      binding.callbacks = callbacks
-      Log.i("DEANH", "Doing episode '${episode.title}' from ${episode.podcastID}")
-      binding.vm = EpisodeRowViewModel(podcasts[episode.podcastID]!!, episode)
-      binding.executePendingBindings()
+    private val callbacks: SubscriptionsLayout.Callbacks
+    private val epBinding: SubEpisodesRowBinding?
+    private val dtBinding: SubEpisodesDateRowBinding?
+
+    constructor(binding: SubEpisodesRowBinding, callbacks: SubscriptionsLayout.Callbacks)
+        : super(binding.root) {
+      this.callbacks = callbacks
+      this.epBinding = binding
+      dtBinding = null
+    }
+
+    constructor(binding: SubEpisodesDateRowBinding, callbacks: SubscriptionsLayout.Callbacks)
+        : super(binding.root) {
+      this.callbacks = callbacks
+      this.dtBinding = binding
+      epBinding = null
+    }
+
+    fun bind(row: Row) {
+      if (epBinding != null) {
+        epBinding.callbacks = callbacks
+        epBinding.iconCache = App.i.iconCache // TODO: pass this in
+        epBinding.vm = EpisodeRowViewModel(row.podcast!!, row.episode!!)
+        epBinding.executePendingBindings()
+      } else if (dtBinding != null) {
+        dtBinding.dt = row.date
+        dtBinding.fmt = dateFormatter
+        dtBinding.executePendingBindings()
+      }
+    }
+  }
+
+  class Row {
+    val viewType: Int
+    val date: ZonedDateTime?
+    val podcast: Podcast?
+    val episode: Episode?
+
+    constructor(dt: ZonedDateTime) {
+      viewType = 0
+      date = dt
+      podcast = null
+      episode = null
+    }
+
+    constructor(p: Podcast, ep: Episode) {
+      viewType = 1
+      date = null
+      podcast = p
+      episode = ep
     }
   }
 

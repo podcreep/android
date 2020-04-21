@@ -21,6 +21,10 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
                           private val lifecycleOwner: LifecycleOwner) {
   private val subscriptions = store.subscriptions()
 
+  companion object {
+    const val MAX_RESULT_SIZE = 16
+  }
+
   fun onLoadChildren(
       parentId: String,
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
@@ -148,6 +152,10 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
         for (ep in episodes) {
           val desc = populateEpisode(podcasts[ep.podcastID]!!, ep)
           items.add(MediaBrowserCompat.MediaItem(desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+
+          if (items.size > MAX_RESULT_SIZE) {
+            break
+          }
         }
         result.sendResult(items)
       }
@@ -172,7 +180,7 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
                       MediaBrowserCompat.MediaItem(
                           desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
 
-                  if (items.size > 20) {
+                  if (items.size > MAX_RESULT_SIZE) {
                     break
                   }
                 }
