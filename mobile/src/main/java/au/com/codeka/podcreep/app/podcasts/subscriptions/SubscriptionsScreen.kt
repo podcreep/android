@@ -4,10 +4,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.App
-import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
+import au.com.codeka.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
-import au.com.codeka.podcreep.app.welcome.LoginScreen
-import au.com.codeka.podcreep.app.welcome.WelcomeLayout
+import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
@@ -35,11 +34,11 @@ class SubscriptionsScreen(private val store: Store): Screen() {
           }
 
           override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
-            // TODO: play
+            MediaServiceClient.i.play(podcast, episode)
           }
 
           override fun onViewPodcastClick(podcast: LiveData<Podcast>) {
-            context.pushScreen<DetailsScreen>(podcast)
+            context.pushScreen<PodcastDetailsScreen>(podcast)
           }
         })
   }

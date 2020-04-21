@@ -8,7 +8,7 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 
 /**
- * Store is a class we use for local storage of sub_podcasts, episode details, and all that stuff.
+ * Store is a class we use for local storage of sub_podcasts, episode podcast_details, and all that stuff.
  * This class also manages requesting from the server for updates to this data as required. You
  * should use the {@link LiveData} methods to make sure you're always displaying the most up-to-date
  * data.

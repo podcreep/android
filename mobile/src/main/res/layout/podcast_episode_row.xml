@@ -7,10 +7,10 @@
     <import type="android.view.View"/>
     <variable
       name="callbacks"
-      type="au.com.codeka.podcreep.app.podcasts.details.DetailsLayout.Callbacks" />
+      type="au.com.codeka.podcreep.app.podcasts.podcast.PodcastDetailsLayout.Callbacks" />
     <variable
       name="vm"
-      type="au.com.codeka.podcreep.app.podcasts.details.DetailsRowViewModel" />
+      type="au.com.codeka.podcreep.app.podcasts.podcast.PodcastRowViewModel" />
   </data>
 
   <RelativeLayout

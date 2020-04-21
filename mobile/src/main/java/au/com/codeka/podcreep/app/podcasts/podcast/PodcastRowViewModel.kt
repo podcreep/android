@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts.details
+package au.com.codeka.podcreep.app.podcasts.podcast
 
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -7,7 +7,7 @@ import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-class DetailsRowViewModel(val podcast: Podcast, val episode: Episode) {
+class PodcastRowViewModel(val podcast: Podcast, val episode: Episode) {
   private val displayDateFormat = SimpleDateFormat("dd'\n'MMM", Locale.US)
 
   fun getDate(): String {

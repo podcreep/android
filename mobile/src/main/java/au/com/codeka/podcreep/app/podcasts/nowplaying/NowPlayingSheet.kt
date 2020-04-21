@@ -24,7 +24,7 @@ import kotlin.math.abs
 
 /**
  * The {@link NowPlayingSheet} is displayed at the bottom of the screen, you can drag it up to
- * display more details.
+ * display more podcast_details.
  */
 class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   : FrameLayout(context, attributeSet) {

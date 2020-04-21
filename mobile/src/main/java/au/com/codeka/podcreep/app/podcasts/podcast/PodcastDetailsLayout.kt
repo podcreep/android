@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts.details
+package au.com.codeka.podcreep.app.podcasts.podcast
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -6,18 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
 import au.com.codeka.podcreep.concurrency.TaskRunner
-import au.com.codeka.podcreep.databinding.DetailsBinding
-import au.com.codeka.podcreep.databinding.DetailsEpisodeRowBinding
+import au.com.codeka.podcreep.databinding.PodcastDetailsBinding
+import au.com.codeka.podcreep.databinding.PodcastEpisodeRowBinding
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 
 
-class DetailsLayout(
+class PodcastDetailsLayout(
     context: Context,
     podcast: Podcast,
     episodes: List<Episode>?,
@@ -25,7 +23,7 @@ class DetailsLayout(
     private val callbacks: Callbacks)
   : FrameLayout(context) {
 
-  val binding: DetailsBinding
+  val binding: PodcastDetailsBinding
 
   interface Callbacks {
     fun onEpisodePlay(podcast: Podcast, episode: Episode)
@@ -34,7 +32,7 @@ class DetailsLayout(
 
   init {
     val inflater = LayoutInflater.from(context)
-    binding = DetailsBinding.inflate(inflater, this, true)
+    binding = PodcastDetailsBinding.inflate(inflater, this, true)
 
     val episodesList = findViewById<RecyclerView>(R.id.episodes)
     episodesList.layoutManager = LinearLayoutManager(context)
@@ -59,7 +57,7 @@ class DetailsLayout(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
       val inflater = LayoutInflater.from(parent.context)
-      val binding = DetailsEpisodeRowBinding.inflate(inflater, parent, false)
+      val binding = PodcastEpisodeRowBinding.inflate(inflater, parent, false)
       return ViewHolder(binding, callbacks)
     }
 
@@ -73,14 +71,13 @@ class DetailsLayout(
     }
   }
 
-  class ViewHolder(val binding: DetailsEpisodeRowBinding, val callbacks: Callbacks)
+  class ViewHolder(val binding: PodcastEpisodeRowBinding, val callbacks: Callbacks)
     : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(podcast: Podcast, episode: Episode) {
       binding.callbacks = callbacks
-      binding.vm = DetailsRowViewModel(podcast, episode)
+      binding.vm = PodcastRowViewModel(podcast, episode)
       binding.executePendingBindings()
     }
   }
-
 }

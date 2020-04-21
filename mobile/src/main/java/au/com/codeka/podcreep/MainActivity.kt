@@ -11,7 +11,7 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import au.com.codeka.podcreep.R.layout.activity
-import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
+import au.com.codeka.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.Threads
@@ -23,7 +23,6 @@ import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
 import android.view.Menu
-import android.view.MenuInflater
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
@@ -67,12 +66,12 @@ class MainActivity : AppCompatActivity() {
     ss.register<DiscoverScreen> {
       _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner, App.i.store)
     }
-    ss.register<DetailsScreen> {
+    ss.register<PodcastDetailsScreen> {
       _: ScreenContext,
       params: Array<Any>? -> {
         @Suppress("UNCHECKED_CAST")
         val podcast = params?.get(0) as LiveData<Podcast>
-        DetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
+      PodcastDetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
       }()
     }
     ss.register<EpisodeDetailsScreen> {
