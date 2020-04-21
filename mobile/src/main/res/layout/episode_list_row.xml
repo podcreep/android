@@ -11,7 +11,7 @@
         type="au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsLayout.Callbacks" />
     <variable
         name="vm"
-        type="au.com.codeka.podcreep.app.podcasts.subscriptions.EpisodeRowViewModel" />
+        type="au.com.codeka.podcreep.app.podcasts.episode.EpisodeRowViewModel" />
     <variable
         name="iconCache"
         type="au.com.codeka.podcreep.model.cache.PodcastIconCache" />

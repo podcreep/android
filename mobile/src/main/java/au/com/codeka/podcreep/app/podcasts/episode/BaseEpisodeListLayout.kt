@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts.subscriptions
+package au.com.codeka.podcreep.app.podcasts.episode
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -12,9 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
-import au.com.codeka.podcreep.databinding.SubEpisodesBinding
-import au.com.codeka.podcreep.databinding.SubEpisodesDateRowBinding
-import au.com.codeka.podcreep.databinding.SubEpisodesRowBinding
+import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsLayout
+import au.com.codeka.podcreep.databinding.*
 import au.com.codeka.podcreep.model.cache.EpisodeMediaCache
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -26,7 +25,8 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.HashMap
 
-open class BaseEpisodeListTabLayout(
+/** Base layout class for showing a list of episodes. */
+open class BaseEpisodeListLayout(
     context: Context,
     lifecycleOwner: LifecycleOwner,
     subscriptions: LiveData<List<Subscription>>,
@@ -39,12 +39,12 @@ open class BaseEpisodeListTabLayout(
   }
 
   val model: Model
-  val binding: SubEpisodesBinding
+  val binding: EpisodeListBinding
   val adapter: Adapter
 
   init {
     val inflater = LayoutInflater.from(context)
-    binding = SubEpisodesBinding.inflate(inflater, this, true)
+    binding = EpisodeListBinding.inflate(inflater, this, true)
 
     adapter = Adapter(callbacks, App.i.mediaCache)
     val episodesList = findViewById<RecyclerView>(R.id.episodes)
@@ -78,7 +78,6 @@ open class BaseEpisodeListTabLayout(
       }
     }
 
-    val episodesList = findViewById<RecyclerView>(R.id.episodes)
     adapter.refresh(podcasts, episodes)
   }
 
@@ -112,11 +111,11 @@ open class BaseEpisodeListTabLayout(
       val inflater = LayoutInflater.from(parent.context)
       return when (viewType) {
         0 -> {
-          val binding = SubEpisodesDateRowBinding.inflate(inflater, parent, false)
+          val binding = EpisodeListDateRowBinding.inflate(inflater, parent, false)
           ViewHolder(binding, callbacks, mediaCache)
         }
         1 -> {
-          val binding = SubEpisodesRowBinding.inflate(inflater, parent, false)
+          val binding = EpisodeListRowBinding.inflate(inflater, parent, false)
           ViewHolder(binding, callbacks, mediaCache)
         }
         else -> {
@@ -141,10 +140,10 @@ open class BaseEpisodeListTabLayout(
   class ViewHolder : RecyclerView.ViewHolder {
     private val mediaCache: EpisodeMediaCache
     private val callbacks: SubscriptionsLayout.Callbacks
-    private val epBinding: SubEpisodesRowBinding?
-    private val dtBinding: SubEpisodesDateRowBinding?
+    private val epBinding: EpisodeListRowBinding?
+    private val dtBinding: EpisodeListDateRowBinding?
 
-    constructor(binding: SubEpisodesRowBinding, callbacks: SubscriptionsLayout.Callbacks,
+    constructor(binding: EpisodeListRowBinding, callbacks: SubscriptionsLayout.Callbacks,
                 mediaCache: EpisodeMediaCache)
         : super(binding.root) {
       this.callbacks = callbacks
@@ -153,7 +152,7 @@ open class BaseEpisodeListTabLayout(
       dtBinding = null
     }
 
-    constructor(binding: SubEpisodesDateRowBinding, callbacks: SubscriptionsLayout.Callbacks,
+    constructor(binding: EpisodeListDateRowBinding, callbacks: SubscriptionsLayout.Callbacks,
                 mediaCache: EpisodeMediaCache)
         : super(binding.root) {
       this.callbacks = callbacks

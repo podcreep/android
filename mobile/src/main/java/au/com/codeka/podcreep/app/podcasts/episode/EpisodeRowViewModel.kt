@@ -1,4 +1,4 @@
-package au.com.codeka.podcreep.app.podcasts.subscriptions
+package au.com.codeka.podcreep.app.podcasts.episode
 
 import android.view.View
 import au.com.codeka.podcreep.R
@@ -8,6 +8,7 @@ import au.com.codeka.podcreep.model.store.Podcast
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
+/** View model for showing an episode in a row of {@link BaseEpisodeListLayout}. */
 class EpisodeRowViewModel(val podcast: Podcast, val episode: Episode,
                           private val mediaCache: EpisodeMediaCache) {
   fun isInProgress(): Boolean {
