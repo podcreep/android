@@ -34,8 +34,9 @@ class PodcastDetailsScreen(
     val episodes = store.episodes(podcastID)
     layout = PodcastDetailsLayout(
         context.activity,
-        podcast.value!!,
-        episodes.value,
+        context.activity,
+        podcast,
+        episodes,
         taskRunner,
         object : PodcastDetailsLayout.Callbacks {
           override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
@@ -46,14 +47,6 @@ class PodcastDetailsScreen(
             context.pushScreen<EpisodeDetailsScreen>(EpisodeDetailsScreen.Data(podcast, episode))
           }
         })
-
-    podcast.observe(this, Observer {
-      p -> layout?.refresh(p, episodes.value)
-    })
-
-    episodes.observe(this, Observer {
-      e -> layout?.refresh(podcast.value!!, episodes.value)
-    })
   }
 
   override fun onShow(): View? {

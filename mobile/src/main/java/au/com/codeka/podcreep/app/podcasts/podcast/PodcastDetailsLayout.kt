@@ -1,83 +1,72 @@
 package au.com.codeka.podcreep.app.podcasts.podcast
 
 import android.content.Context
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
 import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.R
+import au.com.codeka.podcreep.app.podcasts.episode.BaseEpisodeListLayout
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.databinding.PodcastDetailsBinding
-import au.com.codeka.podcreep.databinding.PodcastEpisodeRowBinding
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
-
+import au.com.codeka.podcreep.model.store.Subscription
 
 class PodcastDetailsLayout(
     context: Context,
-    podcast: Podcast,
-    episodes: List<Episode>?,
+    lifecycleOwner: LifecycleOwner,
+    podcast: LiveData<Podcast>,
+    episodes: LiveData<List<Episode>>,
     taskRunner: TaskRunner,
     private val callbacks: Callbacks)
   : FrameLayout(context) {
 
   val binding: PodcastDetailsBinding
+  private val episodeListLayout: EpisodeListLayout
 
-  interface Callbacks {
-    fun onEpisodePlay(podcast: Podcast, episode: Episode)
-    fun onEpisodeDetails(podcast: Podcast, episode: Episode)
+  interface Callbacks: BaseEpisodeListLayout.Callbacks {
   }
 
   init {
     val inflater = LayoutInflater.from(context)
     binding = PodcastDetailsBinding.inflate(inflater, this, true)
 
-    val episodesList = findViewById<RecyclerView>(R.id.episodes)
-    episodesList.layoutManager = LinearLayoutManager(context)
+    val subscriptionsLiveData = MediatorLiveData<List<Subscription>>()
+    subscriptionsLiveData.addSource(podcast) {
+        p -> run {
+        val sub = Subscription(0, p.id, ByteArray(0))
+        sub.podcast.value = p
+        val subscriptions = ArrayList<Subscription>()
+        subscriptions.add(sub)
+        subscriptionsLiveData.value = subscriptions
+      }
+    }
 
-    refresh(podcast, episodes)
+    episodeListLayout = EpisodeListLayout(
+        context, lifecycleOwner, subscriptionsLiveData, episodes, callbacks)
+    findViewById<FrameLayout>(R.id.episode_list).addView(episodeListLayout)
+
+    podcast.observe(lifecycleOwner, Observer {
+      p -> run {
+        refresh(p)
+      }
+    })
   }
 
-  fun refresh(podcast: Podcast, episodes: List<Episode>?) {
+  fun refresh(podcast: Podcast) {
     binding.podcast = podcast
     binding.iconCache = App.i.iconCache
     binding.executePendingBindings()
-
-    val episodesList = findViewById<RecyclerView>(R.id.episodes)
-    episodesList.adapter = Adapter(podcast, episodes, callbacks)
   }
 
-  class Adapter(
-      private val podcast: Podcast,
-      private val episodes: List<Episode>?,
-      private val callbacks: Callbacks)
-    : RecyclerView.Adapter<ViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-      val inflater = LayoutInflater.from(parent.context)
-      val binding = PodcastEpisodeRowBinding.inflate(inflater, parent, false)
-      return ViewHolder(binding, callbacks)
-    }
-
-    override fun getItemCount(): Int {
-      val ep = episodes
-      return if (ep == null) 0 else return ep.size
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-      holder.bind(podcast, episodes!![position])
-    }
-  }
-
-  class ViewHolder(val binding: PodcastEpisodeRowBinding, val callbacks: Callbacks)
-    : RecyclerView.ViewHolder(binding.root) {
-
-    fun bind(podcast: Podcast, episode: Episode) {
-      binding.callbacks = callbacks
-      binding.vm = PodcastRowViewModel(podcast, episode)
-      binding.executePendingBindings()
-    }
+  class EpisodeListLayout(context: Context, lifecycleOwner: LifecycleOwner,
+                          subscriptions: LiveData<List<Subscription>>,
+                          episodes: LiveData<List<Episode>>,
+                          callbacks: Callbacks)
+    : BaseEpisodeListLayout(context, lifecycleOwner, subscriptions, episodes, callbacks) {
   }
 }

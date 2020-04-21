@@ -8,7 +8,7 @@
     <import type="androidx.core.content.ContextCompat" />
     <variable
         name="callbacks"
-        type="au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsLayout.Callbacks" />
+        type="au.com.codeka.podcreep.app.podcasts.episode.BaseEpisodeListLayout.Callbacks" />
     <variable
         name="vm"
         type="au.com.codeka.podcreep.app.podcasts.episode.EpisodeRowViewModel" />

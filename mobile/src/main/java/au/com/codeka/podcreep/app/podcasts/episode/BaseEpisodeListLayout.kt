@@ -31,11 +31,16 @@ open class BaseEpisodeListLayout(
     lifecycleOwner: LifecycleOwner,
     subscriptions: LiveData<List<Subscription>>,
     episodes: LiveData<List<Episode>>,
-    callbacks: SubscriptionsLayout.Callbacks)
+    callbacks: Callbacks)
   : FrameLayout(context) {
 
   companion object {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM, yyyy")
+  }
+
+  interface Callbacks {
+    fun onEpisodeDetails(podcast: Podcast, episode: Episode)
+    fun onEpisodePlay(podcast: Podcast, episode: Episode)
   }
 
   val model: Model
@@ -81,8 +86,7 @@ open class BaseEpisodeListLayout(
     adapter.refresh(podcasts, episodes)
   }
 
-  class Adapter(private val callbacks: SubscriptionsLayout.Callbacks,
-                private val mediaCache: EpisodeMediaCache)
+  class Adapter(private val callbacks: Callbacks, private val mediaCache: EpisodeMediaCache)
     : RecyclerView.Adapter<ViewHolder>() {
 
     private val rows: ArrayList<Row> = ArrayList()
@@ -139,12 +143,11 @@ open class BaseEpisodeListLayout(
 
   class ViewHolder : RecyclerView.ViewHolder {
     private val mediaCache: EpisodeMediaCache
-    private val callbacks: SubscriptionsLayout.Callbacks
+    private val callbacks: Callbacks
     private val epBinding: EpisodeListRowBinding?
     private val dtBinding: EpisodeListDateRowBinding?
 
-    constructor(binding: EpisodeListRowBinding, callbacks: SubscriptionsLayout.Callbacks,
-                mediaCache: EpisodeMediaCache)
+    constructor(binding: EpisodeListRowBinding, callbacks: Callbacks, mediaCache: EpisodeMediaCache)
         : super(binding.root) {
       this.callbacks = callbacks
       this.mediaCache = mediaCache
@@ -152,7 +155,7 @@ open class BaseEpisodeListLayout(
       dtBinding = null
     }
 
-    constructor(binding: EpisodeListDateRowBinding, callbacks: SubscriptionsLayout.Callbacks,
+    constructor(binding: EpisodeListDateRowBinding, callbacks: Callbacks,
                 mediaCache: EpisodeMediaCache)
         : super(binding.root) {
       this.callbacks = callbacks

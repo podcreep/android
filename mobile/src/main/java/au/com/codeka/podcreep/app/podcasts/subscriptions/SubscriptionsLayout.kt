@@ -6,6 +6,7 @@ import android.widget.RelativeLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.R
+import au.com.codeka.podcreep.app.podcasts.episode.BaseEpisodeListLayout
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
@@ -20,9 +21,7 @@ class SubscriptionsLayout(
     callbacks: Callbacks)
   : RelativeLayout(context) {
 
-  interface Callbacks {
-    fun onEpisodeDetails(podcast: Podcast, episode: Episode)
-    fun onEpisodePlay(podcast: Podcast, episode: Episode)
+  interface Callbacks : BaseEpisodeListLayout.Callbacks {
     fun onViewPodcastClick(podcast: LiveData<Podcast>)
   }
 

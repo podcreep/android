@@ -40,8 +40,8 @@
       android:text="@{podcast.description}"
       tools:text="Podcast description" />
 
-    <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/episodes"
+    <FrameLayout
+      android:id="@+id/episode_list"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_below="@id/description" />
