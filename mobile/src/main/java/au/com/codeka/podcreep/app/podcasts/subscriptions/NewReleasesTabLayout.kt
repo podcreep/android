@@ -6,10 +6,7 @@ import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.model.store.Store
 
 class NewReleasesTabLayout(
-    context: Context,
-    private val lifecyleOwner: LifecycleOwner,
-    private val store: Store,
-    private val taskRunner: TaskRunner,
-    private val callbacks: SubscriptionsLayout.Callbacks)
-  : BaseEpisodeListTabLayout(context, lifecyleOwner, store.subscriptions(), store.newEpisodes(),
+    context: Context, lifecycleOwner: LifecycleOwner, store: Store, taskRunner: TaskRunner,
+    callbacks: SubscriptionsLayout.Callbacks)
+  : BaseEpisodeListTabLayout(context, lifecycleOwner, store.subscriptions(), store.newEpisodes(),
                              callbacks)

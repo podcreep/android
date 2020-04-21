@@ -28,7 +28,7 @@ import kotlin.collections.HashMap
 
 open class BaseEpisodeListTabLayout(
     context: Context,
-    lifecyleOwner: LifecycleOwner,
+    lifecycleOwner: LifecycleOwner,
     subscriptions: LiveData<List<Subscription>>,
     episodes: LiveData<List<Episode>>,
     callbacks: SubscriptionsLayout.Callbacks)
@@ -52,7 +52,7 @@ open class BaseEpisodeListTabLayout(
     episodesList.adapter = adapter
 
     model = Model(subscriptions, episodes)
-    model.observe(lifecyleOwner, Observer {
+    model.observe(lifecycleOwner, Observer {
       m -> refresh(m.first, m.second)
     })
   }
@@ -89,6 +89,8 @@ open class BaseEpisodeListTabLayout(
     private val rows: ArrayList<Row> = ArrayList()
 
     fun refresh(podcasts: HashMap<Long, LiveData<Podcast>>, episodes: List<Episode>) {
+      rows.clear()
+
       var lastDate: ZonedDateTime? = null
       for (ep in episodes) {
         val epDt = ep.pubDate.toInstant().atZone(ZoneOffset.systemDefault())
