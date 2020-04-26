@@ -87,7 +87,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
 
     // If someone's getting our root node, we'll do a sync now so we'll be ready when they request
     // our non-root nodes.
-    SyncManager(this, App.i.taskRunner).maybeSync()
+    App.i.syncManager.maybeSync()
 
     return BrowserRoot("root", null)
   }

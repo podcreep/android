@@ -64,13 +64,17 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
 
   /** If we haven't run in a while, run now. */
   fun maybeSync() {
-    val s = Settings(context)
-    val lastSync: Date = s.get(Settings.LAST_SYNC_TIME)
+    synchronized(this) {
+      val s = Settings(context)
+      val lastSync: Date = s.get(Settings.LAST_SYNC_TIME)
 
-    // If we haven't synced in the last hour, sync now.
-    val dontSyncAfter = Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1))
-    if (lastSync.before(dontSyncAfter)) {
-      sync()
+      // If we haven't synced in the last hour, sync now.
+      val dontSyncAfter = Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1))
+      if (lastSync.before(dontSyncAfter)) {
+        s.put(Settings.LAST_SYNC_TIME, Date())
+
+        sync()
+      }
     }
   }
 

@@ -49,9 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     // Make sure the sync worker is set up to periodically sync with the server. Also, do a sync now
     // if we haven't done one in a while.
-    val syncManager = SyncManager(this, App.i.taskRunner)
-    syncManager.maybeEnqueue()
-    syncManager.maybeSync()
+    App.i.syncManager.maybeEnqueue()
+    App.i.syncManager.maybeSync()
 
     val actionbarSizeTypedArray = obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
     actionBarHeight = actionbarSizeTypedArray.getDimension(0, 0f).toInt()
@@ -117,7 +116,7 @@ class MainActivity : AppCompatActivity() {
           true
         }
         R.id.nav_refresh -> {
-          SyncManager(this, App.i.taskRunner).sync()
+          App.i.syncManager.sync()
           true
         }
         else -> false

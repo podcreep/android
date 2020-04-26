@@ -2,6 +2,7 @@ package au.com.codeka.podcreep
 
 import android.app.Application
 import android.os.Handler
+import au.com.codeka.podcreep.app.service.SyncManager
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
 import au.com.codeka.podcreep.model.cache.EpisodeMediaCache
@@ -18,6 +19,7 @@ class App : Application() {
   private lateinit var _store: Store
   private lateinit var _iconCache: PodcastIconCache
   private lateinit var _mediaCache: EpisodeMediaCache
+  private lateinit var _syncManager: SyncManager
 
   override fun onCreate() {
     super.onCreate()
@@ -27,6 +29,7 @@ class App : Application() {
     _store = Store(this, taskRunner)
     _iconCache = PodcastIconCache(this, store, taskRunner)
     _mediaCache = EpisodeMediaCache(this, taskRunner)
+    _syncManager = SyncManager(this, taskRunner)
     i = this
 
     val s = Settings(this)
@@ -46,4 +49,7 @@ class App : Application() {
 
   val mediaCache: EpisodeMediaCache
     get() = _mediaCache
+
+  val syncManager: SyncManager
+    get() = _syncManager
 }
