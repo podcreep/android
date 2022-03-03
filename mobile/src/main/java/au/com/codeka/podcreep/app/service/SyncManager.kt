@@ -7,6 +7,7 @@ import au.com.codeka.podcreep.App
 import au.com.codeka.podcreep.Settings
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
+import au.com.codeka.podcreep.model.cache.PodcastIconCache
 import au.com.codeka.podcreep.model.sync.StoreSyncer
 import au.com.codeka.podcreep.net.HttpException
 import java.lang.Exception
@@ -24,7 +25,7 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
 
     /** Actually performs the sync, assumes we're running on some kind of background thread. */
     private fun performSync(context: Context): Boolean {
-      val syncer = StoreSyncer(context, App.i.store)
+      val syncer = StoreSyncer(context, App.i.store, App.i.iconCache)
 
       try {
         syncer.sync()
@@ -63,13 +64,17 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
 
   /** If we haven't run in a while, run now. */
   fun maybeSync() {
-    val s = Settings(context)
-    val lastSync: Date = s.get(Settings.LAST_SYNC_TIME)
+    synchronized(this) {
+      val s = Settings(context)
+      val lastSync: Date = s.get(Settings.LAST_SYNC_TIME)
 
-    // If we haven't synced in the last hour, sync now.
-    val dontSyncAfter = Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1))
-    if (lastSync.before(dontSyncAfter)) {
-      sync()
+      // If we haven't synced in the last hour, sync now.
+      val dontSyncAfter = Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1))
+      if (lastSync.before(dontSyncAfter)) {
+        s.put(Settings.LAST_SYNC_TIME, Date())
+
+        sync()
+      }
     }
   }
 

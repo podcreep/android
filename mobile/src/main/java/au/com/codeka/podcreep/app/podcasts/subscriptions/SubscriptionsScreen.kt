@@ -3,7 +3,11 @@ package au.com.codeka.podcreep.app.podcasts.subscriptions
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
-import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
+import au.com.codeka.podcreep.App
+import au.com.codeka.podcreep.app.podcasts.podcast.PodcastDetailsScreen
+import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
+import au.com.codeka.podcreep.app.service.MediaServiceClient
+import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
 import au.com.codeka.podcreep.ui.Screen
@@ -22,10 +26,19 @@ class SubscriptionsScreen(private val store: Store): Screen() {
     layout = SubscriptionsLayout(
         context.activity,
         this,
-        store.subscriptions(),
-        object : SubscriptionsLayout.Callbacks {
+        store,
+        App.i.taskRunner,
+        callbacks = object : SubscriptionsLayout.Callbacks {
+          override fun onEpisodeDetails(podcast: Podcast, episode: Episode) {
+            context.pushScreen<EpisodeDetailsScreen>(EpisodeDetailsScreen.Data(podcast, episode))
+          }
+
+          override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
+            MediaServiceClient.i.play(podcast, episode)
+          }
+
           override fun onViewPodcastClick(podcast: LiveData<Podcast>) {
-            context.pushScreen<DetailsScreen>(podcast)
+            context.pushScreen<PodcastDetailsScreen>(podcast)
           }
         })
   }

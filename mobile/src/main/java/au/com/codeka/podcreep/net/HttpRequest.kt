@@ -31,6 +31,8 @@ class HttpRequest private constructor(
     }
   }
 
+  private lateinit var conn: HttpURLConnection
+
   enum class Method {
     GET,
     POST,
@@ -38,15 +40,18 @@ class HttpRequest private constructor(
     DELETE
   }
 
+  val contentSize: Long
+    get() = conn.contentLengthLong
+
   fun execute(): BufferedSource {
     try {
-      val conn = URL(url).openConnection() as HttpURLConnection
+      conn = URL(url).openConnection() as HttpURLConnection
       conn.requestMethod = method.toString()
       for (key in headers.keys) {
         conn.setRequestProperty(key, headers[key])
       }
       if (body != null) {
-        conn.setRequestProperty("Content-Length", Integer.toString(body.size))
+        conn.setRequestProperty("Content-Length", body.size.toString())
         conn.outputStream.write(body)
       }
 

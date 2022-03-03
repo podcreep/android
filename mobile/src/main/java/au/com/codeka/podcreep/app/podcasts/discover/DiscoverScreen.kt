@@ -3,11 +3,10 @@ package au.com.codeka.podcreep.app.podcasts.discover
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
-import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
+import au.com.codeka.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.model.store.Store
-import au.com.codeka.podcreep.model.sync.PodcastInfo
 import au.com.codeka.podcreep.ui.Screen
 import au.com.codeka.podcreep.ui.ScreenContext
 import au.com.codeka.podcreep.ui.ScreenOptions
@@ -23,7 +22,7 @@ class DiscoverScreen(private val taskRunner: TaskRunner, private val store: Stor
 
     layout = DiscoverLayout(context.activity, taskRunner, object : DiscoverLayout.Callbacks {
       override fun onViewPodcastClick(podcast: LiveData<Podcast>) {
-        context.pushScreen<DetailsScreen>(podcast)
+        context.pushScreen<PodcastDetailsScreen>(podcast)
       }
     })
   }

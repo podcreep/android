@@ -3,7 +3,7 @@ package au.com.codeka.podcreep.model.store
 import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
-@Entity(tableName = "subscriptions",
+@Entity(tableName = "sub_podcasts",
     foreignKeys = [ForeignKey(
         entity = Podcast::class,
         onDelete = ForeignKey.CASCADE,

@@ -17,16 +17,25 @@
   <string name="subscriptions">Subscriptions</string>
   <string name="discover">Discover</string>
   <string name="refresh">Refresh</string>
-  <string name="refreshing">Refreshing...</string>
+  <string name="refreshing">Refreshing…</string>
 
   <!-- Podcasts screen -->
   <string name="trending">Trending</string>
   <string name="search">Search</string>
 
+  <!-- Subscriptions screens -->
+  <string name="in_progress">In progress</string>
+  <string name="new_releases">New releases</string>
+  <string name="podcasts">Podcasts</string>
+
   <!-- Episodes screens -->
   <string name="play">Play</string>
   <string name="skip_forward_30">Skip forward</string>
   <string name="skip_back_10">Skip back</string>
+  <string name="mark_done">Mark done</string>
+  <string name="download">Download</string>
+  <string name="status_downloaded">Downloaded</string>
+  <string name="status_downloading">Downloading...</string>
 
   <!-- Notification controls -->
   <string name="pause">Pause</string>

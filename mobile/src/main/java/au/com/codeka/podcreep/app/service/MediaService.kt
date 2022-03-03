@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import android.view.KeyEvent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -42,11 +43,11 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
         MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
-    mediaManager = MediaManager(this, session, App.i.taskRunner, App.i.store)
+    mediaManager = MediaManager(this, session, App.i.taskRunner, App.i.mediaCache, App.i.store)
     notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
     audioFocusManager = AudioFocusManager(this, mediaManager)
 
-    browseTreeGenerator = BrowseTreeGenerator(App.i.store, this)
+    browseTreeGenerator = BrowseTreeGenerator(App.i.store, App.i.iconCache, App.i.mediaCache, this)
 
     lifecycle.currentState = Lifecycle.State.RESUMED
   }
@@ -86,7 +87,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
 
     // If someone's getting our root node, we'll do a sync now so we'll be ready when they request
     // our non-root nodes.
-    SyncManager(this, App.i.taskRunner).maybeSync()
+    App.i.syncManager.maybeSync()
 
     return BrowserRoot("root", null)
   }
@@ -136,8 +137,23 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
     }
 
     override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
-      Log.i(TAG, "onMediaButtonEvent($mediaButtonEvent)")
-      return super.onMediaButtonEvent(mediaButtonEvent)
+      val keyEvent = mediaButtonEvent.extras?.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+      if (keyEvent == null || keyEvent.action != KeyEvent.ACTION_DOWN) {
+        // Not an event we are able to handle.
+        return false
+      }
+
+      when(keyEvent.keyCode) {
+        KeyEvent.KEYCODE_MEDIA_PAUSE -> onPause()
+        KeyEvent.KEYCODE_MEDIA_PLAY -> onPlay()
+        KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD -> onSkipToNext()
+        KeyEvent.KEYCODE_MEDIA_NEXT -> onSkipToNext()
+        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> onSkipToPrevious()
+        KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD -> onSkipToPrevious()
+        KeyEvent.KEYCODE_MEDIA_STOP -> onStop()
+        else -> return false
+      }
+      return true
     }
 
     override fun onStop() {

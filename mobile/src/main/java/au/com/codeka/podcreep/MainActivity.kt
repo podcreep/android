@@ -11,7 +11,7 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import au.com.codeka.podcreep.R.layout.activity
-import au.com.codeka.podcreep.app.podcasts.details.DetailsScreen
+import au.com.codeka.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.discover.DiscoverScreen
 import au.com.codeka.podcreep.app.service.MediaServiceClient
 import au.com.codeka.podcreep.concurrency.Threads
@@ -22,11 +22,11 @@ import au.com.codeka.podcreep.app.welcome.LoginScreen
 import au.com.codeka.podcreep.app.welcome.WelcomeScreen
 import kotlinx.android.synthetic.main.activity.*
 import android.util.TypedValue
+import android.view.Menu
 import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.app.service.SyncManager
-import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
@@ -49,9 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     // Make sure the sync worker is set up to periodically sync with the server. Also, do a sync now
     // if we haven't done one in a while.
-    val syncManager = SyncManager(this, App.i.taskRunner)
-    syncManager.maybeEnqueue()
-    syncManager.maybeSync()
+    App.i.syncManager.maybeEnqueue()
+    App.i.syncManager.maybeSync()
 
     val actionbarSizeTypedArray = obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
     actionBarHeight = actionbarSizeTypedArray.getDimension(0, 0f).toInt()
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     ss.register<DiscoverScreen> {
       _: ScreenContext, _: Array<Any>? -> DiscoverScreen(App.i.taskRunner, App.i.store)
     }
-    ss.register<DetailsScreen> {
+    ss.register<PodcastDetailsScreen> {
       _: ScreenContext,
       params: Array<Any>? ->
       @Suppress("UNCHECKED_CAST")
@@ -117,7 +116,7 @@ class MainActivity : AppCompatActivity() {
           true
         }
         R.id.nav_refresh -> {
-          SyncManager(this, App.i.taskRunner).sync()
+          App.i.syncManager.sync()
           true
         }
         else -> false
@@ -131,8 +130,13 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
+<<<<<<< HEAD
         if ((screenStack?.depth ?: 0) > 1) {
           // If you're deeper in the screen stack, the home back is "back".
+=======
+        if (screenStack?.depth ?: 0 > 1) {
+          // If you're deeper in the screen stack, the home button is "back".
+>>>>>>> 1c35c3f65de13a09c076199e406884ea8d4fff8c
           screenStack?.pop()
         } else {
           // TODO: animate some kind of transition or something?
@@ -140,12 +144,31 @@ class MainActivity : AppCompatActivity() {
         }
         true
       }
-      else -> super.onOptionsItemSelected(item)
+      else -> {
+        val handled = screenStack?.top?.onMenuItemSelected(item)
+        if (handled != null && handled) {
+          return true
+        }
+
+        super.onOptionsItemSelected(item)
+      }
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    val menuId = screenStack?.top?.options?.actionBarMenu
+    if (menuId == null) {
+      menu?.clear()
+    } else {
+      menuInflater.inflate(menuId, menu)
+    }
+
+    return true
   }
 
   private fun onScreensUpdated(prev: Screen?, current: Screen?) {
     enableActionBar(current?.options?.enableActionBar ?: false)
+    invalidateOptionsMenu()
 
     // Change the home button to a back button if we're deep in the hierarchy.
     // TODO: animate the transition
