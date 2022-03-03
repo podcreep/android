@@ -27,6 +27,7 @@ import androidx.lifecycle.LiveData
 import au.com.codeka.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import au.com.codeka.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
 import au.com.codeka.podcreep.app.service.SyncManager
+import au.com.codeka.podcreep.model.store.Episode
 import au.com.codeka.podcreep.model.store.Podcast
 import au.com.codeka.podcreep.net.HttpException
 import au.com.codeka.podcreep.net.HttpRequest
@@ -68,9 +69,9 @@ class MainActivity : AppCompatActivity() {
     ss.register<PodcastDetailsScreen> {
       _: ScreenContext,
       params: Array<Any>? ->
-      @Suppress("UNCHECKED_CAST")
-      val podcast = params?.get(0) as LiveData<Podcast>
-      DetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
+        @Suppress("UNCHECKED_CAST")
+        val podcast = params?.get(0) as LiveData<Podcast>
+      PodcastDetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
     }
     ss.register<EpisodeDetailsScreen> {
       _: ScreenContext,
@@ -80,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
       @Suppress("UNCHECKED_CAST")
       val episode = params[0] as LiveData<Episode>
-      EpisodeDetailsScreen(App.i.taskRunner, App.i.store, podcast, episode)
+      EpisodeDetailsScreen(App.i.taskRunner, App.i.store, App.i.mediaCache, podcast.value!!, episode.value!!)
     }
     screenStack = ss
 
@@ -130,13 +131,8 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-<<<<<<< HEAD
         if ((screenStack?.depth ?: 0) > 1) {
-          // If you're deeper in the screen stack, the home back is "back".
-=======
-        if (screenStack?.depth ?: 0 > 1) {
           // If you're deeper in the screen stack, the home button is "back".
->>>>>>> 1c35c3f65de13a09c076199e406884ea8d4fff8c
           screenStack?.pop()
         } else {
           // TODO: animate some kind of transition or something?
@@ -155,10 +151,10 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
     val menuId = screenStack?.top?.options?.actionBarMenu
     if (menuId == null) {
-      menu?.clear()
+      menu.clear()
     } else {
       menuInflater.inflate(menuId, menu)
     }
