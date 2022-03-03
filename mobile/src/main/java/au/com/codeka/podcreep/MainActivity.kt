@@ -68,21 +68,20 @@ class MainActivity : AppCompatActivity() {
     }
     ss.register<DetailsScreen> {
       _: ScreenContext,
-      params: Array<Any>? -> {
-        @Suppress("UNCHECKED_CAST")
-        val podcast = params?.get(0) as LiveData<Podcast>
-        DetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
-      }()
+      params: Array<Any>? ->
+      @Suppress("UNCHECKED_CAST")
+      val podcast = params?.get(0) as LiveData<Podcast>
+      DetailsScreen(App.i.taskRunner, App.i.store, podcast.value!!.id, podcast)
     }
     ss.register<EpisodeDetailsScreen> {
       _: ScreenContext,
-      params: Array<Any>? -> {
-        @Suppress("UNCHECKED_CAST")
-        val podcast = params?.get(0) as LiveData<Podcast>
-        @Suppress("UNCHECKED_CAST")
-        val episode = params[0] as LiveData<Episode>
-        EpisodeDetailsScreen(App.i.taskRunner, App.i.store, podcast, episode)
-      }()
+      params: Array<Any>? ->
+      @Suppress("UNCHECKED_CAST")
+      val podcast = params?.get(0) as LiveData<Podcast>
+
+      @Suppress("UNCHECKED_CAST")
+      val episode = params[0] as LiveData<Episode>
+      EpisodeDetailsScreen(App.i.taskRunner, App.i.store, podcast, episode)
     }
     screenStack = ss
 
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        if (screenStack?.depth ?: 0 > 1) {
+        if ((screenStack?.depth ?: 0) > 1) {
           // If you're deeper in the screen stack, the home back is "back".
           screenStack?.pop()
         } else {
