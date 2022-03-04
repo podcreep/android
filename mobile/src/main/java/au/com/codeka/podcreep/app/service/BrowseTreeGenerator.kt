@@ -93,33 +93,33 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
     result.detach()
 
-    store.inProgress().observeOnce(lifecycleOwner, Observer {
-      episodes -> run {
-      populateEpisodeResult(result, episodes)
+    store.inProgress().observeOnce(lifecycleOwner) { episodes ->
+      run {
+        populateEpisodeResult(result, episodes)
+      }
     }
-    })
   }
 
   private fun onLoadNewEpisodesChildren(
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
     result.detach()
 
-    store.newEpisodes().observeOnce(lifecycleOwner, Observer {
-      episodes -> run {
-      populateEpisodeResult(result, episodes)
+    store.newEpisodes().observeOnce(lifecycleOwner) { episodes ->
+      run {
+        populateEpisodeResult(result, episodes)
+      }
     }
-    })
   }
 
   private fun onLoadSubscriptionsChildren(
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
     result.detach()
 
-    subscriptions.observeOnce(lifecycleOwner, Observer {
-      subscriptions -> run {
+    subscriptions.observeOnce(lifecycleOwner) { subscriptions ->
+      run {
         populateSubscriptionsResult(result, subscriptions)
       }
-    })
+    }
   }
 
   private fun populateSubscriptionsResult(
@@ -128,7 +128,7 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
     val items = ArrayList<MediaBrowserCompat.MediaItem>()
     for (sub in subscriptions) {
       val desc = MediaDescriptionCompat.Builder()
-          .setMediaId("sub:${sub.id}")
+          .setMediaId("sub:${sub.podcastID}")
           .setTitle(sub.podcast.value?.title)
           .setIconUri(iconCache.getRemoteUri(sub.podcast.value!!))
           .build()
@@ -140,8 +140,8 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
   private fun populateEpisodeResult(
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>,
       episodes: List<Episode>) {
-    subscriptions.observeOnce(lifecycleOwner, Observer {
-      subscriptions -> run {
+    subscriptions.observeOnce(lifecycleOwner) { subscriptions ->
+      run {
         val podcasts = HashMap<Long, Podcast>()
         for (sub in subscriptions) {
           val podcast = sub.podcast.value
@@ -159,26 +159,28 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
         }
         result.sendResult(items)
       }
-    })
+    }
   }
 
   private fun onLoadSubscriptionChildren(
-      subscriptionId: Long,
+      podcastId: Long,
       result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
     result.detach()
-    subscriptions.observeOnce(lifecycleOwner, Observer {
-      subscriptions -> run {
+    subscriptions.observeOnce(lifecycleOwner) { subscriptions ->
+      run {
         for (sub in subscriptions) {
-          if (sub.id == subscriptionId) {
-            store.episodes(sub.podcastID).observeOnce(lifecycleOwner, Observer {
-              episodes -> run {
+          if (sub.podcastID == podcastId) {
+            store.episodes(sub.podcastID).observeOnce(lifecycleOwner) { episodes ->
+              run {
                 val items = ArrayList<MediaBrowserCompat.MediaItem>()
                 for (ep in episodes) {
                   val podcast = sub.podcast.value!!
                   val desc = populateEpisode(podcast, ep)
                   items.add(
-                      MediaBrowserCompat.MediaItem(
-                          desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+                    MediaBrowserCompat.MediaItem(
+                      desc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+                    )
+                  )
 
                   if (items.size > MAX_RESULT_SIZE) {
                     break
@@ -186,11 +188,11 @@ class BrowseTreeGenerator(private val store: Store, private val iconCache: Podca
                 }
                 result.sendResult(items)
               }
-            })
+            }
           }
         }
       }
-    })
+    }
   }
 
   private fun populateEpisode(podcast: Podcast, episode: Episode): MediaDescriptionCompat {

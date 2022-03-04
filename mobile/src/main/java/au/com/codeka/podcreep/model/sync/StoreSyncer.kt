@@ -54,21 +54,20 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
           .toByteArray(Charsets.UTF_8)
 
       val podcast = Podcast(
-          id = sub.podcast!!.id,
-          title = sub.podcast!!.title,
-          description = sub.podcast!!.description,
-          imageUrl = sub.podcast!!.imageUrl)
+          id = sub.podcast.id,
+          title = sub.podcast.title,
+          description = sub.podcast.description,
+          imageUrl = sub.podcast.imageUrl)
       store.podcasts().insert(podcast)
       iconCache.refresh(podcast)
 
       store.subscriptions().insert(Subscription(
-          id = sub.id,
-          podcastID = sub.podcastID,
+          podcastID = sub.podcast.id,
           positionsJson = positionsJson))
 
-      if (sub.podcast!!.episodes != null) {
-        Log.i(TAG, "  adding '${sub.podcast!!.episodes!!.size}' episodes.")
-        for (ep in sub.podcast!!.episodes!!) {
+      if (sub.podcast.episodes != null) {
+        Log.i(TAG, "  adding '${sub.podcast.episodes!!.size}' episodes.")
+        for (ep in sub.podcast.episodes!!) {
           store.episodes().insert(Episode(
               id = ep.id,
               podcastID = podcast.id,

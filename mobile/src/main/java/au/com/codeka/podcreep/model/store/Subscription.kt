@@ -11,11 +11,10 @@ import androidx.room.*
         childColumns = arrayOf("podcastID"))],
     indices = [Index("podcastID")])
 class Subscription(
-    @PrimaryKey val id: Long,
-    val podcastID: Long,
+    @PrimaryKey val podcastID: Long,
     @Ignore var podcast: MutableLiveData<Podcast>,
     val positionsJson: ByteArray) {
 
-  constructor(id: Long, podcastID: Long, positionsJson: ByteArray)
-      : this(id, podcastID, MutableLiveData(), positionsJson)
+  constructor(podcastID: Long, positionsJson: ByteArray)
+      : this(podcastID, MutableLiveData(), positionsJson)
 }
