@@ -10,8 +10,8 @@ android {
     applicationId "au.com.codeka.podcreep"
     minSdkVersion 26
     targetSdkVersion 31
-    versionCode 14
-    versionName "0.1.12"
+    versionCode project.properties["app.versionCode"] as Integer
+    versionName project.properties["app.versionName"]
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
