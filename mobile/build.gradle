@@ -16,8 +16,9 @@ android {
   }
   buildTypes {
     release {
-      minifyEnabled false
+      minifyEnabled true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
     }
   }
   dataBinding {
@@ -34,7 +35,6 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-//  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation 'androidx.appcompat:appcompat:1.6.0-alpha01'
   implementation 'com.google.android.material:material:1.6.0-alpha03'
