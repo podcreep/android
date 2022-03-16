@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     MediaServiceClient.i.setup(this)
 
     val ss = ScreenStack(this, content)
-    ss.screenUpdated += { (prev: Screen?, current: Screen?) -> onScreensUpdated(prev, current) }
+    ss.screenUpdated += { (_: Screen?, current: Screen?) -> onScreensUpdated(current) }
     ss.register<WelcomeScreen> { _: ScreenContext, _: Array<Any>? -> WelcomeScreen() }
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
     ss.register<DiscoverScreen> {
@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
-  private fun onScreensUpdated(prev: Screen?, current: Screen?) {
+  private fun onScreensUpdated(current: Screen?) {
     enableActionBar(current?.options?.enableActionBar ?: false)
     invalidateOptionsMenu()
 

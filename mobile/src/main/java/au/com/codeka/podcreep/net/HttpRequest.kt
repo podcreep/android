@@ -2,13 +2,15 @@ package au.com.codeka.podcreep.net
 
 import android.util.Log
 import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okio.BufferedSource
-import okio.Okio
+import okio.buffer
+import okio.source
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+
 /**
  * Simple wrapper around [HttpURLConnection] that lets us make HTTP requests more easily.
  */
@@ -59,7 +61,7 @@ class HttpRequest private constructor(
         throw HttpException(conn.responseCode, conn.responseMessage)
       }
 
-      return Okio.buffer(Okio.source(conn.inputStream))
+      return conn.inputStream.source().buffer()
     } catch (e: HttpException) {
       for (errorHandler in globalErrorHandlers) {
         errorHandler.onError(e)

@@ -2,6 +2,7 @@ package au.com.codeka.podcreep
 
 import android.app.Application
 import android.os.Handler
+import android.os.Looper
 import au.com.codeka.podcreep.app.service.SyncManager
 import au.com.codeka.podcreep.concurrency.TaskRunner
 import au.com.codeka.podcreep.concurrency.Threads
@@ -23,7 +24,7 @@ class App : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    Threads.UI.setThread(Thread.currentThread(), Handler())
+    Threads.UI.setThread(Thread.currentThread(), Handler(Looper.getMainLooper()))
 
     _taskRunner = TaskRunner()
     _store = Store(this, taskRunner)
