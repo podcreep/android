@@ -74,7 +74,7 @@ class NotificationManager(
       // Enable launching the player by clicking the notification. Just launch the main activity
       // for now. TODO: find something better?
       val intent = Intent(service, MainActivity::class.java)
-      setContentIntent(PendingIntent.getActivity(service, 0, intent, 0))
+      setContentIntent(PendingIntent.getActivity(service, 0, intent, PendingIntent.FLAG_IMMUTABLE))
 
       // Stop the service when the notification is swiped away
       setDeleteIntent(

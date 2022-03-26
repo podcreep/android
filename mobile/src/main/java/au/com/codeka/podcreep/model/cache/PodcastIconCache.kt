@@ -3,7 +3,6 @@ package au.com.codeka.podcreep.model.cache
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -65,10 +64,8 @@ class PodcastIconCache(private val appContext: Context, private val store: Store
           .build()
       val ins = req.execute().inputStream()
       var bmp: Bitmap
-      try {
+      ins.use { ins ->
         bmp = BitmapFactory.decodeStream(ins)
-      } finally {
-        ins.close()
       }
 
       Log.i(TAG, " - icon downloaded for '${podcast.title}': ${bmp.width}x${bmp.height}")

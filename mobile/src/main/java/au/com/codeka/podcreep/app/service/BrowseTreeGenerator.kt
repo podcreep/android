@@ -7,7 +7,6 @@ import androidx.media.MediaBrowserServiceCompat
 import java.util.ArrayList
 import android.support.v4.media.MediaDescriptionCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import au.com.codeka.podcreep.model.cache.EpisodeMediaCache
 import au.com.codeka.podcreep.model.cache.PodcastIconCache
 import au.com.codeka.podcreep.model.store.Episode
