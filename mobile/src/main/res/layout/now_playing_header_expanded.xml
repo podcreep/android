@@ -7,7 +7,7 @@
   <data>
     <variable
       name="vm"
-      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
+      type="com.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
   </data>
 
   <RelativeLayout

@@ -8,13 +8,13 @@
     <import type="androidx.core.content.ContextCompat" />
     <variable
         name="callbacks"
-        type="au.com.codeka.podcreep.app.podcasts.episode.BaseEpisodeListLayout.Callbacks" />
+        type="com.podcreep.app.podcasts.episode.BaseEpisodeListLayout.Callbacks" />
     <variable
         name="vm"
-        type="au.com.codeka.podcreep.app.podcasts.episode.EpisodeRowViewModel" />
+        type="com.podcreep.app.podcasts.episode.EpisodeRowViewModel" />
     <variable
         name="iconCache"
-        type="au.com.codeka.podcreep.model.cache.PodcastIconCache" />
+        type="com.podcreep.model.cache.PodcastIconCache" />
   </data>
 
   <RelativeLayout

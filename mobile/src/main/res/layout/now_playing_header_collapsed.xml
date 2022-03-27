@@ -7,7 +7,7 @@
   <data>
     <variable
       name="vm"
-      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
+      type="com.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
   </data>
 
   <RelativeLayout
@@ -52,7 +52,7 @@
       android:text="@{vm.metadata.description.subtitle}"
       tools:text="Episode title" />
 
-    <au.com.codeka.podcreep.app.views.PlayPauseButton
+    <com.podcreep.app.views.PlayPauseButton
       android:id="@+id/play_pause"
       android:layout_width="64dp"
       android:layout_height="64dp"
@@ -73,6 +73,5 @@
       android:progress="@{vm.progress}"/>
 
   </RelativeLayout>
-
 </layout>
 

@@ -31,15 +31,14 @@
       android:background="@drawable/top_shadow"
       app:layout_anchor="@+id/now_playing" />
 
-    <au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingSheet
+    <com.podcreep.app.podcasts.nowplaying.NowPlayingSheet
       android:id="@+id/now_playing"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
       app:behavior_hideable="false"
       app:behavior_peekHeight="64dp">
-
-    </au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingSheet>
+    </com.podcreep.app.podcasts.nowplaying.NowPlayingSheet>
   </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
   <com.google.android.material.navigation.NavigationView

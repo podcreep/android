@@ -6,7 +6,7 @@
   <data>
     <variable
         name="iconCache"
-        type="au.com.codeka.podcreep.model.cache.PodcastIconCache" />
+        type="com.podcreep.model.cache.PodcastIconCache" />
   </data>
 
   <RelativeLayout

@@ -6,10 +6,10 @@
   <data>
     <variable
       name="podcast"
-      type="au.com.codeka.podcreep.model.store.Podcast" />
+      type="com.podcreep.model.store.Podcast" />
     <variable
         name="iconCache"
-        type="au.com.codeka.podcreep.model.cache.PodcastIconCache" />
+        type="com.podcreep.model.cache.PodcastIconCache" />
   </data>
 
   <RelativeLayout

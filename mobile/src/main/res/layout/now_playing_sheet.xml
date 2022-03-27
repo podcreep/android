@@ -6,7 +6,7 @@
   <data>
     <variable
       name="vm"
-      type="au.com.codeka.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
+      type="com.podcreep.app.podcasts.nowplaying.NowPlayingViewModel" />
   </data>
 
   <LinearLayout
@@ -72,7 +72,7 @@
         android:scaleType="center"
         android:onClick="@{() -> vm.onSkipBackClick()}" />
 
-      <au.com.codeka.podcreep.app.views.PlayPauseButton
+      <com.podcreep.app.views.PlayPauseButton
         android:id="@+id/play_pause"
         android:layout_width="72dp"
         android:layout_height="72dp"
