@@ -11,15 +11,18 @@ import com.podcreep.model.sync.data.SubscriptionJson
 import com.podcreep.net.HttpRequest
 import com.podcreep.net.Server
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
+@JsonClass(generateAdapter = false)
 data class SubscriptionsSyncPostRequest(
     @Json(name="todo")
     val todo: Boolean)
 
+@JsonClass(generateAdapter = false)
 data class SubscriptionsSyncPostResponse(
     @Json(name="subscriptions")
     val subscriptions: List<SubscriptionJson>)

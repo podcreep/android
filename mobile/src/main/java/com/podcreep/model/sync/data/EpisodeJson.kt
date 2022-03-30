@@ -1,7 +1,9 @@
 package com.podcreep.model.sync.data
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = false)
 data class EpisodeJson(
     @Json(name="id")
     val id: Long,

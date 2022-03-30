@@ -2,7 +2,6 @@ package com.podcreep.app.welcome
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.Keep
 import com.podcreep.Settings
 import com.podcreep.app.podcasts.discover.DiscoverScreen
 import com.podcreep.concurrency.TaskRunner
@@ -13,7 +12,9 @@ import com.podcreep.ui.Screen
 import com.podcreep.ui.ScreenContext
 import com.podcreep.ui.ScreenOptions
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = false)
 data class LoginRequest(
     @Json(name="username")
     val username: String,
@@ -22,7 +23,7 @@ data class LoginRequest(
     val password: String
 )
 
-@Keep
+@JsonClass(generateAdapter = false)
 data class LoginResponse(
     @Json(name="cookie")
     val cookie: String
@@ -58,6 +59,7 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
   }
 
   override fun onShow(): View? {
+    super.onShow()
     return layout
   }
 }
