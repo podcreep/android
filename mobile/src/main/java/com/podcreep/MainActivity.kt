@@ -75,11 +75,9 @@ class MainActivity : AppCompatActivity() {
       _: ScreenContext,
       params: Array<Any>? ->
       @Suppress("UNCHECKED_CAST")
-      val podcast = params?.get(0) as LiveData<Podcast>
+      val data = params?.get(0) as EpisodeDetailsScreen.Data
 
-      @Suppress("UNCHECKED_CAST")
-      val episode = params[0] as LiveData<Episode>
-      EpisodeDetailsScreen(App.i.taskRunner, App.i.store, App.i.mediaCache, podcast.value!!, episode.value!!)
+      EpisodeDetailsScreen(App.i.taskRunner, App.i.store, App.i.mediaCache, data.podcast.value!!, data.episode)
     }
     screenStack = ss
 

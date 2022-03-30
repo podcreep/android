@@ -29,7 +29,7 @@ class SubscriptionsScreen(private val store: Store): Screen() {
         store,
         App.i.taskRunner,
         callbacks = object : SubscriptionsLayout.Callbacks {
-          override fun onEpisodeDetails(podcast: Podcast, episode: Episode) {
+          override fun onEpisodeDetails(podcast: LiveData<Podcast>, episode: Episode) {
             context.pushScreen<EpisodeDetailsScreen>(EpisodeDetailsScreen.Data(podcast, episode))
           }
 

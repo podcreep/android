@@ -1,6 +1,7 @@
 package com.podcreep.app.podcasts.episode
 
 import android.view.View
+import androidx.lifecycle.LiveData
 import com.podcreep.R
 import com.podcreep.model.cache.EpisodeMediaCache
 import com.podcreep.model.store.Episode
@@ -9,7 +10,7 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 /** View model for showing an episode in a row of {@link BaseEpisodeListLayout}. */
-class EpisodeRowViewModel(val podcast: Podcast, val episode: Episode,
+class EpisodeRowViewModel(val podcast: LiveData<Podcast>, val episode: Episode,
                           private val mediaCache: EpisodeMediaCache) {
   fun isInProgress(): Boolean {
     val pos = episode.position
@@ -38,21 +39,21 @@ class EpisodeRowViewModel(val podcast: Podcast, val episode: Episode,
   }
 
   val statusIconResId: Int
-    get() = when (mediaCache.getStatus(podcast, episode)) {
+    get() = when (mediaCache.getStatus(podcast.value!!, episode)) {
       EpisodeMediaCache.Status.Downloaded -> R.drawable.ic_download_24dp
       EpisodeMediaCache.Status.InProgress -> R.drawable.ic_dots_horz_24dp
       else -> R.drawable.ic_download_24dp // We'll be hidden anyway, so doesn't matter
     }
 
   val statusTextResId: Int
-    get() = when (mediaCache.getStatus(podcast, episode)) {
+    get() = when (mediaCache.getStatus(podcast.value!!, episode)) {
       EpisodeMediaCache.Status.Downloaded -> R.string.status_downloaded
       EpisodeMediaCache.Status.InProgress -> R.string.status_downloading
       else -> R.string.status_downloaded // We'll be hidden anyway, so doesn't matter.
     }
 
   val statusIconVisibility: Int
-    get() = when(mediaCache.getStatus(podcast, episode)) {
+    get() = when(mediaCache.getStatus(podcast.value!!, episode)) {
       EpisodeMediaCache.Status.NotDownloaded -> View.GONE
       else -> View.VISIBLE
     }

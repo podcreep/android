@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +37,7 @@ open class BaseEpisodeListLayout(
   }
 
   interface Callbacks {
-    fun onEpisodeDetails(podcast: Podcast, episode: Episode)
+    fun onEpisodeDetails(podcast: LiveData<Podcast>, episode: Episode)
     fun onEpisodePlay(podcast: Podcast, episode: Episode)
   }
 
@@ -54,7 +55,7 @@ open class BaseEpisodeListLayout(
     episodesList.adapter = adapter
 
     model = Model(subscriptions, episodes)
-    model.observe(lifecycleOwner, Observer {
+    model.observe(lifecycleOwner, {
       m -> refresh(m.first, m.second)
     })
   }
@@ -103,7 +104,7 @@ open class BaseEpisodeListLayout(
         if (podcast == null || podcast.value == null) {
           continue
         }
-        rows.add(Row(podcast.value!!, ep))
+        rows.add(Row(podcast, ep))
       }
       notifyDataSetChanged()
     }
@@ -165,7 +166,7 @@ open class BaseEpisodeListLayout(
       if (epBinding != null) {
         epBinding.callbacks = callbacks
         epBinding.iconCache = App.i.iconCache // TODO: pass this in
-        epBinding.vm = EpisodeRowViewModel(row.podcast!!, row.episode!!, mediaCache)
+        epBinding.vm = EpisodeRowViewModel(row.podcast, row.episode!!, mediaCache)
         epBinding.executePendingBindings()
       } else if (dtBinding != null) {
         dtBinding.dt = row.date
@@ -178,17 +179,17 @@ open class BaseEpisodeListLayout(
   class Row {
     val viewType: Int
     val date: ZonedDateTime?
-    val podcast: Podcast?
+    val podcast: LiveData<Podcast>
     val episode: Episode?
 
     constructor(dt: ZonedDateTime) {
       viewType = 0
       date = dt
-      podcast = null
+      podcast = MutableLiveData()
       episode = null
     }
 
-    constructor(p: Podcast, ep: Episode) {
+    constructor(p: LiveData<Podcast>, ep: Episode) {
       viewType = 1
       date = null
       podcast = p

@@ -3,6 +3,7 @@ package com.podcreep.app.podcasts.episode
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import com.podcreep.R
 import com.podcreep.concurrency.TaskRunner
 import com.podcreep.model.cache.EpisodeMediaCache
@@ -59,5 +60,5 @@ class EpisodeDetailsScreen(
     }
   }
 
-  class Data (val podcast: Podcast, val episode: Episode)
+  class Data (val podcast: LiveData<Podcast>, val episode: Episode)
 }

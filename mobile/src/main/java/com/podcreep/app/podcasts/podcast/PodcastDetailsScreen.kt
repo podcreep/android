@@ -42,7 +42,7 @@ class PodcastDetailsScreen(
             MediaServiceClient.i.play(podcast, episode)
           }
 
-          override fun onEpisodeDetails(podcast: Podcast, episode: Episode) {
+          override fun onEpisodeDetails(podcast: LiveData<Podcast>, episode: Episode) {
             context.pushScreen<EpisodeDetailsScreen>(EpisodeDetailsScreen.Data(podcast, episode))
           }
         })
