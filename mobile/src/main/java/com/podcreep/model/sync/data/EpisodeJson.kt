@@ -20,6 +20,6 @@ data class EpisodeJson(
     @Json(name="mediaUrl")
     val mediaUrl: String,
 
-    @Json(name="pubDat")
+    @Json(name="pubDate")
     val pubDate: String
 )
