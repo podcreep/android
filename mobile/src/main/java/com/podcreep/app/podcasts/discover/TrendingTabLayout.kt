@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.Keep
 import androidx.lifecycle.MutableLiveData
 import com.podcreep.concurrency.TaskRunner
 import com.podcreep.concurrency.Threads
@@ -15,7 +16,7 @@ import com.podcreep.model.sync.data.PodcastListJson
 import com.podcreep.net.HttpRequest
 import com.podcreep.net.Server
 
-class TrendingTabLayout(
+class TrendingTabLayout @Keep constructor(
     context: Context,
     private val taskRunner: TaskRunner,
     private val callbacks: DiscoverLayout.Callbacks)

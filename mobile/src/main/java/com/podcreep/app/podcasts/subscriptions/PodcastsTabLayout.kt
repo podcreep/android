@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import androidx.annotation.Keep
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -18,7 +19,7 @@ import com.podcreep.model.store.Store
 import com.podcreep.model.store.Subscription
 import kotlinx.android.synthetic.main.sub_podcasts.view.*
 
-class PodcastsTabLayout(
+class PodcastsTabLayout @Keep constructor(
     context: Context,
     private val lifecyleOwner: LifecycleOwner,
     private val store: Store,

@@ -1,5 +1,10 @@
 # Add project specific ProGuard rules here.
 
+-keepclassmembers class * {
+    @androidx.annotation.Keep <init>(...);
+    @androidx.annotation.Keep <methods>;
+    @androidx.annotation.Keep <fields>;
+}
 
 ##### MOSHI ######
 
