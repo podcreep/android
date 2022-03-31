@@ -20,9 +20,7 @@ import com.podcreep.model.store.Store
 import com.podcreep.model.sync.data.PlaybackStateJson
 import com.podcreep.model.sync.PlaybackStateSyncer
 
-/**
- * MediaManager manages the actual playback of the media.
- */
+/** MediaManager manages the actual playback of the media. */
 class MediaManager(
     private val service: MediaService,
     private val mediaSession: MediaSessionCompat,
@@ -40,24 +38,26 @@ class MediaManager(
   }
 
   private var _playbackState = PlaybackStateCompat.Builder()
-  private var _metadata = MediaMetadataCompat.Builder()
-  private var _mediaPlayer: MediaPlayer? = null
+  val playbackState: PlaybackStateCompat.Builder
+    get() = _playbackState
 
-  private var _currPodcast: Podcast? = null
-  private var _currEpisode: Episode? = null
-  private var _timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
-  private var _updateQueued = false
+  private var metadata = MediaMetadataCompat.Builder()
+  private var mediaPlayer: MediaPlayer? = null
+  private var isPreparing: Boolean = false
+
+  private var currPodcast: Podcast? = null
+  private var currEpisode: Episode? = null
+  private var timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
+  private var updateQueued = false
 
   // We update the metadata at the same time as playback state, but we don't want to update the
   // metadata over and over if nothing changes, so this keeps track of the last podcast/episode
   // that we updated the metadata for.
-  private var _lastPodcast: Podcast? = null
-  private var _lastEpisode: Episode? = null
+  private var lastPodcast: Podcast? = null
+  private var lastEpisode: Episode? = null
+  private var lastIsPlaying: Boolean? = null
 
   private val handler = Handler()
-
-  val playbackState: PlaybackStateCompat.Builder
-    get() = _playbackState
 
   init {
     _playbackState.addCustomAction(
@@ -77,50 +77,54 @@ class MediaManager(
   }
 
   fun play(podcast: Podcast, episode: Episode) {
-    _currPodcast = podcast
-    _currEpisode = episode
+    currPodcast = podcast
+    currEpisode = episode
 
     val offset = episode.position ?: 0
 
     // TODO: if we haven't downloaded the media yet, instead of just using the live one, we should
     // start downloading it now and then play from there.
     val uri = mediaCache.getUri(podcast, episode) ?: Uri.parse(episode.mediaUrl)
-    _mediaPlayer = MediaPlayer().apply {
+    mediaPlayer = MediaPlayer().apply {
       setAudioAttributes(AudioAttributes.Builder()
           .setUsage(AudioAttributes.USAGE_MEDIA)
           .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
           .build())
       setDataSource(service, uri!!)
-      prepare()
-      seekTo(offset * 1000)
-      start()
+      setOnPreparedListener {
+        it.seekTo(offset * 1000)
+        it.start()
+        isPreparing = false
+      }
+      prepareAsync()
     }
+    isPreparing = true
     mediaSession.isActive = true
 
     updateState(false)
   }
 
   fun play() {
-    _mediaPlayer?.start()
+    mediaPlayer?.start()
     updateState(false)
   }
 
   fun pause() {
-    _mediaPlayer?.pause()
+    mediaPlayer?.pause()
     updateState(true)
   }
 
   fun skipForward() {
-    var currPos = _mediaPlayer?.currentPosition!!
+    var currPos = mediaPlayer?.currentPosition!!
     currPos += 30 * 1000
-    _mediaPlayer?.seekTo(currPos)
+    mediaPlayer?.seekTo(currPos)
     updateState(true)
   }
 
   fun skipBack() {
-    var currPos = _mediaPlayer?.currentPosition!!
+    var currPos = mediaPlayer?.currentPosition!!
     currPos -= 10 * 1000
-    _mediaPlayer?.seekTo(currPos)
+    mediaPlayer?.seekTo(currPos)
     updateState(true)
   }
 
@@ -133,29 +137,35 @@ class MediaManager(
   }
 
   private fun updateState(updateServer: Boolean) {
-    val currPodcast = _currPodcast
-    val currEpisode = _currEpisode
-    if (currEpisode != _lastEpisode && currPodcast != _lastPodcast) {
-      if (currEpisode != null && currPodcast != null) {
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currPodcast.title)
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currPodcast.title)
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currEpisode.title)
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, currPodcast.imageUrl)
-        _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, _mediaPlayer!!.duration.toLong())
+    val currPodcast = currPodcast
+    val currEpisode = currEpisode
+    val mp = mediaPlayer
+    if (currEpisode != lastEpisode && currPodcast != lastPodcast && mp?.isPlaying != lastIsPlaying) {
+      if (currEpisode != null && currPodcast != null && mp != null) {
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currPodcast.title)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currPodcast.title)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currEpisode.title)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, currPodcast.imageUrl)
+        if (mp.isPlaying) {
+          metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mp.duration.toLong())
+        } else {
+          metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+        }
       } else {
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, "")
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "")
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "")
-        _metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "")
-        _metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, "")
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "")
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "")
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "")
+        metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
       }
-      mediaSession.setMetadata(_metadata.build())
+      mediaSession.setMetadata(metadata.build())
 
-      _lastEpisode = currEpisode
-      _lastPodcast = currPodcast
+      lastEpisode = currEpisode
+      lastPodcast = currPodcast
+      lastIsPlaying = mp?.isPlaying
     }
 
-    val mediaPlayer = _mediaPlayer
+    val mediaPlayer = mediaPlayer
     if (mediaPlayer == null) {
       _playbackState.setState(
           PlaybackStateCompat.STATE_NONE, 0, 1.0f, SystemClock.elapsedRealtime())
@@ -164,10 +174,17 @@ class MediaManager(
       _playbackState.setActions(getSupportedActions(mediaPlayer.isPlaying))
       if (mediaPlayer.isPlaying) {
         _playbackState.setState(
-            PlaybackStateCompat.STATE_PLAYING,
-            mediaPlayer.currentPosition.toLong(),
-            1.0f,
-            SystemClock.elapsedRealtime())
+          PlaybackStateCompat.STATE_PLAYING,
+          mediaPlayer.currentPosition.toLong(),
+          1.0f,
+          SystemClock.elapsedRealtime()
+        )
+      } else if (isPreparing) {
+        _playbackState.setState(
+          PlaybackStateCompat.STATE_BUFFERING,
+          mediaPlayer.currentPosition.toLong(),
+          1.0f,
+          SystemClock.elapsedRealtime())
       } else {
         _playbackState.setState(
             PlaybackStateCompat.STATE_PAUSED,
@@ -181,24 +198,24 @@ class MediaManager(
     if (updateServer) {
       updateServerState()
     } else {
-      _timeToServerUpdate --
-      if (_timeToServerUpdate <= 0) {
+      timeToServerUpdate --
+      if (timeToServerUpdate <= 0) {
         updateServerState()
       }
     }
 
     // Update our internal store of the position.
     if (currPodcast != null && currEpisode != null) {
-      currEpisode.position = _mediaPlayer!!.currentPosition / 1000
+      currEpisode.position = this.mediaPlayer!!.currentPosition / 1000
       taskRunner.runTask({ store.localStore.episodes().insert(currEpisode) }, Threads.BACKGROUND)
     }
 
-    if (!_updateQueued) {
+    if (!updateQueued) {
       handler.postDelayed({
-        _updateQueued = false
+        updateQueued = false
         updateState(false)
       }, 1000)
-      _updateQueued = true
+      updateQueued = true
     }
   }
 
@@ -213,11 +230,11 @@ class MediaManager(
   }
 
   private fun updateServerState() {
-    _timeToServerUpdate = SERVER_UPDATE_FREQUENCY_SECONDS
+    timeToServerUpdate = SERVER_UPDATE_FREQUENCY_SECONDS
 
-    val podcastID = _currPodcast?.id ?: return
-    val episodeID = _currEpisode?.id ?: return
-    val position = _mediaPlayer?.currentPosition ?: return
+    val podcastID = currPodcast?.id ?: return
+    val episodeID = currEpisode?.id ?: return
+    val position = mediaPlayer?.currentPosition ?: return
     val state = PlaybackStateJson(podcastID, episodeID, position / 1000)
     PlaybackStateSyncer(service, taskRunner).sync(state)
   }

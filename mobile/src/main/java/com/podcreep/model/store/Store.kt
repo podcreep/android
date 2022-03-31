@@ -25,7 +25,7 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
       .build()
 
   /**
-   * Gets a list of the sub_podcasts the user has subscribed to. We'll also keep the podcast within
+   * Gets a list of the subscriptions the user has subscribed to. We'll also keep the podcast within
    * the subscription updated as well.
    */
   fun subscriptions(): LiveData<List<Subscription>> {
@@ -54,8 +54,7 @@ class Store(applicationContext: Context, private val taskRunner: TaskRunner) {
   }
 
   /**
-   * Fetches a list of in-progress episodes (that is, episodes that we have listened to a least
-   * some of).
+   * Fetches a list of in-progress episodes (that is, episodes that we have listened to at least some of).
    */
   fun inProgress(): LiveData<List<Episode>> {
     return localStore.episodes().getInProgress()

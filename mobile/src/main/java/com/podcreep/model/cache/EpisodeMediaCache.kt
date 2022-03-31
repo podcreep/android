@@ -12,8 +12,8 @@ import com.podcreep.net.HttpRequest
 import java.io.File
 
 /**
- * This is the episode cache. You can download the media file for a podcast episode and then play
- * it back from here directly. This allows us offline access to our podcasts.
+ * This is the episode cache. You can download the media file for a podcast episode and then play it back from here
+ * directly. This allows us offline access to our podcasts.
  */
 class EpisodeMediaCache(private val appContext: Context, private val taskRunner: TaskRunner) {
   companion object {
@@ -50,8 +50,7 @@ class EpisodeMediaCache(private val appContext: Context, private val taskRunner:
   }
 
   /**
-   * Gets the Uri for playing the episode from the given file. Returns null if the file hasn't
-   * been downloaded.
+   * Gets the Uri for playing the episode from the given file. Returns null if the file hasn't been downloaded.
    */
   fun getUri(podcast: Podcast, episode: Episode): Uri? {
     val file = cacheFile(podcast, episode)
