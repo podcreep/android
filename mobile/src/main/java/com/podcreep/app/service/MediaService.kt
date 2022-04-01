@@ -19,7 +19,8 @@ import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 
 /**
- * This is the main media service for Pod Creep. It handles playback and also
+ * This is the main media service for Pod Creep. It handles playback and also lets other bits of the UI know what's
+ * going on.
  */
 class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
   companion object {

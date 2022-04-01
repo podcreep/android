@@ -95,9 +95,11 @@ class MediaManager(
         it.seekTo(offset * 1000)
         it.start()
         isPreparing = false
+        Log.i(TAG, "Playing: $uri")
       }
       prepareAsync()
     }
+    Log.i(TAG, "Preparing to play: $uri")
     isPreparing = true
     mediaSession.isActive = true
 

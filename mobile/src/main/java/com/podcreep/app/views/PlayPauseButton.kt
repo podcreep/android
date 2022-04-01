@@ -3,46 +3,38 @@ package com.podcreep.app.views
 import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
 import android.view.View
-import android.widget.ImageView
 import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import com.podcreep.R
+import com.podcreep.app.service.MediaServiceClient
 
-class PlayPauseButton(context: Context, attrs: AttributeSet) : ImageView(context, attrs) {
+class PlayPauseButton(context: Context, attrs: AttributeSet) : AppCompatImageView(context, attrs) {
   sealed class Mode(val styleableInt: Int, @DrawableRes val drawableRes: Int) {
     object PLAY : Mode(0, R.drawable.pause_to_play_animation)
     object PAUSE : Mode(1, R.drawable.play_to_pause_animation)
   }
 
-  private var realOnClickListener: View.OnClickListener? = null
-
-  private var currentMode: Mode = Mode.PLAY
+  private var currentMode: Mode = Mode.PAUSE
     set(value) {
       field = value
       setImageDrawable(field)
       drawable.startAsAnimatable()
     }
 
-  init {
-    super.setOnClickListener {
-        if (currentMode == Mode.PLAY) {
-          currentMode = Mode.PAUSE
-        } else {
-          currentMode = Mode.PLAY
-        }
-        drawable.startAsAnimatable()
-
-        if (realOnClickListener != null) {
-          realOnClickListener!!.onClick(this)
-        }
-      }
-    currentMode = Mode.PAUSE
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    MediaServiceClient.i.addCallback(mediaControllerCallback)
+    currentMode = Mode.PLAY
   }
 
-  override fun setOnClickListener(l: OnClickListener?) {
-    realOnClickListener = l
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    MediaServiceClient.i.removeCallback(mediaControllerCallback)
   }
 
   private fun Drawable.startAsAnimatable() = (this as Animatable).start()
@@ -50,5 +42,30 @@ class PlayPauseButton(context: Context, attrs: AttributeSet) : ImageView(context
   private fun setImageDrawable(mode: Mode) {
     val animatedVector = ContextCompat.getDrawable(context, mode.drawableRes)
     this.setImageDrawable(animatedVector)
+  }
+
+  private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
+    override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+      super.onPlaybackStateChanged(state)
+
+      var newMode = currentMode
+      when (state?.state) {
+          PlaybackStateCompat.STATE_BUFFERING -> {
+            newMode = Mode.PAUSE
+          }
+          PlaybackStateCompat.STATE_PLAYING -> {
+            newMode = Mode.PAUSE
+          }
+          PlaybackStateCompat.STATE_PAUSED -> {
+            newMode = Mode.PLAY
+          }
+          else -> {
+            // what to do?
+          }
+      }
+      if (newMode != currentMode) {
+        currentMode = newMode
+      }
+    }
   }
 }
