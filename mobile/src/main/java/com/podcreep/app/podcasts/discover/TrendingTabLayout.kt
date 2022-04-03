@@ -33,7 +33,7 @@ class TrendingTabLayout @Keep constructor(
       val request = Server.request("/api/podcasts")
           .method(HttpRequest.Method.GET)
           .build()
-      var resp = request.execute<PodcastListJson>()
+      val resp = request.execute<PodcastListJson>()
       taskRunner.runTask({
         adapter = Adapter(resp.podcasts, callbacks)
       }, Threads.UI)

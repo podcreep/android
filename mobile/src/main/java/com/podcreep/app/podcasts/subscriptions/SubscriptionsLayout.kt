@@ -1,18 +1,16 @@
 package com.podcreep.app.podcasts.subscriptions
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import androidx.annotation.Keep
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import com.podcreep.R
 import com.podcreep.app.podcasts.episode.BaseEpisodeListLayout
 import com.podcreep.concurrency.TaskRunner
-import com.podcreep.model.store.Episode
+import com.podcreep.databinding.SubscriptionsBinding
 import com.podcreep.model.store.Podcast
 import com.podcreep.model.store.Store
-import kotlinx.android.synthetic.main.discover.view.*
 
 class SubscriptionsLayout @Keep constructor(
     context: Context,
@@ -27,8 +25,10 @@ class SubscriptionsLayout @Keep constructor(
   }
 
   init {
-    View.inflate(context, R.layout.subscriptions, this)
-    viewpager.adapter = TabPagerAdapter(context, lifecycleOwner, store, taskRunner, callbacks)
-    tab_layout.setupWithViewPager(viewpager)
+    val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    val binding = SubscriptionsBinding.inflate(layoutInflater, this)
+
+    binding.viewpager.adapter = TabPagerAdapter(context, lifecycleOwner, store, taskRunner, callbacks)
+    binding.tabLayout.setupWithViewPager(binding.viewpager)
   }
 }

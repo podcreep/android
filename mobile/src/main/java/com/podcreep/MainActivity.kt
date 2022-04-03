@@ -8,12 +8,13 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LiveData
-import com.podcreep.R.layout.activity
 import com.podcreep.app.podcasts.discover.DiscoverScreen
 import com.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import com.podcreep.app.podcasts.podcast.PodcastDetailsScreen
@@ -22,27 +23,25 @@ import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.app.welcome.LoginScreen
 import com.podcreep.app.welcome.WelcomeScreen
 import com.podcreep.concurrency.Threads
-import com.podcreep.model.store.Episode
+import com.podcreep.databinding.ActivityBinding
 import com.podcreep.model.store.Podcast
 import com.podcreep.net.HttpException
 import com.podcreep.net.HttpRequest
 import com.podcreep.ui.Screen
 import com.podcreep.ui.ScreenContext
 import com.podcreep.ui.ScreenStack
-import kotlinx.android.synthetic.main.activity.*
-import kotlinx.android.synthetic.main.drawer_header.view.*
 
 /** The main, in fact one-and-only activity. */
 class MainActivity : AppCompatActivity() {
-  // Will be non-null between onCreate/onDestroy.
-  private var screenStack: ScreenStack? = null
-
+  private lateinit var screenStack: ScreenStack
+  private lateinit var binding: ActivityBinding
   private var actionBarHeight: Int = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(activity)
-    setSupportActionBar(toolbar)
+
+    binding = DataBindingUtil.setContentView(this, R.layout.activity)
+    setSupportActionBar(binding.toolbar)
     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
     MediaServiceClient.i.setup(this)
 
-    val ss = ScreenStack(this, content)
+    val ss = ScreenStack(this, binding.content)
     ss.screenUpdated += { (_: Screen?, current: Screen?) -> onScreensUpdated(current) }
     ss.register<WelcomeScreen> { _: ScreenContext, _: Array<Any>? -> WelcomeScreen() }
     ss.register<LoginScreen> { _: ScreenContext, _: Array<Any>? -> LoginScreen(App.i.taskRunner) }
@@ -100,7 +99,7 @@ class MainActivity : AppCompatActivity() {
       }
     })
 
-    nav_view.setNavigationItemSelectedListener {
+    binding.navView.setNavigationItemSelectedListener {
       when (it.itemId) {
         R.id.nav_subscriptions -> {
           ss.home()
@@ -119,7 +118,8 @@ class MainActivity : AppCompatActivity() {
         else -> false
       }
     }
-    nav_view.getHeaderView(0).app_version.text = String.format("v%s", BuildConfig.VERSION_NAME)
+    val header: TextView = binding.navView.getHeaderView(0).findViewById(R.id.app_version)
+    header.text = String.format("v%s", BuildConfig.VERSION_NAME)
 
     MediaServiceClient.i.addCallback(mediaCallback)
   }
@@ -127,17 +127,18 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        if ((screenStack?.depth ?: 0) > 1) {
+        if (screenStack.depth > 1) {
           // If you're deeper in the screen stack, the home button is "back".
-          screenStack?.pop()
+          screenStack.pop()
         } else {
           // TODO: animate some kind of transition or something?
-          drawer_layout.openDrawer(GravityCompat.START)
+
+          binding.drawerLayout.openDrawer(GravityCompat.START)
         }
         true
       }
       else -> {
-        val handled = screenStack?.top?.onMenuItemSelected(item)
+        val handled = screenStack.top?.onMenuItemSelected(item)
         if (handled != null && handled) {
           return true
         }
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    val menuId = screenStack?.top?.options?.actionBarMenu
+    val menuId = screenStack.top?.options?.actionBarMenu
     if (menuId == null) {
       menu.clear()
     } else {
@@ -164,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
     // Change the home button to a back button if we're deep in the hierarchy.
     // TODO: animate the transition
-    if (screenStack!!.depth > 1) {
+    if (screenStack.depth > 1) {
       supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp)
     } else {
       supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp)
@@ -173,13 +174,13 @@ class MainActivity : AppCompatActivity() {
 
   private fun enableActionBar(enabled: Boolean) {
     if (enabled) {
-      drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+      binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
       supportActionBar?.show()
-      (content.layoutParams as CoordinatorLayout.LayoutParams).topMargin = actionBarHeight
+      (binding.content.layoutParams as CoordinatorLayout.LayoutParams).topMargin = actionBarHeight
     } else {
-      drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+      binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
       supportActionBar?.hide()
-      (content.layoutParams as CoordinatorLayout.LayoutParams).topMargin = 0
+      (binding.content.layoutParams as CoordinatorLayout.LayoutParams).topMargin = 0
     }
   }
 
@@ -188,12 +189,10 @@ class MainActivity : AppCompatActivity() {
 
     MediaServiceClient.i.removeCallback(mediaCallback)
     MediaServiceClient.i.destroy()
-
-    screenStack = null
   }
 
   override fun onBackPressed() {
-    if (!screenStack!!.pop()) {
+    if (!screenStack.pop()) {
       super.onBackPressed()
     }
   }
@@ -208,20 +207,19 @@ class MainActivity : AppCompatActivity() {
       var contentMarginPx = 0
       if (state?.state != PlaybackStateCompat.STATE_STOPPED &&
           state?.state != PlaybackStateCompat.STATE_NONE) {
-        now_playing.visibility = View.VISIBLE
-        shadow.visibility = View.VISIBLE
+        binding.nowPlaying.visibility = View.VISIBLE
+        binding.shadow.visibility = View.VISIBLE
 
         contentMarginPx = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             64.0f,
             resources.displayMetrics).toInt()
       } else {
-        now_playing.visibility = View.GONE
-        shadow.visibility = View.GONE
+        binding.nowPlaying.visibility = View.GONE
+        binding.shadow.visibility = View.GONE
       }
 
-      (content.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin = contentMarginPx
+      (binding.content.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin = contentMarginPx
     }
   }
-
 }

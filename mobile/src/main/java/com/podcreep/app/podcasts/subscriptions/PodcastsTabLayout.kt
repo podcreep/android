@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.podcreep.App
 import com.podcreep.R
 import com.podcreep.concurrency.TaskRunner
+import com.podcreep.databinding.SubPodcastsBinding
 import com.podcreep.databinding.SubPodcastsRowBinding
 import com.podcreep.model.store.Store
 import com.podcreep.model.store.Subscription
-import kotlinx.android.synthetic.main.sub_podcasts.view.*
 
 class PodcastsTabLayout @Keep constructor(
     context: Context,
@@ -31,12 +31,14 @@ class PodcastsTabLayout @Keep constructor(
   private val subscriptionsLiveData: LiveData<List<Subscription>>
 
   init {
-    View.inflate(context, R.layout.sub_podcasts, this)
+    val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    val binding = SubPodcastsBinding.inflate(layoutInflater, this)
+
     subscriptionsLiveData = store.subscriptions()
 
     adapter = Adapter(callbacks)
-    subscriptions.layoutManager = LinearLayoutManager(context)
-    subscriptions.adapter = adapter
+    binding.subscriptions.layoutManager = LinearLayoutManager(context)
+    binding.subscriptions.adapter = adapter
   }
 
   override fun onAttachedToWindow() {
