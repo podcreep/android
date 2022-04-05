@@ -6,7 +6,4 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = false)
 data class SubscriptionJson(
     @Json(name="podcast")
-    var podcast: PodcastJson,
-
-    @Json(name="positions")
-    val positions: Map<Long, Int>)
+    var podcast: PodcastJson)

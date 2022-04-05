@@ -20,6 +20,6 @@ data class PodcastJson(
     @Json(name="episodes")
     val episodes: List<EpisodeJson>?,
 
-    @Json(name="subscription")
-    val subscription: SubscriptionJson?)
+    @Json(name="isSubscribed")
+    val isSubscribed: Boolean?)
 

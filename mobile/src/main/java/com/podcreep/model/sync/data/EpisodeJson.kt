@@ -21,5 +21,11 @@ data class EpisodeJson(
     val mediaUrl: String,
 
     @Json(name="pubDate")
-    val pubDate: String
+    val pubDate: String,
+
+    @Json(name="progress")
+    val progress: Int?,
+
+    @Json(name="isComplete")
+    val isComplete: Boolean?
 )

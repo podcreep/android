@@ -59,11 +59,6 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
     for (sub in resp.subscriptions) {
       Log.i(TAG, "Syncing subscription '${sub.podcast.title}'")
 
-      val positionsJson = moshi
-          .adapter<Map<Long, Int>>(Map::class.java)
-          .toJson(sub.positions)
-          .toByteArray(Charsets.UTF_8)
-
       val podcast = Podcast(
           id = sub.podcast.id,
           title = sub.podcast.title,
@@ -86,7 +81,7 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
               description = ep.description,
               mediaUrl = ep.mediaUrl,
               pubDate = pubDateFmt.parse(ep.pubDate)!!,
-              position = sub.positions[ep.id]))
+              position = ep.position))
         }
       } else {
         Log.i(TAG, "  no episodes?")
