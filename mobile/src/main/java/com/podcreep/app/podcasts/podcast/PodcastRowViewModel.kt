@@ -21,12 +21,12 @@ class PodcastRowViewModel(val podcast: LiveData<Podcast>, val episode: LiveData<
   }
 
   fun getProgressDisplay(): String {
-    val pos = episode.value?.position
-    if (pos == null || pos <= 0) {
+    val position = episode.value?.position
+    if (position == null || position <= 0) {
       return "--:--"
     }
 
-    val seconds = pos.toDouble()
+    val seconds = position.toDouble()
     val min = floor(seconds / 60)
     val sec = (seconds - (min * 60)).roundToInt()
     var str = ""

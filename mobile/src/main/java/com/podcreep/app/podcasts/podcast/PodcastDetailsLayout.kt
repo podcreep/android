@@ -38,7 +38,7 @@ class PodcastDetailsLayout(
     val subscriptionsLiveData = MediatorLiveData<List<Subscription>>()
     subscriptionsLiveData.addSource(podcast) {
         p -> run {
-        val sub = Subscription(p.id, ByteArray(0))
+        val sub = Subscription(p.id)
         sub.podcast.value = p
         val subscriptions = ArrayList<Subscription>()
         subscriptions.add(sub)

@@ -37,10 +37,6 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
 
   private val store = s.localStore
 
-  private val moshi = Moshi.Builder()
-      .add(KotlinJsonAdapterFactory())
-      .build()
-
   // pubDate will be in a format like: 2019-04-14T03:00:00-07:00
   private val pubDateFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US)
 
@@ -68,8 +64,7 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
       iconCache.refresh(podcast)
 
       store.subscriptions().insert(Subscription(
-          podcastID = sub.podcast.id,
-          positionsJson = positionsJson))
+          podcastID = sub.podcast.id))
 
       if (sub.podcast.episodes != null) {
         Log.i(TAG, "  adding '${sub.podcast.episodes!!.size}' episodes.")
@@ -81,7 +76,8 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
               description = ep.description,
               mediaUrl = ep.mediaUrl,
               pubDate = pubDateFmt.parse(ep.pubDate)!!,
-              position = ep.position))
+              position = ep.position,
+              isComplete = null))
         }
       } else {
         Log.i(TAG, "  no episodes?")

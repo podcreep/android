@@ -21,4 +21,5 @@ data class Episode(
     var description: String,
     var mediaUrl: String,
     var pubDate: Date,
-    var position: Int?)
+    var position: Int?,
+    var isComplete: Boolean?)

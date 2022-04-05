@@ -23,8 +23,8 @@ data class EpisodeJson(
     @Json(name="pubDate")
     val pubDate: String,
 
-    @Json(name="progress")
-    val progress: Int?,
+    @Json(name="position")
+    val position: Int?,
 
     @Json(name="isComplete")
     val isComplete: Boolean?

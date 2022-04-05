@@ -12,9 +12,8 @@ import androidx.room.*
     indices = [Index("podcastID")])
 class Subscription(
     @PrimaryKey val podcastID: Long,
-    @Ignore var podcast: MutableLiveData<Podcast>,
-    val positionsJson: ByteArray) {
+    @Ignore var podcast: MutableLiveData<Podcast>) {
 
-  constructor(podcastID: Long, positionsJson: ByteArray)
-      : this(podcastID, MutableLiveData(), positionsJson)
+  constructor(podcastID: Long)
+      : this(podcastID, MutableLiveData())
 }
