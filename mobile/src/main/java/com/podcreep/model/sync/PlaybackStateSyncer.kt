@@ -8,7 +8,10 @@ import com.podcreep.model.sync.data.PlaybackStateJson
 import com.podcreep.model.sync.data.SubscriptionJson
 import com.podcreep.net.HttpRequest
 import com.podcreep.net.Server
+import com.podcreep.util.L
+import com.podcreep.util.MoshiHelper
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -22,7 +25,8 @@ class PlaybackStateSyncer(
     private val context: Context,
     private val taskRunner: TaskRunner?) {
   companion object {
-    val lock = Object()
+    private val L = L("MediaService")
+    private val lock = Object()
   }
 
   /**
@@ -32,8 +36,8 @@ class PlaybackStateSyncer(
   fun sync(playbackState: PlaybackStateJson) {
     taskRunner!!.runTask({
       synchronized(lock) {
-        // If this playback state is pending, remove it (we'll either succeed or or we'll fail and
-        // add the latest value later one).
+        // If this playback state is pending, remove it (we'll either succeed or we'll fail and add the latest
+        // value later on).
         val pending = loadPendingPlaybackState()
         if (pending.removeIf {
               it.podcastID == playbackState.podcastID && it.episodeID == playbackState.episodeID
@@ -47,8 +51,7 @@ class PlaybackStateSyncer(
   }
 
   /**
-   * Attempt to sync all pending playback state to the server now. This should not be run on a UI
-   * thread.
+   * Attempt to sync all pending playback state to the server now. This should not be run on a UI thread.
    */
   fun syncPending() {
     // Grab all the pending playback states, and remove all from the pending queue.
@@ -71,14 +74,17 @@ class PlaybackStateSyncer(
    * Sync only the given {@link PlaybackState}. If we fail to sync, we store this state for later.
    */
   private fun syncOnly(playbackState: PlaybackStateJson) {
+    L.info("Sending playback state: ${playbackState.episodeID} ${playbackState.position} ${playbackState.lastUpdated}")
     val url = "/api/podcasts/${playbackState.podcastID}/episodes/${playbackState.episodeID}/playback-state"
     val request = Server.request(url)
         .method(HttpRequest.Method.PUT)
         .body(playbackState)
         .build()
     try {
-      request.execute<SubscriptionJson>()
+      request.executeEmptyResponse()
     } catch (e: Exception) {
+      L.warning("Error syncing playback state: %s", e)
+
       // If there's an error syncing it now, we'll save it for later.
       synchronized(lock) {
         val pending = loadPendingPlaybackState()
@@ -95,7 +101,13 @@ class PlaybackStateSyncer(
       return ArrayList()
     }
 
-    return moshiAdapter().fromJson(json)!!
+    return try {
+      moshiAdapter().fromJson(json)!!
+    } catch (e: JsonDataException) {
+      // Ignore errors, we'll just forget about these pending states. It's not great, but there's not much we can do.
+      // This typically happens if we change the data format.
+      ArrayList()
+    }
   }
 
   private fun savePendingPlaybackState(playbackState: MutableList<PlaybackStateJson>) {
@@ -104,10 +116,7 @@ class PlaybackStateSyncer(
   }
 
   private fun moshiAdapter(): JsonAdapter<MutableList<PlaybackStateJson>> {
-    val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-    return moshi.adapter(
+    return MoshiHelper.create().adapter(
         Types.newParameterizedType(MutableList::class.java, PlaybackStateJson::class.java))
   }
 }

@@ -19,6 +19,7 @@ import com.podcreep.model.store.Podcast
 import com.podcreep.model.store.Store
 import com.podcreep.model.sync.data.PlaybackStateJson
 import com.podcreep.model.sync.PlaybackStateSyncer
+import java.util.*
 
 /** MediaManager manages the actual playback of the media. */
 class MediaManager(
@@ -199,7 +200,7 @@ class MediaManager(
 
     if (updateServer) {
       updateServerState()
-    } else {
+    } else if (mediaPlayer?.isPlaying == true) { // Only auto-update while playing.
       timeToServerUpdate --
       if (timeToServerUpdate <= 0) {
         updateServerState()
@@ -237,7 +238,7 @@ class MediaManager(
     val podcastID = currPodcast?.id ?: return
     val episodeID = currEpisode?.id ?: return
     val position = mediaPlayer?.currentPosition ?: return
-    val state = PlaybackStateJson(podcastID, episodeID, position / 1000)
+    val state = PlaybackStateJson(podcastID, episodeID, position / 1000, Date())
     PlaybackStateSyncer(service, taskRunner).sync(state)
   }
 }

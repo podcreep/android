@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.view.KeyEvent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -15,8 +14,10 @@ import com.podcreep.model.store.Episode
 import com.podcreep.model.store.Podcast
 import com.podcreep.model.sync.data.EpisodeJson
 import com.podcreep.model.sync.data.PodcastJson
-import com.squareup.moshi.KotlinJsonAdapterFactory
+import com.podcreep.util.L
+import com.podcreep.util.MoshiHelper
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 /**
  * This is the main media service for Pod Creep. It handles playback and also lets other bits of the UI know what's
@@ -24,7 +25,7 @@ import com.squareup.moshi.Moshi
  */
 class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
   companion object {
-    private const val TAG = "MediaService"
+    private val L = L("MediaService")
   }
 
   private lateinit var session: MediaSessionCompat
@@ -36,13 +37,14 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
 
   override fun onCreate() {
     super.onCreate()
+    L.info("onCreate")
+
+    // We've just been created, so maybe we need to sync.
+    App.i.syncManager.maybeSync()
 
     session = MediaSessionCompat(this, "MediaService")
     sessionToken = session.sessionToken
     session.setCallback(MediaSessionCallback())
-    session.setFlags(
-        MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
-        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
     mediaManager = MediaManager(this, session, App.i.taskRunner, App.i.mediaCache, App.i.store)
     notificationManager = NotificationManager(this, 1234 /* notification_id */, "playback", "Playback service")
@@ -55,14 +57,13 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val id = super.onStartCommand(intent, flags, startId)
+    L.info("onStart %s %d", intent, flags)
 
     if (intent != null) {
       val podcastStr = intent.extras!!["podcast"] as String
       val episodeStr = intent.extras!!["episode"] as String
 
-      val moshi = Moshi.Builder()
-          .add(KotlinJsonAdapterFactory())
-          .build()
+      val moshi = MoshiHelper.create()
       val podcast = moshi.adapter<Podcast>(PodcastJson::class.java).fromJson(podcastStr)!!
       val episode = moshi.adapter<Episode>(EpisodeJson::class.java).fromJson(episodeStr)!!
 
@@ -77,6 +78,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
   }
 
   override fun onDestroy() {
+    L.info("onDestroy")
     lifecycle.currentState = Lifecycle.State.DESTROYED
     session.release()
   }
@@ -85,36 +87,35 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
       clientPackageName: String,
       clientUid: Int,
       rootHints: Bundle?): BrowserRoot? {
-
-    // If someone's getting our root node, we'll do a sync now so we'll be ready when they request
-    // our non-root nodes.
-    App.i.syncManager.maybeSync()
+    L.info("onGetRoot(%s, %d, %s)", clientPackageName, clientUid, rootHints)
 
     return BrowserRoot("root", null)
   }
 
   override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {
+    L.info("onLoadChildren(%s)", parentId)
+
     browseTreeGenerator.onLoadChildren(parentId, result)
   }
 
   private inner class MediaSessionCallback : MediaSessionCompat.Callback() {
     override fun onPlay() {
-      Log.i(TAG, "onPlay")
+      L.info("onPlay")
       if (audioFocusManager.request()) {
         mediaManager.play()
       } else {
-        Log.i(TAG, "We didn't get audio focus, not playing.")
+        L.info("We didn't get audio focus, not playing.")
       }
     }
 
     override fun onPause() {
-      Log.i(TAG, "onPause")
+      L.info("onPause")
       mediaManager.pause()
       audioFocusManager.abandon()
     }
 
     override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
-      Log.i(TAG, "onPlayFromMediaId($mediaId)")
+      L.info("onPlayFromMediaId($mediaId)")
 
       val pair = MediaIdBuilder().parse(mediaId!!)
       val podcast = pair!!.first
@@ -127,17 +128,21 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
       if (audioFocusManager.request()) {
         mediaManager.play(podcast, episode)
       } else {
-        Log.i(TAG, "We didn't get audio focus, not playing.")
+        L.info("We didn't get audio focus, not playing.")
       }
     }
 
-    override fun onSkipToQueueItem(queueId: Long) {}
+    override fun onSkipToQueueItem(queueId: Long) {
+      L.info("onSkipToQueueItem(%d)", queueId)
+    }
 
     override fun onSeekTo(position: Long) {
-
+      L.info("onSeekTo(%d)", position)
     }
 
     override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
+      L.info("onMediaButtonEvent(%s)", mediaButtonEvent)
+
       val keyEvent = mediaButtonEvent.extras?.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
       if (keyEvent == null || keyEvent.action != KeyEvent.ACTION_DOWN) {
         // Not an event we are able to handle.
@@ -158,15 +163,17 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
     }
 
     override fun onStop() {
-      Log.i(TAG, "onStop")
+      L.info("onStop")
       stopSelf()
     }
 
     override fun onSkipToNext() {
+      L.info("onSkipToNext")
       mediaManager.skipForward()
     }
 
     override fun onSkipToPrevious() {
+      L.info("onSkipToPrevious")
       mediaManager.skipBack()
     }
 
@@ -175,6 +182,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
      * buttons in Android Auto.
      */
     override fun onFastForward() {
+      L.info("onFastForward")
       mediaManager.skipForward()
     }
 
@@ -183,16 +191,17 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
      * in Android Auto.
      */
     override fun onRewind() {
+      L.info("onRewind")
       mediaManager.skipBack()
     }
 
     override fun onCustomAction(action: String?, extras: Bundle?) {
-      Log.i(TAG, "onCustomAction($action)")
+      L.info("onCustomAction($action)")
       mediaManager.customAction(action, extras)
     }
 
     override fun onPlayFromSearch(query: String?, extras: Bundle?) {
-      Log.i(TAG, "onPlayFromSearch($query)")
+      L.info("onPlayFromSearch($query)")
     }
   }
 

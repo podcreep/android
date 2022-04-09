@@ -2,6 +2,7 @@ package com.podcreep.model.sync.data
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.util.Date
 
 @JsonClass(generateAdapter = false)
 data class PlaybackStateJson(
@@ -12,5 +13,8 @@ data class PlaybackStateJson(
     val episodeID: Long,
 
     @Json(name="position")
-    val position: Int
+    val position: Int,
+
+    @Json(name="lastUpdated")
+    val lastUpdated: Date
 )

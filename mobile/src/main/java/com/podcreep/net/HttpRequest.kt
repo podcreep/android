@@ -1,6 +1,7 @@
 package com.podcreep.net
 
 import android.util.Log
+import com.podcreep.util.MoshiHelper
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -82,16 +83,18 @@ class HttpRequest private constructor(
     val json = resp.readString(Charsets.UTF_8)
 
     try {
-      val moshi = Moshi.Builder()
-          .add(KotlinJsonAdapterFactory())
-          .build()
-      return moshi
+      return MoshiHelper.create()
           .adapter(T::class.java)
           .fromJson(json)!!
     } catch(e: JsonDataException) {
       Log.e(TAG, json)
       throw e
     }
+  }
+
+  /** Execute the request, expecting no content in return (just look at errors). */
+  inline fun executeEmptyResponse() {
+    execute()
   }
 
   class Builder {
@@ -126,10 +129,7 @@ class HttpRequest private constructor(
     }
 
     inline fun <reified T> body(body: T): Builder {
-      val moshi = Moshi.Builder()
-          .add(KotlinJsonAdapterFactory())
-          .build()
-      return body(moshi
+      return body(MoshiHelper.create()
           .adapter(T::class.java)
           .toJson(body)
           .toByteArray())
