@@ -77,6 +77,7 @@ class StoreSyncer(private val context: Context, s: Store, private val iconCache:
               mediaUrl = ep.mediaUrl,
               pubDate = pubDateFmt.parse(ep.pubDate)!!,
               position = ep.position,
+              lastListenTime = ep.lastListenTime,
               isComplete = null))
         }
       } else {

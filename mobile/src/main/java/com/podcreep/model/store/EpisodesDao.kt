@@ -15,7 +15,7 @@ interface EpisodesDao {
   @Query("SELECT * FROM episodes WHERE id=:episodeID AND podcastID=:podcastID")
   fun get(podcastID: Long, episodeID: Long): LiveData<Episode>
 
-  @Query("SELECT * FROM episodes WHERE position IS NOT NULL AND position > 0 ORDER BY pubDate DESC LIMIT $MAX_RESULT_SIZE")
+  @Query("SELECT * FROM episodes WHERE position IS NOT NULL AND position > 0 ORDER BY lastListenTime DESC, pubDate DESC LIMIT $MAX_RESULT_SIZE")
   fun getInProgress(): LiveData<List<Episode>>
 
   @Query("SELECT * FROM episodes WHERE position IS NULL ORDER BY pubDate DESC LIMIT $MAX_RESULT_SIZE")

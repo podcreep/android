@@ -2,6 +2,7 @@ package com.podcreep.model.sync.data
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.util.*
 
 @JsonClass(generateAdapter = false)
 data class EpisodeJson(
@@ -27,5 +28,8 @@ data class EpisodeJson(
     val position: Int?,
 
     @Json(name="isComplete")
-    val isComplete: Boolean?
+    val isComplete: Boolean?,
+
+    @Json(name="lastListenTime")
+    val lastListenTime: Date?
 )
