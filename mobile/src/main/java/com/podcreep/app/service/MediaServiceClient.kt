@@ -15,12 +15,17 @@ import com.podcreep.model.store.Podcast
  * Doing it this way means we keep things nicely in sync with other playback state.
  */
 class MediaServiceClient(private val context: Context) {
+  abstract class Callbacks {
+    open fun onPlaybackStateChanged(state: PlaybackStateCompat) {}
+    open fun onMetadataChanged(metadata: MediaMetadataCompat) {}
+  }
+
   companion object {
     val TAG = "MediaServiceClient"
   }
 
   private val mediaBrowser: MediaBrowserCompat
-  private val callbacks: ArrayList<MediaControllerCompat.Callback> = ArrayList()
+  private val callbacks: ArrayList<Callbacks> = ArrayList()
   private var mediaController: MediaControllerCompat? = null
 
   private var activity: MainActivity? = null
@@ -57,18 +62,20 @@ class MediaServiceClient(private val context: Context) {
     this.activity = null
   }
 
-  fun addCallback(callback: MediaControllerCompat.Callback) {
+  fun addCallback(callback: Callbacks) {
     callbacks.add(callback)
 
-    if (lastPlaybackState != null) {
-      callback.onPlaybackStateChanged(lastPlaybackState!!)
+    val playbackState = lastPlaybackState
+    if (playbackState != null) {
+      callback.onPlaybackStateChanged(playbackState)
     }
-    if (lastMetadata != null) {
-      callback.onMetadataChanged(lastMetadata!!)
+    val metadata = lastMetadata
+    if (metadata != null) {
+      callback.onMetadataChanged(metadata)
     }
   }
 
-  fun removeCallback(callback: MediaControllerCompat.Callback) {
+  fun removeCallback(callback: Callbacks) {
     callbacks.remove(callback)
   }
 
@@ -98,12 +105,20 @@ class MediaServiceClient(private val context: Context) {
 
   private var controllerCallback = object : MediaControllerCompat.Callback() {
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+      if (metadata == null) {
+        return
+      }
+
       callbacks.forEach {
         it.onMetadataChanged(metadata)
       }
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+      if (state == null) {
+        return
+      }
+
       callbacks.forEach {
         it.onPlaybackStateChanged(state)
       }

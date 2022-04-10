@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
 import androidx.annotation.DrawableRes
@@ -11,6 +12,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import com.podcreep.App
 import com.podcreep.R
+import com.podcreep.app.service.MediaServiceClient
 
 class PlayPauseButton(context: Context, attrs: AttributeSet) : AppCompatImageView(context, attrs) {
   sealed class Mode(val styleableInt: Int, @DrawableRes val drawableRes: Int) {
@@ -43,12 +45,12 @@ class PlayPauseButton(context: Context, attrs: AttributeSet) : AppCompatImageVie
     this.setImageDrawable(animatedVector)
   }
 
-  private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
-    override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+  private val mediaControllerCallback = object : MediaServiceClient.Callbacks() {
+    override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
       super.onPlaybackStateChanged(state)
 
       var newMode = currentMode
-      when (state?.state) {
+      when (state.state) {
           PlaybackStateCompat.STATE_BUFFERING -> {
             newMode = Mode.PAUSE
           }

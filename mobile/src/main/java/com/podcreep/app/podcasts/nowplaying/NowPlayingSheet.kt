@@ -20,6 +20,7 @@ import com.podcreep.databinding.NowPlayingHeaderExpandedBinding
 import com.podcreep.databinding.NowPlayingSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.podcreep.App
+import com.podcreep.app.service.MediaServiceClient
 import kotlin.math.abs
 
 /**
@@ -104,21 +105,19 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
     App.i.mediaServiceClient.removeCallback(mediaCallback)
   }
 
-  private val mediaCallback = object : MediaControllerCompat.Callback() {
-    override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+  private val mediaCallback = object : MediaServiceClient.Callbacks() {
+    override fun onMetadataChanged(metadata: MediaMetadataCompat) {
       vm.metadata = metadata
 
-      if (metadata != null) {
-        sheetBinding.vm = vm
-        sheetBinding.executePendingBindings()
-        collapsedHeaderBinding.vm = vm
-        collapsedHeaderBinding.executePendingBindings()
-        expandedHeaderBinding.vm = vm
-        expandedHeaderBinding.executePendingBindings()
-      }
+      sheetBinding.vm = vm
+      sheetBinding.executePendingBindings()
+      collapsedHeaderBinding.vm = vm
+      collapsedHeaderBinding.executePendingBindings()
+      expandedHeaderBinding.vm = vm
+      expandedHeaderBinding.executePendingBindings()
     }
 
-    override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+    override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
       vm.playbackState = state
 
       sheetBinding.vm = vm

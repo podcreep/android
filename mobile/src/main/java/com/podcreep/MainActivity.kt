@@ -19,6 +19,7 @@ import com.podcreep.app.podcasts.discover.DiscoverScreen
 import com.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import com.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import com.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
+import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.app.welcome.LoginScreen
 import com.podcreep.app.welcome.WelcomeScreen
 import com.podcreep.concurrency.Threads
@@ -195,16 +196,16 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private var mediaCallback = object : MediaControllerCompat.Callback() {
-    override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+  private var mediaCallback = object : MediaServiceClient.Callbacks() {
+    override fun onMetadataChanged(metadata: MediaMetadataCompat) {
 
     }
 
-    override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+    override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
       // If we're not stopped, then set the now playing control visible.
       var contentMarginPx = 0
-      if (state?.state != PlaybackStateCompat.STATE_STOPPED &&
-          state?.state != PlaybackStateCompat.STATE_NONE) {
+      if (state.state != PlaybackStateCompat.STATE_STOPPED &&
+          state.state != PlaybackStateCompat.STATE_NONE) {
         binding.nowPlaying.visibility = View.VISIBLE
         binding.shadow.visibility = View.VISIBLE
 
