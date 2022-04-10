@@ -21,6 +21,7 @@ import com.podcreep.databinding.NowPlayingSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.podcreep.App
 import com.podcreep.app.service.MediaServiceClient
+import com.podcreep.util.L
 import kotlin.math.abs
 
 /**
@@ -29,6 +30,9 @@ import kotlin.math.abs
  */
 class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   : FrameLayout(context, attributeSet) {
+  companion object {
+    private val L = L("NowPlayingSheet")
+  }
 
   private val vm: NowPlayingViewModel = NowPlayingViewModel(null, null)
 

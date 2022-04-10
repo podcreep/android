@@ -108,6 +108,7 @@ class MediaServiceClient(private val context: Context) {
       if (metadata == null) {
         return
       }
+      lastMetadata = metadata
 
       callbacks.forEach {
         it.onMetadataChanged(metadata)
@@ -118,6 +119,7 @@ class MediaServiceClient(private val context: Context) {
       if (state == null) {
         return
       }
+      lastPlaybackState = state
 
       callbacks.forEach {
         it.onPlaybackStateChanged(state)

@@ -19,7 +19,6 @@ class TabPagerAdapter(
 
   override fun instantiateItem(container: ViewGroup, position: Int): Any {
     val tab = Tabs.values()[position]
-    Log.i("DEANH", String.format("tab=%s class=%s, constructors=%s", tab, tab.layoutClass, tab.layoutClass.constructors))
     val view = tab.layoutClass.constructors.first().call(
         context, lifecycleOwner, store, taskRunner, callbacks)
     container.addView(view)
