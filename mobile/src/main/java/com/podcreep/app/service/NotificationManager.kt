@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
+import com.podcreep.App
 import com.podcreep.MainActivity
 import com.podcreep.R
 import com.podcreep.model.store.Episode
@@ -27,23 +28,7 @@ class NotificationManager(
     private val notificationId: Int,
     channelName: String,
     channelDesc: String /* TODO: make this a resource */) {
-
-  private val _builder: NotificationCompat.Builder
-
-  init {
-    val channelId =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          createNotificationChannel(channelName, channelDesc)
-        } else {
-          // If earlier version channel ID is not used
-          ""
-        }
-
-    _builder = NotificationCompat.Builder(service, channelId)
-  }
-
-  val builder: NotificationCompat.Builder
-    get() = _builder
+  private val builder = NotificationCompat.Builder(service, createNotificationChannel(channelName, channelDesc))
 
   fun startForeground() {
     service.startForeground(notificationId, builder.build())
@@ -54,7 +39,7 @@ class NotificationManager(
   }
 
   fun refresh(title: String) {
-    _builder.apply {
+    builder.apply {
       setContentTitle(title)
       setSmallIcon(R.drawable.ic_refresh_black_24dp)
       color = ContextCompat.getColor(service, R.color.colorPrimaryDark)
@@ -62,7 +47,7 @@ class NotificationManager(
   }
 
   fun refresh(podcast: Podcast, episode: Episode, sessionToken: MediaSessionCompat.Token) {
-    _builder.apply {
+    builder.apply {
       // Add the metadata for the currently playing episode.
       setContentTitle(podcast.title)
       setContentText(episode.title)

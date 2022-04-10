@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.media.MediaBrowserServiceCompat
+import androidx.media.session.MediaButtonReceiver
 import com.podcreep.App
 import com.podcreep.model.store.Episode
 import com.podcreep.model.store.Podcast
@@ -16,8 +17,6 @@ import com.podcreep.model.sync.data.EpisodeJson
 import com.podcreep.model.sync.data.PodcastJson
 import com.podcreep.util.L
 import com.podcreep.util.MoshiHelper
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 /**
  * This is the main media service for Pod Creep. It handles playback and also lets other bits of the UI know what's
@@ -56,24 +55,10 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    MediaButtonReceiver.handleIntent(session, intent);
+
     val id = super.onStartCommand(intent, flags, startId)
     L.info("onStart %s %d", intent, flags)
-
-    if (intent != null) {
-      val podcastStr = intent.extras!!["podcast"] as String
-      val episodeStr = intent.extras!!["episode"] as String
-
-      val moshi = MoshiHelper.create()
-      val podcast = moshi.adapter<Podcast>(PodcastJson::class.java).fromJson(podcastStr)!!
-      val episode = moshi.adapter<Episode>(EpisodeJson::class.java).fromJson(episodeStr)!!
-
-      // Display the notification and place the service in the foreground
-      notificationManager.refresh(podcast, episode, session.sessionToken)
-      notificationManager.startForeground()
-
-      mediaManager.play(podcast, episode)
-    }
-
     return id
   }
 
@@ -165,6 +150,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
     override fun onStop() {
       L.info("onStop")
       stopSelf()
+      notificationManager.stopService()
     }
 
     override fun onSkipToNext() {
