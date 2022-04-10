@@ -11,12 +11,7 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
 import com.podcreep.App
-import com.podcreep.model.store.Episode
-import com.podcreep.model.store.Podcast
-import com.podcreep.model.sync.data.EpisodeJson
-import com.podcreep.model.sync.data.PodcastJson
 import com.podcreep.util.L
-import com.podcreep.util.MoshiHelper
 
 /**
  * This is the main media service for Pod Creep. It handles playback and also lets other bits of the UI know what's
@@ -91,6 +86,7 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
       } else {
         L.info("We didn't get audio focus, not playing.")
       }
+      notificationManager.startForeground()
     }
 
     override fun onPause() {

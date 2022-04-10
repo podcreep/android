@@ -63,6 +63,10 @@ class MediaServiceClient(private val context: Context) {
   }
 
   fun addCallback(callback: Callbacks) {
+    if (callbacks.contains(callback)) {
+      return
+    }
+
     callbacks.add(callback)
 
     val playbackState = lastPlaybackState
