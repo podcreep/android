@@ -3,6 +3,7 @@ package com.podcreep
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.app.service.SyncManager
 import com.podcreep.concurrency.TaskRunner
 import com.podcreep.concurrency.Threads
@@ -17,10 +18,28 @@ class App : Application() {
   }
 
   private lateinit var _taskRunner: TaskRunner
+  val taskRunner: TaskRunner
+    get() = _taskRunner
+
   private lateinit var _store: Store
+  val store: Store
+    get() = _store
+
   private lateinit var _iconCache: PodcastIconCache
+  val iconCache: PodcastIconCache
+    get() = _iconCache
+
   private lateinit var _mediaCache: EpisodeMediaCache
+  val mediaCache: EpisodeMediaCache
+    get() = _mediaCache
+
   private lateinit var _syncManager: SyncManager
+  val syncManager: SyncManager
+    get() = _syncManager
+
+  private lateinit var _mediaServiceClient: MediaServiceClient
+  val mediaServiceClient: MediaServiceClient
+    get() = _mediaServiceClient
 
   override fun onCreate() {
     super.onCreate()
@@ -31,6 +50,7 @@ class App : Application() {
     _iconCache = PodcastIconCache(this, store, taskRunner)
     _mediaCache = EpisodeMediaCache(this, taskRunner)
     _syncManager = SyncManager(this, taskRunner)
+    _mediaServiceClient = MediaServiceClient(this)
     i = this
 
     val s = Settings(this)
@@ -38,19 +58,4 @@ class App : Application() {
       Server.updateCookie(s.getString(Settings.COOKIE))
     }
   }
-
-  val taskRunner: TaskRunner
-    get() = _taskRunner
-
-  val store: Store
-    get() = _store
-
-  val iconCache: PodcastIconCache
-    get() = _iconCache
-
-  val mediaCache: EpisodeMediaCache
-    get() = _mediaCache
-
-  val syncManager: SyncManager
-    get() = _syncManager
 }

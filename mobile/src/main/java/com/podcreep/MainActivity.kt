@@ -19,7 +19,6 @@ import com.podcreep.app.podcasts.discover.DiscoverScreen
 import com.podcreep.app.podcasts.episode.EpisodeDetailsScreen
 import com.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import com.podcreep.app.podcasts.subscriptions.SubscriptionsScreen
-import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.app.welcome.LoginScreen
 import com.podcreep.app.welcome.WelcomeScreen
 import com.podcreep.concurrency.Threads
@@ -53,8 +52,6 @@ class MainActivity : AppCompatActivity() {
     val actionbarSizeTypedArray = obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
     actionBarHeight = actionbarSizeTypedArray.getDimension(0, 0f).toInt()
     actionbarSizeTypedArray.recycle()
-
-    MediaServiceClient.i.setup(this)
 
     val ss = ScreenStack(this, binding.content)
     ss.screenUpdated += { (_: Screen?, current: Screen?) -> onScreensUpdated(current) }
@@ -121,7 +118,8 @@ class MainActivity : AppCompatActivity() {
     val header: TextView = binding.navView.getHeaderView(0).findViewById(R.id.app_version)
     header.text = String.format("v%s", BuildConfig.VERSION_NAME)
 
-    MediaServiceClient.i.addCallback(mediaCallback)
+    App.i.mediaServiceClient.attachActivity(this)
+    App.i.mediaServiceClient.addCallback(mediaCallback)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -187,8 +185,8 @@ class MainActivity : AppCompatActivity() {
   override fun onDestroy() {
     super.onDestroy()
 
-    MediaServiceClient.i.removeCallback(mediaCallback)
-    MediaServiceClient.i.destroy()
+    App.i.mediaServiceClient.removeCallback(mediaCallback)
+    App.i.mediaServiceClient.detachActivity(this)
   }
 
   override fun onBackPressed() {

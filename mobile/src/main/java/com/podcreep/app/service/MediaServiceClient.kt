@@ -1,6 +1,7 @@
 package com.podcreep.app.service
 
 import android.content.ComponentName
+import android.content.Context
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -10,42 +11,50 @@ import com.podcreep.model.store.Episode
 import com.podcreep.model.store.Podcast
 
 /**
- * MediaServiceClient is a helper class that uses the media browser/media session API to talk
- * with the media service. Doing it this ways means we keep things nicely in sync with other
- * playback state.
+ * MediaServiceClient is a helper class that uses the media browser/media session API to talk with the media service.
+ * Doing it this way means we keep things nicely in sync with other playback state.
  */
-class MediaServiceClient {
+class MediaServiceClient(private val context: Context) {
   companion object {
-    val i: MediaServiceClient = MediaServiceClient()
     val TAG = "MediaServiceClient"
   }
 
-  private var activity: MainActivity? = null
-  private var mediaBrowser: MediaBrowserCompat? = null
-  private var mediaController: MediaControllerCompat? = null
+  private val mediaBrowser: MediaBrowserCompat
   private val callbacks: ArrayList<MediaControllerCompat.Callback> = ArrayList()
+  private var mediaController: MediaControllerCompat? = null
+
+  private var activity: MainActivity? = null
 
   private var lastPlaybackState: PlaybackStateCompat? = null
   private var lastMetadata: MediaMetadataCompat? = null
 
-  fun setup(activity: MainActivity) {
-    this.activity = activity
+
+  init {
     mediaBrowser = MediaBrowserCompat(
-        activity,
-        ComponentName(activity, MediaService::class.java),
-        mediaBrowserConnectionCallbacks,
+        context,
+        ComponentName(context, MediaService::class.java),
+        MediaBrowserConnectionCallbacks(),
         null // optional Bundle
     )
-    mediaBrowser?.connect()
+    mediaBrowser.connect()
   }
 
-  fun destroy() {
-    mediaController?.unregisterCallback(controllerCallback)
-    mediaBrowser?.disconnect()
+  fun attachActivity(activity: MainActivity) {
+    val oldActivity = this.activity
+    if (oldActivity != null) {
+      // TODO: error?
+      detachActivity(oldActivity)
+    }
+    this.activity = activity
+    MediaControllerCompat.setMediaController(activity, mediaController)
+  }
 
-    mediaController = null
-    mediaBrowser = null
-    activity = null
+  fun detachActivity(activity: MainActivity) {
+    if (this.activity != activity) {
+      // TODO: error?
+      return
+    }
+    this.activity = null
   }
 
   fun addCallback(callback: MediaControllerCompat.Callback) {
@@ -101,17 +110,12 @@ class MediaServiceClient {
     }
   }
 
-  private val mediaBrowserConnectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
+  private inner class MediaBrowserConnectionCallbacks : MediaBrowserCompat.ConnectionCallback() {
     override fun onConnected() {
-      if (activity == null) {
-        // Activity was finished before we connected.
-        return
-      }
       // Get the token for the MediaSession
-      mediaBrowser?.sessionToken.also { token ->
+      mediaBrowser.sessionToken.also { token ->
         // Create a MediaControllerCompat.
-        mediaController = MediaControllerCompat(activity, token!!)
-        MediaControllerCompat.setMediaController(activity!!, mediaController)
+        mediaController = MediaControllerCompat(context, token)
 
         // Get the current values of things.
         lastPlaybackState = mediaController?.playbackState

@@ -2,6 +2,7 @@ package com.podcreep.app.podcasts.nowplaying
 
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import com.podcreep.App
 import com.podcreep.app.service.MediaServiceClient
 
 class NowPlayingViewModel(
@@ -21,17 +22,17 @@ class NowPlayingViewModel(
     val pbs = playbackState ?: return
 
     if (pbs.state == PlaybackStateCompat.STATE_PLAYING) {
-      MediaServiceClient.i.pause()
+      App.i.mediaServiceClient.pause()
     } else {
-      MediaServiceClient.i.play()
+      App.i.mediaServiceClient.play()
     }
   }
 
   fun onSkipBackClick() {
-    MediaServiceClient.i.skipBack()
+    App.i.mediaServiceClient.skipBack()
   }
 
   fun onSkipForwardClick() {
-    MediaServiceClient.i.skipForward()
+    App.i.mediaServiceClient.skipForward()
   }
 }

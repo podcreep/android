@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import com.podcreep.App
 import com.podcreep.app.podcasts.podcast.PodcastDetailsScreen
 import com.podcreep.app.podcasts.episode.EpisodeDetailsScreen
-import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.model.store.Episode
 import com.podcreep.model.store.Podcast
 import com.podcreep.model.store.Store
@@ -34,7 +33,7 @@ class SubscriptionsScreen(private val store: Store): Screen() {
           }
 
           override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
-            MediaServiceClient.i.play(podcast, episode)
+            App.i.mediaServiceClient.play(podcast, episode)
           }
 
           override fun onViewPodcastClick(podcast: LiveData<Podcast>) {

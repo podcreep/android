@@ -6,12 +6,11 @@ import android.graphics.drawable.Drawable
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import com.podcreep.App
 import com.podcreep.R
-import com.podcreep.app.service.MediaServiceClient
 
 class PlayPauseButton(context: Context, attrs: AttributeSet) : AppCompatImageView(context, attrs) {
   sealed class Mode(val styleableInt: Int, @DrawableRes val drawableRes: Int) {
@@ -28,13 +27,13 @@ class PlayPauseButton(context: Context, attrs: AttributeSet) : AppCompatImageVie
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    MediaServiceClient.i.addCallback(mediaControllerCallback)
+    App.i.mediaServiceClient.addCallback(mediaControllerCallback)
     currentMode = Mode.PLAY
   }
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    MediaServiceClient.i.removeCallback(mediaControllerCallback)
+    App.i.mediaServiceClient.removeCallback(mediaControllerCallback)
   }
 
   private fun Drawable.startAsAnimatable() = (this as Animatable).start()

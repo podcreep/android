@@ -3,8 +3,8 @@ package com.podcreep.app.podcasts.podcast
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
+import com.podcreep.App
 import com.podcreep.app.podcasts.episode.EpisodeDetailsScreen
-import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.concurrency.TaskRunner
 import com.podcreep.model.store.Episode
 import com.podcreep.model.store.Podcast
@@ -39,7 +39,7 @@ class PodcastDetailsScreen(
         taskRunner,
         object : PodcastDetailsLayout.Callbacks {
           override fun onEpisodePlay(podcast: Podcast, episode: Episode) {
-            MediaServiceClient.i.play(podcast, episode)
+            App.i.mediaServiceClient.play(podcast, episode)
           }
 
           override fun onEpisodeDetails(podcast: LiveData<Podcast>, episode: Episode) {

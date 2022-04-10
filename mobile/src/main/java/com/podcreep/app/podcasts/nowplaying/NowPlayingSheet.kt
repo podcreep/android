@@ -15,11 +15,11 @@ import android.transition.Fade
 import android.transition.TransitionSet
 import android.widget.ImageView
 import com.podcreep.R
-import com.podcreep.app.service.MediaServiceClient
 import com.podcreep.databinding.NowPlayingHeaderCollapsedBinding
 import com.podcreep.databinding.NowPlayingHeaderExpandedBinding
 import com.podcreep.databinding.NowPlayingSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.podcreep.App
 import kotlin.math.abs
 
 /**
@@ -75,7 +75,7 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
 
-    MediaServiceClient.i.addCallback(mediaCallback)
+    App.i.mediaServiceClient.addCallback(mediaCallback)
 
     val behavior = BottomSheetBehavior.from(this)
     behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -101,7 +101,7 @@ class NowPlayingSheet(context: Context, attributeSet: AttributeSet)
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
 
-    MediaServiceClient.i.removeCallback(mediaCallback)
+    App.i.mediaServiceClient.removeCallback(mediaCallback)
   }
 
   private val mediaCallback = object : MediaControllerCompat.Callback() {
