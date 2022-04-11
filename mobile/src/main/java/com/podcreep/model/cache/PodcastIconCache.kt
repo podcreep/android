@@ -29,6 +29,18 @@ class PodcastIconCache(private val appContext: Context, private val store: Store
     const val MAX_SIZE = 256
   }
 
+  private val connectedPackages = HashSet<String>()
+
+  /**
+   * Called when a package connects to our media service. We'll add it to a list of packages we'll allow to access our
+   * remote Uris.
+   *
+   * Note: currently there's no way to remove packages.
+   */
+  fun onPackageConnected(packageName: String) {
+    connectedPackages.add(packageName)
+  }
+
   /** Get a {@link Uri} that can be called from remote processes (such as Android Auto). */
   fun getRemoteUri(podcast: Podcast): Uri {
     val file = cacheFile(podcast)
@@ -37,9 +49,10 @@ class PodcastIconCache(private val appContext: Context, private val store: Store
     }
 
     val uri = FileProvider.getUriForFile(appContext, "com.podcreep.fileprovider", file)
-    // Grant everybody access to our URI. TODO: only the media controller attached to us...
-    for (ri in appContext.packageManager.getInstalledPackages(PackageManager.GET_SERVICES)) {
-      appContext.grantUriPermission(ri.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    // Grant everybody who has connected to us access to our URI.
+    for (packageName in connectedPackages) {
+      appContext.grantUriPermission(
+        packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     return uri

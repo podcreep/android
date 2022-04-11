@@ -62,19 +62,9 @@ class NotificationManager(
   }
 
   fun refresh() {
-    val podcast = this.podcast ?: return
-    val episode = this.episode ?: return
     val sessionToken = this.sessionToken ?: return
 
     builder.apply {
-      // Add the metadata for the currently playing episode.
-      setContentTitle(podcast.title)
-      setContentText(episode.title)
-      setSubText(episode.description)
-      // TODO: load the icon
-      // Picasso.get().load(podcast.imageUrl).
-      // setLargeIcon(podcast.imageUrl)
-
       // Enable launching the player by clicking the notification. Just launch the main activity
       // for now. TODO: find something better?
       val intent = Intent(service, MainActivity::class.java)
@@ -101,16 +91,32 @@ class NotificationManager(
 
       // Add a play/pause button.
       val isPlaying = playbackState?.state == PlaybackStateCompat.STATE_PLAYING
+      if (isPlaying) {
+        addAction(
+          NotificationCompat.Action(
+            R.drawable.ic_rewind_10_24dp,
+            service.getString(R.string.skip_back_10),
+            MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+          )
+        )
+      }
       addAction(
           NotificationCompat.Action(
               if (isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp,
               service.getString(if (isPlaying) R.string.pause else R.string.play),
-              MediaButtonReceiver.buildMediaButtonPendingIntent(
-                  service,
-                  PlaybackStateCompat.ACTION_PLAY_PAUSE
-              )
+              MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_PLAY_PAUSE)
           )
       )
+      if (isPlaying) {
+        addAction(
+          NotificationCompat.Action(
+            R.drawable.ic_forward_30_24dp,
+            service.getString(R.string.skip_forward_30),
+            MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
+          )
+        )
+      }
+      val playPauseActionIndex = if (isPlaying) 1 else 0
 
         // TODO:
 //      val state = playbackState
@@ -121,7 +127,7 @@ class NotificationManager(
       // Take advantage of MediaStyle features
       setStyle(MediaStyle()
           .setMediaSession(sessionToken)
-          .setShowActionsInCompactView(0)
+          .setShowActionsInCompactView(playPauseActionIndex)
 
           // Add a cancel button
           .setShowCancelButton(true)
@@ -154,7 +160,6 @@ class NotificationManager(
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
-      L.info("DEANH MediaService(not): onPlaybackStateChanged: %s", state)
       playbackState = state
       refresh()
     }

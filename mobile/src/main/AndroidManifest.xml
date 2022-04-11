@@ -48,7 +48,7 @@
     </service>
 
     <provider
-        android:name="androidx.core.content.FileProvider"
+        android:name=".app.service.MediaIconFileProvider"
         android:authorities="com.podcreep.fileprovider"
         android:exported="false"
         android:grantUriPermissions="true">

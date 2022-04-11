@@ -10,6 +10,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import com.podcreep.App
 import com.podcreep.R
 import com.podcreep.concurrency.TaskRunner
 import com.podcreep.concurrency.Threads
@@ -19,6 +20,7 @@ import com.podcreep.model.store.Podcast
 import com.podcreep.model.store.Store
 import com.podcreep.model.sync.data.PlaybackStateJson
 import com.podcreep.model.sync.PlaybackStateSyncer
+import com.podcreep.util.L
 import java.util.*
 
 /** MediaManager manages the actual playback of the media. */
@@ -30,7 +32,7 @@ class MediaManager(
     private val store: Store) {
 
   companion object {
-    private const val TAG = "MediaManager"
+    private val L = L("MediaManager")
 
     private const val SERVER_UPDATE_FREQUENCY_SECONDS = 20
 
@@ -96,11 +98,11 @@ class MediaManager(
         it.seekTo(offset * 1000)
         it.start()
         isPreparing = false
-        Log.i(TAG, "Playing: $uri")
+        L.info("Playing: $uri")
       }
       prepareAsync()
     }
-    Log.i(TAG, "Preparing to play: $uri")
+    L.info("Preparing to play: $uri")
     isPreparing = true
     mediaSession.isActive = true
 
@@ -135,7 +137,7 @@ class MediaManager(
     when(action) {
       CUSTOM_ACTION_SKIP_FORWARD -> skipForward()
       CUSTOM_ACTION_SKIP_BACK -> skipBack()
-      else -> Log.i(TAG, "Unknown custom action: $action")
+      else -> L.info("Unknown custom action: $action")
     }
   }
 
@@ -145,10 +147,14 @@ class MediaManager(
     val mp = mediaPlayer
     if (currEpisode != lastEpisode && currPodcast != lastPodcast && mp?.isPlaying != lastIsPlaying) {
       if (currEpisode != null && currPodcast != null && mp != null) {
-        metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currPodcast.title)
-        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currPodcast.title)
-        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currEpisode.title)
-        metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, currPodcast.imageUrl)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currEpisode.title)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currEpisode.title)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currPodcast.title)
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currPodcast.title)
+        L.info("DEANH uri: %s", App.i.iconCache.getRemoteUri(currPodcast).toString())
+        metadata.putString(
+          MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
+          App.i.iconCache.getRemoteUri(currPodcast).toString())
         if (mp.isPlaying) {
           metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mp.duration.toLong())
         } else {
@@ -157,6 +163,7 @@ class MediaManager(
       } else {
         metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, "")
         metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "")
+        metadata.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "")
         metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "")
         metadata.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "")
         metadata.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)

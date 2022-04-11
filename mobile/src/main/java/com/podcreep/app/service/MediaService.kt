@@ -69,6 +69,8 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
       rootHints: Bundle?): BrowserRoot? {
     L.info("onGetRoot(%s, %d, %s)", clientPackageName, clientUid, rootHints)
 
+    App.i.iconCache.onPackageConnected(clientPackageName)
+
     return BrowserRoot("root", null)
   }
 
