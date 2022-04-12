@@ -9,7 +9,6 @@ import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import com.podcreep.App
 import com.podcreep.R
 import com.podcreep.concurrency.TaskRunner
@@ -151,13 +150,12 @@ class MediaManager(
     val currPodcast = currPodcast
     val currEpisode = currEpisode
     val mp = mediaPlayer
-    if (currEpisode != lastEpisode && currPodcast != lastPodcast && mp?.isPlaying != lastIsPlaying) {
+    if (currEpisode != lastEpisode || currPodcast != lastPodcast || mp?.isPlaying != lastIsPlaying) {
       if (currEpisode != null && currPodcast != null && mp != null) {
         metadata.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currEpisode.title)
         metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currEpisode.title)
         metadata.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currPodcast.title)
         metadata.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currPodcast.title)
-        L.info("DEANH uri: %s", App.i.iconCache.getRemoteUri(currPodcast).toString())
         metadata.putString(
           MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
           App.i.iconCache.getRemoteUri(currPodcast).toString())
@@ -181,30 +179,29 @@ class MediaManager(
       lastIsPlaying = mp?.isPlaying
     }
 
-    val mediaPlayer = mediaPlayer
-    if (mediaPlayer == null) {
+    if (mp == null) {
       _playbackState.setState(
           PlaybackStateCompat.STATE_NONE, 0, 1.0f, SystemClock.elapsedRealtime())
       _playbackState.setActions(getSupportedActions(false))
     } else {
-      _playbackState.setActions(getSupportedActions(mediaPlayer.isPlaying))
-      if (mediaPlayer.isPlaying) {
+      _playbackState.setActions(getSupportedActions(mp.isPlaying))
+      if (mp.isPlaying) {
         _playbackState.setState(
           PlaybackStateCompat.STATE_PLAYING,
-          mediaPlayer.currentPosition.toLong(),
+          mp.currentPosition.toLong(),
           1.0f,
           SystemClock.elapsedRealtime()
         )
       } else if (isPreparing) {
         _playbackState.setState(
           PlaybackStateCompat.STATE_BUFFERING,
-          mediaPlayer.currentPosition.toLong(),
+          mp.currentPosition.toLong(),
           1.0f,
           SystemClock.elapsedRealtime())
       } else {
         _playbackState.setState(
             PlaybackStateCompat.STATE_PAUSED,
-            mediaPlayer.currentPosition.toLong(),
+            mp.currentPosition.toLong(),
             1.0f,
             SystemClock.elapsedRealtime())
       }
@@ -213,7 +210,7 @@ class MediaManager(
 
     if (updateServer) {
       updateServerState()
-    } else if (mediaPlayer?.isPlaying == true) { // Only auto-update while playing.
+    } else if (mp?.isPlaying == true) { // Only auto-update while playing.
       timeToServerUpdate --
       if (timeToServerUpdate <= 0) {
         updateServerState()
@@ -221,8 +218,8 @@ class MediaManager(
     }
 
     // Update our internal store of the position.
-    if (currPodcast != null && currEpisode != null) {
-      currEpisode.position = this.mediaPlayer!!.currentPosition / 1000
+    if (currPodcast != null && currEpisode != null && mp != null) {
+      currEpisode.position = mp.currentPosition / 1000
       taskRunner.runTask({ store.localStore.episodes().insert(currEpisode) }, Threads.BACKGROUND)
     }
 
