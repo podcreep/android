@@ -80,6 +80,12 @@ class MediaManager(
   }
 
   fun play(podcast: Podcast, episode: Episode) {
+    // Stop playing the current one, if any.
+    if (mediaPlayer?.isPlaying == true) {
+      mediaPlayer?.stop()
+    }
+    mediaPlayer?.release()
+
     currPodcast = podcast
     currEpisode = episode
 
