@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/src/podcreep/android/mobile/src/main/res/drawable/ic_inprogress_24dp.xml" value="0.42604166666666665" />
+        <entry key="..\:/src/podcreep/android/mobile/src/main/res/drawable/ic_new_episode_24dp.xml" value="0.42604166666666665" />
+        <entry key="..\:/src/podcreep/android/mobile/src/main/res/drawable/ic_subscriptions_black_24dp.xml" value="0.42604166666666665" />
         <entry key="..\:/src/podcreep/android/mobile/src/main/res/layout/activity.xml" value="0.28541666666666665" />
         <entry key="..\:/src/podcreep/android/mobile/src/main/res/layout/discover_trending_row.xml" value="0.28541666666666665" />
         <entry key="..\:/src/podcreep/android/mobile/src/main/res/layout/drawer_header.xml" value="0.3307291666666667" />

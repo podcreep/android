@@ -3,7 +3,7 @@
   <group android:id="@+id/group_sections">
     <item
         android:id="@+id/nav_subscriptions"
-        android:icon="@drawable/ic_subscriptions_black_24dp"
+        android:icon="@drawable/ic_browsetree_subscriptions"
         android:title="@string/subscriptions"/>
     <item
         android:id="@+id/nav_discover"
