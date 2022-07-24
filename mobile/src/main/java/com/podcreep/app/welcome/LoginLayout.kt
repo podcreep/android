@@ -9,13 +9,14 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.podcreep.R
 import com.podcreep.databinding.LoginBinding
 
 /**
  * A login screen that offers login via email/password.
  */
-class LoginLayout(context: Context, var callbacks: Callbacks) : LinearLayout(context) {
+class LoginLayout(context: Context, var callbacks: Callbacks) : ConstraintLayout(context) {
   private var binding: LoginBinding
 
   interface Callbacks {
@@ -34,6 +35,7 @@ class LoginLayout(context: Context, var callbacks: Callbacks) : LinearLayout(con
       false
     })
     binding.signInBtn.setOnClickListener { attemptLogin() }
+    binding.signInBtn.requestFocus()
   }
 
   /** Show an error message, presumably from a failed login attempt. */
@@ -82,24 +84,20 @@ class LoginLayout(context: Context, var callbacks: Callbacks) : LinearLayout(con
   private fun showProgress(show: Boolean) {
     val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-    binding.loginForm.visibility = if (show) View.GONE else View.VISIBLE
-    binding.loginForm.animate()
+    val updateVisibility: (View, Boolean) -> Unit = { view, visible ->
+      view.visibility = if (visible) View.VISIBLE else View.GONE
+      view.animate()
         .setDuration(shortAnimTime)
-        .alpha((if (show) 0 else 1).toFloat())
+        .alpha((if (visible) 1 else 0).toFloat())
         .setListener(object : AnimatorListenerAdapter() {
           override fun onAnimationEnd(animation: Animator) {
-            binding.loginForm.visibility = if (show) View.GONE else View.VISIBLE
+            view.visibility = if (visible) View.VISIBLE else View.GONE
           }
         })
+    }
 
-    binding.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
-    binding.loginProgress.animate()
-        .setDuration(shortAnimTime)
-        .alpha((if (show) 1 else 0).toFloat())
-        .setListener(object : AnimatorListenerAdapter() {
-          override fun onAnimationEnd(animation: Animator) {
-            binding.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
-          }
-        })
+    updateVisibility(binding.usernameLayout, !show)
+    updateVisibility(binding.passwordLayout, !show)
+    updateVisibility(binding.loginProgress, show)
   }
 }

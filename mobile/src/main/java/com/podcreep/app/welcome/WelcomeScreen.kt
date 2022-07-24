@@ -30,6 +30,7 @@ class WelcomeScreen: Screen() {
   }
 
   override fun onShow(): View? {
+    super.onShow()
     return layout
   }
 }

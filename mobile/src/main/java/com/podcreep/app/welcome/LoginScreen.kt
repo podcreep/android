@@ -6,6 +6,7 @@ import com.podcreep.Settings
 import com.podcreep.app.podcasts.discover.DiscoverScreen
 import com.podcreep.concurrency.TaskRunner
 import com.podcreep.concurrency.Threads
+import com.podcreep.net.HttpException
 import com.podcreep.net.HttpRequest
 import com.podcreep.net.Server
 import com.podcreep.ui.Screen
@@ -40,7 +41,9 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
 
     layout = LoginLayout(context.activity, callbacks = object : LoginLayout.Callbacks {
       override fun onSignIn(username: String, password: String) {
-        taskRunner.runTask({
+        taskRunner.runTask(Threads.UI, { httpError: HttpException ->
+          layout!!.showError(httpError.message ?: "Unknown error occured")
+        }) {
           val request = Server.request("/api/accounts/login")
               .method(HttpRequest.Method.POST)
               .body(LoginRequest(username, password))
@@ -53,7 +56,7 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
           taskRunner.runTask({
             context.pushScreen<DiscoverScreen>()
           }, Threads.UI)
-        }, Threads.BACKGROUND)
+        }
       }
     })
   }
