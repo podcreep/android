@@ -34,7 +34,7 @@ class PlaybackStateSyncer(
    * whatever reason (no network, for example) we'll attempt to sync it at a later time.
    */
   fun sync(playbackState: PlaybackStateJson) {
-    taskRunner!!.runTask({
+    taskRunner!!.runTask(Threads.BACKGROUND) {
       synchronized(lock) {
         // If this playback state is pending, remove it (we'll either succeed or we'll fail and add the latest
         // value later on).
@@ -47,7 +47,7 @@ class PlaybackStateSyncer(
       }
 
       syncOnly(playbackState)
-    }, Threads.BACKGROUND)
+    }
   }
 
   /**

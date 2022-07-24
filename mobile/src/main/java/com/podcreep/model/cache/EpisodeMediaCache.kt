@@ -62,7 +62,7 @@ class EpisodeMediaCache(private val appContext: Context, private val taskRunner:
   }
 
   fun download(podcast: Podcast, episode: Episode) {
-    taskRunner.runTask({
+    taskRunner.runTask(Threads.BACKGROUND) {
       Log.i(TAG, "Downloading media for '${podcast.title}' episode '${episode.title}'...")
       val mediaId = MediaIdBuilder().getMediaId(podcast, episode)
       val ipd = InProgressDownload(podcast, episode)
@@ -91,7 +91,7 @@ class EpisodeMediaCache(private val appContext: Context, private val taskRunner:
       } while (true)
 
       inProgressDownloads.remove(mediaId)
-    }, Threads.BACKGROUND)
+    }
   }
 
   private fun cacheFile(podcast: Podcast, episode: Episode): File {

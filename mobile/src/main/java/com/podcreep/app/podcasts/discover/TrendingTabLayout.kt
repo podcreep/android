@@ -29,15 +29,15 @@ class TrendingTabLayout @Keep constructor(
     layoutManager = _layoutManager
 
 
-    taskRunner.runTask({
+    taskRunner.runTask(Threads.BACKGROUND) {
       val request = Server.request("/api/podcasts")
           .method(HttpRequest.Method.GET)
           .build()
       val resp = request.execute<PodcastListJson>()
-      taskRunner.runTask({
+      taskRunner.runTask(Threads.UI) {
         adapter = Adapter(resp.podcasts, callbacks)
-      }, Threads.UI)
-    }, Threads.BACKGROUND)
+      }
+    }
   }
 
   class Adapter(

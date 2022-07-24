@@ -45,7 +45,7 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
    * Called at start up to ensure our Worker is enqueued and is going to run.
    */
   fun maybeEnqueue() {
-    taskRunner.runTask({
+    taskRunner.runTask(Threads.BACKGROUND) {
       val s = Settings(context)
       val uuid: String = s.get(Settings.SYNC_WORK_ID)
       if (uuid.isEmpty()) {
@@ -59,7 +59,7 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
         WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> enqueueWorker()
         else -> Log.i(TAG, "Worker already queued, nothing to do.")
       }
-    }, Threads.BACKGROUND)
+    }
   }
 
   /** If we haven't run in a while, run now. */
@@ -80,9 +80,9 @@ class SyncManager(private val context: Context, private val taskRunner: TaskRunn
 
   /** Perform a sync now. Runs on a background thread. */
   fun sync() {
-    taskRunner.runTask({
+    taskRunner.runTask(Threads.BACKGROUND) {
       performSync(context)
-    }, Threads.BACKGROUND)
+    }
   }
 
   private fun enqueueWorker() {

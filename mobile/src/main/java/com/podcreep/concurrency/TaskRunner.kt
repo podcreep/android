@@ -38,22 +38,18 @@ class TaskRunner {
     }
   }
 
-  fun runTask(task: () -> Unit, thread: Threads) {
+  fun runTask(thread: Threads, task: () -> Unit) {
     runTask(thread, { e: Throwable -> Log.e("TaskRunner", "UnhandledException", e) }, task)
   }
 
-  fun runTask(runnable: Runnable, thread: Threads) {
-    thread.runTask(runnable)
-  }
-
   /** Run a task after the given delay.  */
-  fun runTask(runnable: Runnable, thread: Threads, delayMs: Long) {
+  fun runTask(thread: Threads, delayMs: Long, task: () -> Unit) {
     if (delayMs == 0L) {
-      runTask(runnable, thread)
+      runTask(thread, task)
     } else {
       timer.schedule(object : TimerTask() {
         override fun run() {
-          runTask(runnable, thread)
+          runTask(thread, task)
         }
       }, delayMs)
     }

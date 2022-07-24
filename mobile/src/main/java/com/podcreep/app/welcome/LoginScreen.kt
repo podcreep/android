@@ -53,9 +53,9 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
           s.put(Settings.COOKIE, resp.cookie)
           Server.updateCookie(resp.cookie)
 
-          taskRunner.runTask({
+          taskRunner.runTask(Threads.UI) {
             context.pushScreen<DiscoverScreen>()
-          }, Threads.UI)
+          }
         }
       }
     })

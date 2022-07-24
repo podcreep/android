@@ -2,7 +2,6 @@ package com.podcreep
 
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.TypedValue
 import android.view.Menu
@@ -89,10 +88,10 @@ class MainActivity : AppCompatActivity() {
     HttpRequest.addGlobalErrorHandler(object : HttpRequest.ErrorHandler{
       override fun onError(e: HttpException) {
         if (e.statusCode == 401) {
-          App.i.taskRunner.runTask({
+          App.i.taskRunner.runTask(Threads.UI) {
             ss.home()
             ss.push(WelcomeScreen())
-          }, Threads.UI)
+          }
         }
       }
     })

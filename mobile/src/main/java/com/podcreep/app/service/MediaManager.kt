@@ -220,7 +220,7 @@ class MediaManager(
     // Update our internal store of the position.
     if (currPodcast != null && currEpisode != null && mp != null) {
       currEpisode.position = mp.currentPosition / 1000
-      taskRunner.runTask({ store.localStore.episodes().insert(currEpisode) }, Threads.BACKGROUND)
+      taskRunner.runTask(Threads.BACKGROUND) { store.localStore.episodes().insert(currEpisode) }
     }
 
     if (!updateQueued) {

@@ -70,7 +70,7 @@ class PodcastIconCache(private val appContext: Context, private val store: Store
 
   /** Refresh the cached icon of the given {@link Podcast}. */
   fun refresh(podcast: Podcast) {
-    taskRunner.runTask({
+    taskRunner.runTask(Threads.BACKGROUND) {
       Log.i(TAG, "Downloading icon for '${podcast.title}'")
       var url = podcast.imageUrl
       if (url.startsWith("/")) {
@@ -108,7 +108,7 @@ class PodcastIconCache(private val appContext: Context, private val store: Store
       val file = cacheFile(podcast)
       Log.i(TAG, " - saving '${podcast.title}' icon to: ${file.absolutePath}")
       bmp.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
-    }, Threads.BACKGROUND)
+    }
   }
 
   private fun cacheFile(podcast: Podcast): File {

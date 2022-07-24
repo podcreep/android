@@ -22,7 +22,7 @@ class DiscoverScreen(private val taskRunner: TaskRunner, private val store: Stor
 
     layout = DiscoverLayout(context.activity, taskRunner, object : DiscoverLayout.Callbacks {
       override fun onViewPodcastClick(podcast: LiveData<Podcast>) {
-        context.pushScreen<PodcastDetailsScreen>(podcast)
+        context.pushScreen<PodcastDetailsScreen>(/*sharedViews=*/null, podcast)
       }
     })
   }
