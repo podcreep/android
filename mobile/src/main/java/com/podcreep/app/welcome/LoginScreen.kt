@@ -41,8 +41,8 @@ class LoginScreen(val taskRunner: TaskRunner): Screen() {
 
     layout = LoginLayout(context.activity, callbacks = object : LoginLayout.Callbacks {
       override fun onSignIn(username: String, password: String) {
-        taskRunner.runTask(Threads.UI, { httpError: HttpException ->
-          layout!!.showError(httpError.message ?: "Unknown error occured")
+        taskRunner.runTask(Threads.BACKGROUND, { httpError: HttpException ->
+          layout!!.showError(httpError.message ?: "Unknown error occurred")
         }) {
           val request = Server.request("/api/accounts/login")
               .method(HttpRequest.Method.POST)

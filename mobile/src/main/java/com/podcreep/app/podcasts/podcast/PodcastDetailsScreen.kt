@@ -43,7 +43,8 @@ class PodcastDetailsScreen(
           }
 
           override fun onEpisodeDetails(podcast: LiveData<Podcast>, episode: Episode) {
-            context.pushScreen<EpisodeDetailsScreen>(/*sharedViews=*/null, EpisodeDetailsScreen.Data(podcast, episode))
+            context.pushScreen<EpisodeDetailsScreen>(
+              /*sharedViews=*/null, EpisodeDetailsScreen.Data(podcast, episode))
           }
         })
   }
