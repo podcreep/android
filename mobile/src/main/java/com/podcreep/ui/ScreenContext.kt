@@ -29,7 +29,7 @@ class ScreenContext(
   }
 
   inline fun <reified S: Screen> pushScreen(sharedViews: SharedViews?, vararg params: Any) {
-    pushScreen(S::class, sharedViews, arrayOf(params))
+    pushScreen(S::class, sharedViews, arrayOf(*params))
   }
 
   fun <S: Screen> pushScreen(cls: KClass<S>, sharedViews: SharedViews?, params: Array<Any>?) {
