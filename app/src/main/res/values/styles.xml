@@ -1,0 +1,11 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.Podcreep">
+    </style>
+
+    <!-- Theme in Android Auto. -->
+    <style name="CarTheme" parent="android:Theme.Material.Light">
+        <item name="android:colorPrimaryDark">#ffbf360c</item>
+        <item name="android:colorAccent">#00B8D4</item>
+    </style>
+</resources>
