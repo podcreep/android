@@ -36,4 +36,7 @@ interface SubscriptionsDao {
     insert(*sub_podcasts.toTypedArray())
   }
   */
+
+  @Query("DELETE FROM sub_podcasts")
+  suspend fun deleteAll()
 }

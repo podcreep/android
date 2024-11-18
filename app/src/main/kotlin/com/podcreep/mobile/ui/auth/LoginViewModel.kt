@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.podcreep.mobile.Settings
 import com.podcreep.mobile.domain.AuthUseCase
+import com.podcreep.mobile.util.L
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,6 +17,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor (
   private val auth: AuthUseCase,
   private val settings: Settings) : ViewModel() {
+
+  private val log: L = L("LoginViewModel")
 
   var username by mutableStateOf("")
     private set
@@ -43,12 +46,13 @@ class LoginViewModel @Inject constructor (
     private set
 
   fun login() {
-    Log.i("DEANH", "logging in $username $password")
+    log.info("logging in $username ********")
     viewModelScope.launch {
       try {
         auth.login(username, password)
-        Log.i("DEANH", "login successful: ${settings.getString(Settings.COOKIE)}")
+        log.info("login successful: ${settings.getString(Settings.COOKIE)}")
       } catch (e: Exception) {
+        log.info("login unsuccessful: ${e.stackTraceToString()}")
         isError = true
         errorMessage = e.message ?: "An unknown error occurred."
       }

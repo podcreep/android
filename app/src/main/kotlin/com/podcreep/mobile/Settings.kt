@@ -2,7 +2,9 @@ package com.podcreep.mobile
 
 import android.content.Context
 import android.content.SharedPreferences
-import java.util.Date
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 class Settings @Inject constructor(appContext: Context) {
@@ -11,7 +13,8 @@ class Settings @Inject constructor(appContext: Context) {
     INT,
     STRING,
     BOOLEAN,
-    DATE,
+    LOCAL_DATE,
+    LOCAL_DATE_TIME,
   }
 
   companion object Keys {
@@ -19,7 +22,7 @@ class Settings @Inject constructor(appContext: Context) {
     val COOKIE = Key("cookie", ValueType.STRING)
 
     /** The last time we sync'd with the server. */
-    val LAST_SYNC_TIME = Key("last_sync_type", ValueType.DATE)
+    val LAST_SYNC_TIME = Key("last_sync_type", ValueType.LOCAL_DATE_TIME)
 
     /**
      * The WorkItemID for our worker that syncs. We keep track of this to ensure our work item
@@ -34,7 +37,7 @@ class Settings @Inject constructor(appContext: Context) {
     val PLAYBACK_STATE_TO_SYNC = Key("playback_state_to_sync", ValueType.STRING)
   }
 
-  private var preferences: SharedPreferences =appContext.getSharedPreferences("prefs", 0)
+  private var preferences: SharedPreferences = appContext.getSharedPreferences("prefs", 0)
 
   fun getString(key: Key): String {
     return preferences.getString(key.name(), "")!!
@@ -48,17 +51,26 @@ class Settings @Inject constructor(appContext: Context) {
     return preferences.getBoolean(key.name(), false)
   }
 
-  fun getDate(key: Key): Date {
+  fun getLocalDate(key: Key): LocalDate {
+    val day = preferences.getLong(key.name(), 0)
+    return LocalDate.ofEpochDay(day)
+  }
+
+  fun getLocalDateTime(key: Key): LocalDateTime {
     val ts = preferences.getLong(key.name(), 0)
-    return Date(ts)
+    return LocalDateTime.ofEpochSecond(ts, 0, ZoneOffset.UTC)
   }
 
   fun put(key: Key, value: String) {
     preferences.edit().putString(key.name(), value).apply()
   }
 
-  fun put(key: Key, value: Date) {
-    preferences.edit().putLong(key.name(), value.time).apply()
+  fun put(key: Key, value: LocalDate) {
+    preferences.edit().putLong(key.name(), value.toEpochDay()).apply()
+  }
+
+  fun put(key: Key, value: LocalDateTime) {
+    preferences.edit().putLong(key.name(), value.toEpochSecond(ZoneOffset.UTC)).apply()
   }
 
   inline fun <reified T> get(key: Key): T {
@@ -66,7 +78,8 @@ class Settings @Inject constructor(appContext: Context) {
       ValueType.STRING -> getString(key) as T
       ValueType.INT -> getInt(key) as T
       ValueType.BOOLEAN -> getBoolean(key) as T
-      ValueType.DATE -> getDate(key) as T
+      ValueType.LOCAL_DATE -> getLocalDate(key) as T
+      ValueType.LOCAL_DATE_TIME -> getLocalDateTime(key) as T
     }
   }
 

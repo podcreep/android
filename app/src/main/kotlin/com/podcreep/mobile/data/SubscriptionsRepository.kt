@@ -67,4 +67,11 @@ class SubscriptionsRepository @Inject constructor(
   suspend fun syncEpisode(episode: Episode) {
     episodesDao.insert(episode)
   }
+
+  /** Called when we log out, we need clear out all our repositories. */
+  suspend fun logout() {
+    episodesDao.deleteAll()
+    subscriptionsDao.deleteAll()
+    podcastsDao.deleteAll()
+  }
 }

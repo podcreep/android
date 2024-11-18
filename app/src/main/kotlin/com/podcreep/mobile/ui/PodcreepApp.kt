@@ -17,6 +17,8 @@ import com.podcreep.mobile.ui.library.SubscriptionsScreen
 @Composable
 fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
   if (viewModel.isLoggedIn.collectAsState().value) {
+    viewModel.maybeSync()
+
     ModalNavigationDrawer(
       drawerContent = {
         ModalDrawerSheet {
@@ -26,6 +28,12 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
             label = { Text(text = "Drawer Item") },
             selected = false,
             onClick = { /*TODO*/ }
+          )
+          HorizontalDivider()
+          NavigationDrawerItem(
+            label = { Text(text = "Log out") },
+            selected = false,
+            onClick = { viewModel.logout() }
           )
           // ...other drawer items
         }

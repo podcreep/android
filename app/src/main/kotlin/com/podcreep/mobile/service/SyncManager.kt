@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.DelegatingWorkerFactory
+import androidx.work.ListenableWorker
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.podcreep.mobile.Settings
 import com.podcreep.mobile.domain.sync.StoreSyncer
@@ -19,6 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -70,12 +75,12 @@ class SyncManager @Inject constructor(
 
   /** If we haven't run in a while, run now. */
   fun maybeSync() {
-    val lastSync: Date = settings.get(Settings.LAST_SYNC_TIME)
+    val lastSync: LocalDateTime = settings.get(Settings.LAST_SYNC_TIME)
 
     // If we haven't synced in the last hour, sync now.
-    val dontSyncAfter = Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1))
-    if (lastSync.before(dontSyncAfter)) {
-      settings.put(Settings.LAST_SYNC_TIME, Date())
+    val dontSyncAfter = LocalDateTime.now().plusHours(1)
+    if (lastSync.isBefore(dontSyncAfter)) {
+      settings.put(Settings.LAST_SYNC_TIME, LocalDateTime.now())
 
       CoroutineScope(Dispatchers.IO).launch {
         sync()
@@ -86,6 +91,12 @@ class SyncManager @Inject constructor(
   /** Perform a sync now. Runs on a background thread. */
   suspend fun sync() {
     performSync()
+  }
+
+  /** Called when we log out, we should clear our local data store. */
+  suspend fun logout() {
+    storeSyncer.logout()
+    settings.put(Settings.LAST_SYNC_TIME, LocalDateTime.MIN)
   }
 
   private fun enqueueWorker() {
@@ -103,10 +114,34 @@ class SyncManager @Inject constructor(
     s.put(Settings.SYNC_WORK_ID, workRequest.id.toString())
   }
 
-  @HiltWorker
-  class SyncWorker @AssistedInject constructor(
-    @Assisted val context: Context,
-    @Assisted params: WorkerParameters,
+  // TODO(dean): We might need more than one worker factory, if we end up with more than one type
+  // of worker?
+  class SyncWorkerFactory @Inject constructor(
+    private val syncManager: SyncManager
+  ) : WorkerFactory() {
+    override fun createWorker(
+      appContext: Context,
+      workerClassName: String,
+      params: WorkerParameters
+    ): ListenableWorker? {
+      return when (workerClassName) {
+        SyncWorker::class.java.name -> SyncWorker(appContext, params, syncManager)
+        else -> null
+      }
+    }
+  }
+
+  class SyncDelegatingWorkerFactory @Inject constructor(
+    private val syncWorkerFactory: SyncWorkerFactory
+  ) : DelegatingWorkerFactory() {
+    init {
+      addFactory(syncWorkerFactory)
+    }
+  }
+
+  class SyncWorker(
+    context: Context,
+    params: WorkerParameters,
     private val syncManager: SyncManager) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {

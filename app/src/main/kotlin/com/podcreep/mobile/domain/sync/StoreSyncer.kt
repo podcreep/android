@@ -93,4 +93,9 @@ class StoreSyncer @Inject constructor(
       // TODO: any positions that aren't in podcasts.episodes, update those
     }
   }
+
+  /** Called when we log out, we need to clear our local data store. */
+  suspend fun logout() {
+    subscriptionsRepository.logout()
+  }
 }

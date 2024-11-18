@@ -2,8 +2,8 @@ package com.podcreep.mobile
 
 import android.app.Application
 import android.content.Context
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.podcreep.mobile.service.SyncManager
 import dagger.Module
 import dagger.Provides
@@ -17,23 +17,24 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltAndroidApp
-class App : Application(), Configuration.Provider {
+class App : Application() {
   @Inject lateinit var syncManager: SyncManager
 
   @EntryPoint
   @InstallIn(SingletonComponent::class)
-  interface HiltWorkerFactoryEntryPoint {
-    fun workerFactory(): HiltWorkerFactory
+  interface WorkerFactoryEntryPoint {
+    fun workerFactory(): SyncManager.SyncDelegatingWorkerFactory
   }
-  override val workManagerConfiguration = Configuration.Builder()
-      .setWorkerFactory(EntryPoints.get(this, HiltWorkerFactoryEntryPoint::class.java).workerFactory())
-      .setMinimumLoggingLevel(android.util.Log.DEBUG)
-      .build()
-
   override fun onCreate() {
     super.onCreate()
 
-    syncManager.maybeSync()
+    val workManagerConfiguration = Configuration.Builder()
+      .setWorkerFactory(EntryPoints.get(this, WorkerFactoryEntryPoint::class.java).workerFactory())
+      .setMinimumLoggingLevel(android.util.Log.DEBUG)
+      .build()
+    WorkManager.initialize(this, workManagerConfiguration)
+
+    syncManager.maybeEnqueue()
   }
 }
 

@@ -26,6 +26,8 @@ class Server @Inject constructor(settings: Settings) {
   // TODO: inject this?
   private val client: OkHttpClient = OkHttpClient()
 
+  private val log = L("Server")
+
   private var cookie: String? = settings.getString(Settings.COOKIE)
 
   val isLoggedIn = MutableStateFlow(!cookie.isNullOrEmpty())
@@ -80,6 +82,8 @@ suspend fun Call.await(): Response {
 
   return suspendCancellableCoroutine { cont ->
     enqueue(object: Callback {
+      private val log = L("Server")
+
       @ExperimentalCoroutinesApi
       override fun onResponse(call: Call, response: Response) {
         cont.resume(response) {

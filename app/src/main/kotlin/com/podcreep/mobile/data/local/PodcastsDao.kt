@@ -23,4 +23,7 @@ interface PodcastsDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(vararg podcasts: Podcast)
+
+  @Query("DELETE FROM podcasts")
+  suspend fun deleteAll()
 }
