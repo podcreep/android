@@ -9,11 +9,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun NewReleases(viewModel : NewReleasesViewModel = hiltViewModel()) {
-  val episodes = viewModel.episodes.collectAsState(initial = emptyList())
+  val episodeWithPodcast = viewModel.episodeWithPodcast.collectAsState(initial = emptyList())
 
   LazyColumn {
-    itemsIndexed(episodes.value) { index, episode ->
-      Text(episode.title)
+    itemsIndexed(episodeWithPodcast.value) { index, epAndPod ->
+      EpisodeListEntry(epAndPod.podcast, epAndPod.episode)
     }
   }
 }

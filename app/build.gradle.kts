@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.androidx.media)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
     // Dependency injection
     implementation(libs.androidx.hilt.navigation.compose)

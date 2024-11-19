@@ -23,6 +23,7 @@ roomCompiler = "2.6.1"
 workRuntimeKtx = "2.9.1"
 hiltWork = "1.2.0"
 jsonSerialization = "1.7.1"
+coil = "3.0.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,8 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 moshi = { group = "com.squareup.moshi", name="moshi-kotlin", version.ref="moshi" }
 okhttp = { group = "com.squareup.okhttp3", name="okhttp", version.ref="okhttp" }
+coil-compose = { group = "io.coil-kt.coil3", name="coil-compose", version.ref="coil" }
+coil-network = { group = "io.coil-kt.coil3", name="coil-network-okhttp", version.ref="coil" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended"}
 androidx-media = { group = "androidx.media", name = "media", version.ref="androidx_media" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
