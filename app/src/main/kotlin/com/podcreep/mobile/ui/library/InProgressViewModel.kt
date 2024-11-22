@@ -6,7 +6,6 @@ import com.podcreep.mobile.data.combineWithPodcasts
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-
 @HiltViewModel
 class InProgressViewModel @Inject constructor(repo : SubscriptionsRepository)
   : ViewModel() {

@@ -1,5 +1,6 @@
 package com.podcreep.mobile.ui.library
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.podcreep.mobile.R
 import com.podcreep.mobile.data.local.Episode
@@ -27,9 +29,16 @@ import java.time.ZoneId
 import java.util.Locale
 
 @Composable
-fun EpisodeListEntry(podcast: Podcast, episode: Episode) {
-
-  Row {
+fun EpisodeListEntry(
+  podcast: Podcast,
+  episode: Episode,
+  onPodcastDetailsClick: (podcastID: Long, episodeID: Long) -> Unit
+) {
+  Row (
+    modifier = Modifier.clickable {
+      onPodcastDetailsClick(podcast.id, episode.id)
+    }
+  ) {
     AsyncImage(
       model = Server.url(podcast.imageUrl),
       placeholder = painterResource(R.drawable.ic_podcast),

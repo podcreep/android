@@ -48,6 +48,10 @@ class SubscriptionsRepository @Inject constructor(
     return episodesDao.get(podcastID)
   }
 
+  fun episode(podcastID: Long, episodeID: Long): Flow<Episode> {
+    return episodesDao.get(podcastID, episodeID)
+  }
+
   fun podcasts(): Flow<List<Podcast>> {
     return podcastsDao.get()
   }
