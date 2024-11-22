@@ -10,14 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.podcreep.mobile.R
 import com.podcreep.mobile.data.local.Episode
 import com.podcreep.mobile.data.local.Podcast
 import com.podcreep.mobile.util.Server
+import com.podcreep.mobile.util.humanizeDay
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -25,7 +28,6 @@ import java.util.Locale
 
 @Composable
 fun EpisodeListEntry(podcast: Podcast, episode: Episode) {
-  val dateFormat = SimpleDateFormat("MMM\ndd", Locale.getDefault())
 
   Row {
     AsyncImage(
@@ -34,21 +36,23 @@ fun EpisodeListEntry(podcast: Podcast, episode: Episode) {
       contentDescription = null,
       modifier = Modifier.size(75.dp).padding(10.dp)
     )
-    Text(
-      modifier = Modifier
-        .size(width =  50.dp, height = 75.dp)
-        .wrapContentHeight(align = Alignment.CenterVertically),
-      text = dateFormat.format(episode.pubDate),
-      textAlign = TextAlign.Center,
-    )
+
     Column(modifier = Modifier.padding(10.dp)) {
       Text(
+        text = episode.pubDate.humanizeDay(context = LocalContext.current),
+        maxLines = 1,
+        modifier = Modifier.alpha(0.6f),
+      )
+      Text(
         text = episode.title,
-        maxLines = 2)
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+      )
       Text (
         text = podcast.title,
         maxLines = 1,
-        modifier = Modifier.alpha(0.6f))
+        modifier = Modifier.alpha(0.6f),
+      )
     }
   }
 }

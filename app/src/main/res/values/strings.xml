@@ -43,4 +43,7 @@
   <string name="contentdesc_podcast_logo">Podcast logo</string>
   <string name="contentdesc_rewind_10">Rewind 10</string>
   <string name="contentdesc_forward_30">Skip forward 30</string>
+
+  <string name="today">Today</string>
+  <string name="yesterday">Yesterday</string>
 </resources>
