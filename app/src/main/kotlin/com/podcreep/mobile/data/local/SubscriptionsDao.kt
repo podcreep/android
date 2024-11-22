@@ -19,6 +19,9 @@ interface SubscriptionsDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(vararg subscriptions: Subscription)
 
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun insertSync(vararg subscriptions: Subscription)
+
   /*
   @Transaction
   fun updateAll(sub_podcasts: List<Subscription>) {

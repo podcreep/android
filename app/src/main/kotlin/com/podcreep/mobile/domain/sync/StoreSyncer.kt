@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.podcreep.mobile.data.SubscriptionsRepository
 import com.podcreep.mobile.data.local.Episode
+import com.podcreep.mobile.data.local.LocalStore
 import com.podcreep.mobile.data.local.Podcast
 import com.podcreep.mobile.data.local.Subscription
 import com.podcreep.mobile.domain.cache.PodcastIconCache
@@ -35,6 +36,7 @@ class StoreSyncer @Inject constructor(
   private val iconCache: PodcastIconCache,
   private val playbackStateSyncer: PlaybackStateSyncer,
   private val server: Server,
+  private val localStore: LocalStore,
   private val subscriptionsRepository: SubscriptionsRepository
 ) {
   companion object {
@@ -54,43 +56,51 @@ class StoreSyncer @Inject constructor(
         .post(SubscriptionsSyncPostRequest(false).toRequestBody())
     val resp = server.call(request).await().fromJson<SubscriptionsSyncPostResponse>()
 
-    for (sub in resp.subscriptions) {
-      Log.i(TAG, "Syncing subscription '${sub.podcast.title}'")
+    val podcastsToSyncIcons = HashMap<Long, Podcast>()
 
-      val podcast = Podcast(
+    localStore.runInTransaction {
+      for (sub in resp.subscriptions) {
+        Log.i(TAG, "Syncing subscription '${sub.podcast.title}'")
+
+        val podcast = Podcast(
           id = sub.podcast.id,
           title = sub.podcast.title,
           description = sub.podcast.description,
           imageUrl = sub.podcast.imageUrl)
-      subscriptionsRepository.syncPodcast(podcast)
-      iconCache.refresh(podcast)
+        subscriptionsRepository.syncPodcast(podcast)
+        podcastsToSyncIcons.put(podcast.id, podcast)
 
-      subscriptionsRepository.syncSubscription(
-        Subscription(
-          podcastID = sub.podcast.id)
-      )
+        subscriptionsRepository.syncSubscription(
+          Subscription(
+            podcastID = sub.podcast.id)
+        )
 
-      if (sub.podcast.episodes != null) {
-        Log.i(TAG, "  adding '${sub.podcast.episodes!!.size}' episodes.")
-        for (ep in sub.podcast.episodes!!) {
-          subscriptionsRepository.syncEpisode(
-            Episode(
-              id = ep.id,
-              podcastID = podcast.id,
-              title = ep.title,
-              description = ep.description,
-              mediaUrl = ep.mediaUrl,
-              pubDate = pubDateFmt.parse(ep.pubDate)!!,
-              position = ep.position,
-              lastListenTime = ep.lastListenTime,
-              isComplete = null)
-          )
+        if (sub.podcast.episodes != null) {
+          Log.i(TAG, "  adding '${sub.podcast.episodes!!.size}' episodes.")
+          for (ep in sub.podcast.episodes!!) {
+            subscriptionsRepository.syncEpisode(
+              Episode(
+                id = ep.id,
+                podcastID = podcast.id,
+                title = ep.title,
+                description = ep.description,
+                mediaUrl = ep.mediaUrl,
+                pubDate = pubDateFmt.parse(ep.pubDate)!!,
+                position = ep.position,
+                lastListenTime = ep.lastListenTime,
+                isComplete = null)
+            )
+          }
+        } else {
+          Log.i(TAG, "  no episodes?")
         }
-      } else {
-        Log.i(TAG, "  no episodes?")
-      }
 
-      // TODO: any positions that aren't in podcasts.episodes, update those
+        // TODO: any positions that aren't in podcasts.episodes, update those
+      }
+    }
+
+    for (podcast in podcastsToSyncIcons.values) {
+      iconCache.refresh(podcast)
     }
   }
 

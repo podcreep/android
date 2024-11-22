@@ -43,6 +43,9 @@ interface EpisodesDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(vararg episodes: Episode)
 
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun insertSync(vararg episodes: Episode)
+
   @Query("DELETE FROM episodes")
   suspend fun deleteAll()
 }

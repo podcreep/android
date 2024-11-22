@@ -60,16 +60,16 @@ class SubscriptionsRepository @Inject constructor(
     return episodesDao.insert(episode)
   }
 
-  suspend fun syncPodcast(podcast: Podcast) {
-    podcastsDao.insert(podcast)
+  fun syncPodcast(podcast: Podcast) {
+    podcastsDao.insertSync(podcast)
   }
 
-  suspend fun syncSubscription(subscription: Subscription) {
-    subscriptionsDao.insert(subscription)
+  fun syncSubscription(subscription: Subscription) {
+    subscriptionsDao.insertSync(subscription)
   }
 
-  suspend fun syncEpisode(episode: Episode) {
-    episodesDao.insert(episode)
+  fun syncEpisode(episode: Episode) {
+    episodesDao.insertSync(episode)
   }
 
   /** Called when we log out, we need clear out all our repositories. */
