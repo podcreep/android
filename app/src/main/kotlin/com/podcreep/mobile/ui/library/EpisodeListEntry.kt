@@ -34,10 +34,10 @@ fun EpisodeListEntry(podcast: Podcast, episode: Episode) {
       model = Server.url(podcast.imageUrl),
       placeholder = painterResource(R.drawable.ic_podcast),
       contentDescription = null,
-      modifier = Modifier.size(75.dp).padding(10.dp)
+      modifier = Modifier.size(80.dp).padding(10.dp)
     )
 
-    Column(modifier = Modifier.padding(10.dp)) {
+    Column(modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)) {
       Text(
         text = episode.pubDate.humanizeDay(context = LocalContext.current),
         maxLines = 1,
