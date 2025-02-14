@@ -16,4 +16,8 @@ class EpisodeDetailsViewModel @Inject constructor(
   val route = savedStateHandle.toRoute<NavItem.EpisodeDetails>()
   val episode = repo.episode(route.podcastID, route.episodeID)
   val podcast = repo.podcast(route.podcastID)
+
+  fun play() {
+    // TODO
+  }
 }
