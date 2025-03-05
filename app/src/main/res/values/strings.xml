@@ -46,4 +46,7 @@
 
   <string name="today">Today</string>
   <string name="yesterday">Yesterday</string>
+
+  <string name="pause_button_content_description">Pause</string>
+  <string name="play_button_content_description">Play</string>
 </resources>

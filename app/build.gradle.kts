@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
+    implementation(libs.lottie.compose)
 
     // Dependency injection
     implementation(libs.androidx.hilt.navigation.compose)

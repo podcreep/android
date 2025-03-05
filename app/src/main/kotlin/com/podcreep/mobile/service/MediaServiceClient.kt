@@ -65,9 +65,10 @@ class MediaServiceClient @Inject constructor(@ApplicationContext val context: Co
     this.activity = null
   }
 
-  fun addCallback(callback: Callbacks) {
+  // TODO(deanh): Convert this stuff to a flow
+  fun addCallback(callback: Callbacks): Callbacks {
     if (callbacks.contains(callback)) {
-      return
+      return callback
     }
 
     callbacks.add(callback)
@@ -80,6 +81,8 @@ class MediaServiceClient @Inject constructor(@ApplicationContext val context: Co
     if (metadata != null) {
       callback.onMetadataChanged(metadata)
     }
+
+    return callback
   }
 
   fun removeCallback(callback: Callbacks) {

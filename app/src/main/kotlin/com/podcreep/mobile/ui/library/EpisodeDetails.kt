@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
@@ -47,10 +51,12 @@ fun EpisodeDetails(viewModel: EpisodeDetailsViewModel = hiltViewModel()) {
     Row {
       Spacer(Modifier.weight(1f))
       Button(onClick = {
-        viewModel.play()
+          viewModel.play()
         }) {
-        Text(
-          text = "Play"
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_play_arrow_black_24dp),
+            modifier = Modifier.size(32.dp),
+            contentDescription = stringResource(R.string.play)
         )
       }
     }

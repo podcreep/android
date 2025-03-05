@@ -66,22 +66,3 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
   }
 }
 
-@Composable
-fun NowPlayingView() {
-  Column(Modifier.fillMaxSize()) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp),
-      verticalAlignment = Alignment.CenterVertically
-    ) {
-      Text("Current song title", modifier = Modifier.weight(1f))
-      IconButton(onClick = { /*TODO play song*/ }) {
-        Icon(
-          Icons.Rounded.PlayArrow,
-          contentDescription = "Play"
-        )
-      }
-    }
-  }
-}
