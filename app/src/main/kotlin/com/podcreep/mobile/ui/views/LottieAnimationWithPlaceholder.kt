@@ -11,7 +11,7 @@ import com.airbnb.lottie.compose.LottieCompositionResult
 import com.airbnb.lottie.compose.LottieDynamicProperties
 
 @Composable
-public fun LottieAnimationWithPlaceholder(
+fun LottieAnimationWithPlaceholder(
     lottieCompositionResult: LottieCompositionResult,
     progress: () -> Float,
     placeholder: ImageVector,

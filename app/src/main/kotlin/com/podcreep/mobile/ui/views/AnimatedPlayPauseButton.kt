@@ -31,7 +31,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.podcreep.mobile.R
 
 @Composable
-public fun AnimatedPlayPauseButton(
+fun AnimatedPlayPauseButton(
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
     playing: Boolean,
@@ -74,8 +74,6 @@ public fun AnimatedPlayPauseButton(
         ) {
             val contentModifier = Modifier
                 .size(iconSize)
-                //.align(alignment = Alignment.Center)
-                //.graphicsLayer(alpha = LocalContentAlpha.current)
 
             LottieAnimationWithPlaceholder(
                 lottieCompositionResult = compositionResult,
