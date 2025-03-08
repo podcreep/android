@@ -75,8 +75,9 @@ class StoreSyncer @Inject constructor(
             podcastID = sub.podcast.id)
         )
 
-        if (sub.podcast.episodes != null) {
-          Log.i(TAG, "  adding '${sub.podcast.episodes!!.size}' episodes.")
+        val episodes = sub.podcast.episodes
+        if (episodes != null) {
+          Log.i(TAG, "  adding '${episodes.size}' episodes.")
           for (ep in sub.podcast.episodes!!) {
             subscriptionsRepository.syncEpisode(
               Episode(
