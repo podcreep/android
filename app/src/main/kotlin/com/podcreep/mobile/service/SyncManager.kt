@@ -42,22 +42,29 @@ class SyncManager @Inject constructor(
   private val settings: Settings) {
 
   private val L: L = L("SyncManager")
+  private var isSyncing = false
 
   /** Actually performs the sync. */
   private suspend fun performSync(): Boolean {
+    if (isSyncing) {
+      L.info("Already syncing, not starting again")
+      return true
+    }
+    isSyncing = true
+
     try {
       storeSyncer.sync()
     } catch (e: Exception) {
       L.warning("Error", e)
       return false
+    } finally {
+      isSyncing = false
     }
 
     return true
   }
 
-  /**
-   * Called at start up to ensure our Worker is enqueued and is going to run.
-   */
+  /** Called at start up to ensure our Worker is enqueued and is going to run. */
   fun maybeEnqueue() {
     val uuid: String = settings.get(Settings.SYNC_WORK_ID)
     if (uuid.isEmpty()) {
