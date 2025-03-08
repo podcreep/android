@@ -49,4 +49,7 @@
 
   <string name="pause_button_content_description">Pause</string>
   <string name="play_button_content_description">Play</string>
+
+  <string name="more">More</string>
+  <string name="less">Less</string>
 </resources>

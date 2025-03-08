@@ -14,6 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,7 +26,10 @@ import com.podcreep.mobile.util.Server
 import com.podcreep.mobile.util.humanizeDay
 
 @Composable
-fun SubscribedPodcasts(viewModel : SubscribedPodcastsViewModel = hiltViewModel()) {
+fun SubscribedPodcasts(
+  onPodcastDetailsClick: (podcastID: Long) -> Unit,
+  viewModel : SubscribedPodcastsViewModel = hiltViewModel()) {
+
   val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
 
   LazyColumn {
@@ -31,7 +37,7 @@ fun SubscribedPodcasts(viewModel : SubscribedPodcastsViewModel = hiltViewModel()
       val podcast = sub.podcast ?: return@itemsIndexed
       Row (
         modifier = Modifier.clickable {
-          //onPodcastDetailsClick(podcast.id, episode.id)
+          onPodcastDetailsClick(podcast.id)
         }
       ) {
         AsyncImage(
@@ -46,10 +52,12 @@ fun SubscribedPodcasts(viewModel : SubscribedPodcastsViewModel = hiltViewModel()
             text = podcast.title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold
           )
           Text (
-            text = podcast.description,
+            text = AnnotatedString.fromHtml(podcast.description),
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.alpha(0.6f),
           )
         }

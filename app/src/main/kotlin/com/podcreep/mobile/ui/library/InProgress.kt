@@ -7,12 +7,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun InProgress(onPodcastDetailsClick: (podcastID: Long, episodeID: Long) -> Unit, viewModel : InProgressViewModel = hiltViewModel()) {
+fun InProgress(onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> Unit, viewModel : InProgressViewModel = hiltViewModel()) {
   val episodeWithPodcast = viewModel.episodeWithPodcast.collectAsState(initial = emptyList())
 
   LazyColumn {
     itemsIndexed(episodeWithPodcast.value) { index, epAndPod ->
-      EpisodeListEntry(epAndPod.podcast, epAndPod.episode, onPodcastDetailsClick)
+      EpisodeListEntry(epAndPod.podcast, epAndPod.episode, onEpisodeDetailsClick)
     }
   }
 }

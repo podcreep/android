@@ -23,20 +23,27 @@ fun SubscriptionsScreen() {
       startDestination = NavItem.NewReleases()) {
 
       composable<NavItem.NewReleases> {
-        NewReleases(onPodcastDetailsClick = { podcastID, episodeID ->
+        NewReleases(onEpisodeDetailsClick = { podcastID, episodeID ->
           navController.navigate(NavItem.EpisodeDetails(podcastID, episodeID))
         })
       }
       composable<NavItem.InProgress> {
-        InProgress(onPodcastDetailsClick = { podcastID, episodeID ->
+        InProgress(onEpisodeDetailsClick = { podcastID, episodeID ->
           navController.navigate(NavItem.EpisodeDetails(podcastID, episodeID))
         })
       }
       composable<NavItem.Podcasts> {
-        SubscribedPodcasts()
+        SubscribedPodcasts(onPodcastDetailsClick = { podcastID ->
+          navController.navigate(NavItem.PodcastDetails(podcastID))
+        })
       }
       composable<NavItem.EpisodeDetails> {
         EpisodeDetails()
+      }
+      composable<NavItem.PodcastDetails> {
+        PodcastDetails(onEpisodeDetailsClick = { podcastID, episodeID ->
+          navController.navigate(NavItem.EpisodeDetails(podcastID, episodeID))
+        })
       }
     }
   }

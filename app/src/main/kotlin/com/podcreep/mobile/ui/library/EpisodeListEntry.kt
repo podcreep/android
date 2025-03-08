@@ -32,11 +32,11 @@ import java.util.Locale
 fun EpisodeListEntry(
   podcast: Podcast,
   episode: Episode,
-  onPodcastDetailsClick: (podcastID: Long, episodeID: Long) -> Unit
+  onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> Unit
 ) {
   Row (
     modifier = Modifier.clickable {
-      onPodcastDetailsClick(podcast.id, episode.id)
+      onEpisodeDetailsClick(podcast.id, episode.id)
     }
   ) {
     AsyncImage(

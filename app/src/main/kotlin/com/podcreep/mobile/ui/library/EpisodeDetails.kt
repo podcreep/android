@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -15,6 +17,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
@@ -39,7 +43,7 @@ fun EpisodeDetails(viewModel: EpisodeDetailsViewModel = hiltViewModel()) {
         modifier = Modifier.size(80.dp).padding(10.dp)
       )
 
-      Column {
+      Column(modifier = Modifier.padding(vertical = 10.dp)) {
         Text(
           text = podcast.title
         )
@@ -52,7 +56,8 @@ fun EpisodeDetails(viewModel: EpisodeDetailsViewModel = hiltViewModel()) {
       Spacer(Modifier.weight(1f))
       Button(onClick = {
           viewModel.play()
-        }) {
+        },
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_play_arrow_black_24dp),
             modifier = Modifier.size(32.dp),
@@ -61,7 +66,10 @@ fun EpisodeDetails(viewModel: EpisodeDetailsViewModel = hiltViewModel()) {
       }
     }
     Text (
-      text = episode.description
+      text = AnnotatedString.fromHtml(episode.description),
+      modifier = Modifier
+        .padding(horizontal = 16.dp, vertical = 8.dp)
+        .verticalScroll(rememberScrollState())
     )
   }
 }

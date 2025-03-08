@@ -18,6 +18,9 @@ open class NavItem(val label: String, val iconResId: Int, val isTopLevel: Boolea
   @Serializable
   class EpisodeDetails(val podcastID: Long, val episodeID: Long)
     : NavItem("Episode", R.drawable.ic_podcast, false)
+
+  @Serializable
+  class PodcastDetails(val podcastID: Long) : NavItem("Podcast", R.drawable.ic_podcast, false)
 }
 
 val topLevelNavItems = listOf(

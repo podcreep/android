@@ -9,12 +9,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
 @Composable
-fun NewReleases(onPodcastDetailsClick: (podcastID: Long, episodeID: Long) -> Unit, viewModel : NewReleasesViewModel = hiltViewModel()) {
+fun NewReleases(onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> Unit, viewModel : NewReleasesViewModel = hiltViewModel()) {
   val episodeWithPodcast = viewModel.episodeWithPodcast.collectAsState(initial = emptyList())
 
   LazyColumn {
     itemsIndexed(episodeWithPodcast.value) { index, epAndPod ->
-      EpisodeListEntry(epAndPod.podcast, epAndPod.episode, onPodcastDetailsClick)
+      EpisodeListEntry(epAndPod.podcast, epAndPod.episode, onEpisodeDetailsClick)
     }
   }
 }
