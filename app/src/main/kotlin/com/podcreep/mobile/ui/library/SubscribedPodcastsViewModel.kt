@@ -9,5 +9,5 @@ import javax.inject.Inject
 class SubscribedPodcastsViewModel @Inject constructor(private val repo : SubscriptionsRepository)
   : ViewModel() {
 
-  val episodes = repo.subscriptions()
+  val subscriptions = repo.subscriptions()
 }
