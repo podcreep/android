@@ -3,6 +3,7 @@ package com.podcreep.mobile.ui
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalDrawerSheet
@@ -10,6 +11,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,29 +31,15 @@ import com.podcreep.mobile.util.L
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
-  val L = L("DEANH")
-
   if (viewModel.isLoggedIn.collectAsState().value) {
     viewModel.maybeSync()
 
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     ModalNavigationDrawer(
+      drawerState = drawerState,
       drawerContent = {
-        ModalDrawerSheet {
-          Text("Podcreep Drawer", modifier = Modifier.padding(16.dp))
-          HorizontalDivider()
-          NavigationDrawerItem(
-            label = { Text(text = "Drawer Item") },
-            selected = false,
-            onClick = { /*TODO*/ }
-          )
-          HorizontalDivider()
-          NavigationDrawerItem(
-            label = { Text(text = "Log out") },
-            selected = false,
-            onClick = { viewModel.logout() }
-          )
-          // ...other drawer items
-        }
+        PodcreepDrawer()
       }
     ) {
       val bottomSheetState = rememberBottomSheetScaffoldState(
@@ -66,7 +54,7 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
           NowPlayingView()
         },
       ) { paddingValues  ->
-        SubscriptionsScreen()
+        SubscriptionsScreen(drawerState)
       }
     }
   } else {

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -78,13 +81,13 @@ fun TopBarNavigationMenu(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController) {
+fun TopBar(drawerState: DrawerState, navController: NavController) {
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+  val scope = rememberCoroutineScope()
 
   val currentNavItem = navController.currentBackStackEntryFlow.map {
     it.toRoute<NavItem>()
   }.collectAsState(NavItem.NewReleases())
-
 
   CenterAlignedTopAppBar(
     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -101,7 +104,13 @@ fun TopBar(navController: NavController) {
           )
         }
       } else {
-        IconButton(onClick = { /* show menu */}) {
+        IconButton(onClick = {
+          scope.launch {
+            drawerState.apply {
+              if (isClosed) open() else close()
+            }
+          }
+        }) {
           Icon(
             imageVector = Icons.Filled.Menu,
             contentDescription = "Menu"
