@@ -26,9 +26,10 @@ class NowPlayingSheetViewModel @Inject constructor(
 
   data class NowPlaying (
     val playState: PlayState,
-    val title: String)
+    val title: String,
+    val imageUrl: String)
 
-  val initialNowPlaying = NowPlaying(PlayState.STOPPED, "")
+  val initialNowPlaying = NowPlaying(PlayState.STOPPED, "", "")
 
   fun play() {
     mediaServiceClient.play()
@@ -44,9 +45,10 @@ class NowPlayingSheetViewModel @Inject constructor(
 
       override fun onMetadataChanged(metadata: MediaMetadataCompat) {
         val title = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE) ?: ""
+        val imageUrl = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI) ?: ""
 
         log.info("sending title: $title")
-        currState = currState.copy(title = title)
+        currState = currState.copy(title = title, imageUrl = imageUrl)
         trySend(currState)
       }
 
