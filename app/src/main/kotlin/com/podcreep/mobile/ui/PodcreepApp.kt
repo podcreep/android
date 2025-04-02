@@ -24,22 +24,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.podcreep.mobile.R
 import com.podcreep.mobile.ui.auth.LoginScreen
 import com.podcreep.mobile.ui.library.SubscriptionsScreen
+import com.podcreep.mobile.ui.settings.SettingsScreen
 import com.podcreep.mobile.util.L
+
+sealed class TopLevelItem(var route: String, var icon: Int, var title: String) {
+  object Subscriptions : TopLevelItem("subscriptions", R.drawable.ic_podcast, "Subscriptions")
+  object Settings : TopLevelItem("settings", R.drawable.ic_settings, "Settings")
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
   if (viewModel.isLoggedIn.collectAsState().value) {
     viewModel.maybeSync()
+    val navController = rememberNavController()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     ModalNavigationDrawer(
       drawerState = drawerState,
       drawerContent = {
-        PodcreepDrawer()
+        PodcreepDrawer(navController, drawerState)
       }
     ) {
       val bottomSheetState = rememberBottomSheetScaffoldState(
@@ -54,7 +65,14 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
           NowPlayingView()
         },
       ) { paddingValues  ->
-        SubscriptionsScreen(drawerState)
+        NavHost(navController, startDestination = TopLevelItem.Subscriptions.route) {
+          composable(TopLevelItem.Subscriptions.route) {
+            SubscriptionsScreen(drawerState)
+          }
+          composable(TopLevelItem.Settings.route) {
+            SettingsScreen(drawerState)
+          }
+        }
       }
     }
   } else {
