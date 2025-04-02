@@ -103,6 +103,7 @@ class MediaManager @Inject constructor(
           .setUsage(AudioAttributes.USAGE_MEDIA)
           .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
           .build())
+      setVolume(1.0f, 1.0f)
       setDataSource(context, uri!!)
       setOnPreparedListener {
         it.seekTo(offset * 1000)
