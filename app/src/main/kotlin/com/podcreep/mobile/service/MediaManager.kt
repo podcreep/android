@@ -3,6 +3,7 @@ package com.podcreep.mobile.service
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.audiofx.LoudnessEnhancer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -11,6 +12,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.podcreep.mobile.R
+import com.podcreep.mobile.data.SettingsRepository
 import com.podcreep.mobile.data.SubscriptionsRepository
 import com.podcreep.mobile.data.local.Episode
 import com.podcreep.mobile.data.local.Podcast
@@ -22,9 +24,11 @@ import com.podcreep.mobile.util.L
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.log10
 
 /** MediaManager manages the actual playback of the media. */
 class MediaManager @Inject constructor(
@@ -33,7 +37,8 @@ class MediaManager @Inject constructor(
   private val mediaCache: EpisodeMediaCache,
   private val iconCache: PodcastIconCache,
   private val playbackStateSyncer: PlaybackStateSyncer,
-  private val subscriptionsRepository: SubscriptionsRepository) {
+  private val subscriptionsRepository: SubscriptionsRepository,
+  private val settingsRepository: SettingsRepository) {
 
   companion object {
     private val L: L = L("MediaManager")
@@ -63,6 +68,9 @@ class MediaManager @Inject constructor(
   private var lastPodcast: Podcast? = null
   private var lastEpisode: Episode? = null
   private var lastIsPlaying: Boolean? = null
+
+  // This is non-null when we're playing. We use this to boost volume past 100%.
+  private var loudnessEnhancer: LoudnessEnhancer? = null
 
   private val handler = Handler()
 
@@ -110,6 +118,9 @@ class MediaManager @Inject constructor(
         it.start()
         isPreparing = false
         L.info("Playing: $uri")
+
+        loudnessEnhancer = LoudnessEnhancer(it.audioSessionId)
+        updateVolumeBoost()
       }
       prepareAsync()
     }
@@ -120,9 +131,24 @@ class MediaManager @Inject constructor(
     updateState(false)
   }
 
+  fun updateVolumeBoost() {
+    CoroutineScope(Dispatchers.IO).launch {
+      val volumeBoost = settingsRepository.getInt("VolumeBoost", 100) / 100f
+      L.info("DEANH: volumeBoost: %f", volumeBoost)
+      if (volumeBoost < 1f || volumeBoost > 3f) {
+        return@launch
+      }
+      val gain = log10(volumeBoost) * 2000f
+      loudnessEnhancer?.setTargetGain(Math.round(gain))
+      L.info("DEANH: loundnessEnhancer: %s %f", if (loudnessEnhancer == null) "null" else "non-null", gain)
+      loudnessEnhancer?.enabled = true
+    }
+  }
+
   fun play() {
     mediaPlayer?.start()
     updateState(false)
+    updateVolumeBoost()
   }
 
   fun pause() {

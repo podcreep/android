@@ -2,6 +2,7 @@ package com.podcreep.mobile.service
 
 import android.app.Service
 import android.support.v4.media.session.MediaSessionCompat
+import com.podcreep.mobile.data.SettingsRepository
 import com.podcreep.mobile.data.SubscriptionsRepository
 import com.podcreep.mobile.domain.cache.EpisodeMediaCache
 import com.podcreep.mobile.domain.cache.PodcastIconCache
@@ -22,8 +23,11 @@ class ServiceModule {
                           mediaCache: EpisodeMediaCache,
                           iconCache: PodcastIconCache,
                           playbackStateSyncer: PlaybackStateSyncer,
-                          subscriptionsRepository: SubscriptionsRepository
-  ) = MediaManager(service, mediaSession, mediaCache, iconCache, playbackStateSyncer, subscriptionsRepository)
+                          subscriptionsRepository: SubscriptionsRepository,
+                          settingsRepository: SettingsRepository
+  ) = MediaManager(
+    service, mediaSession, mediaCache, iconCache, playbackStateSyncer,
+    subscriptionsRepository, settingsRepository)
 
   @ServiceScoped
   @Provides

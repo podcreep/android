@@ -3,6 +3,8 @@ package com.podcreep.mobile.ui.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -17,6 +19,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 
@@ -51,15 +57,25 @@ fun TopBar(drawerState: DrawerState) {
 }
 
 @Composable
-fun SettingsScreen(drawerState: DrawerState) {
+fun SettingsScreen(drawerState: DrawerState, viewModel: SettingsViewModel = hiltViewModel()) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { TopBar(drawerState) }
     ) { paddingValues  ->
         Column (
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
         )  {
-            Text("TODO")
+            Text("Volume Boost")
+            SliderSetting(
+                minValue = 100f,
+                maxValue = 300f,
+                value = viewModel.volumeBoost.map { it.toFloat() },
+                steps = 7,
+                valueFormatter = { value -> "%.0f %%".format(value) },
+                valueHandler = { value -> viewModel.setVolumeBoost(value.toLong()) }
+            )
         }
     }
 }

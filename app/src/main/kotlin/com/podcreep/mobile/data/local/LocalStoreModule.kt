@@ -44,4 +44,10 @@ object LocalStoreModule {
   fun provideEpisodesDao(localStore: LocalStore): EpisodesDao {
     return localStore.episodes()
   }
+
+  @Singleton
+  @Provides
+  fun provideSettingDao(localStore: LocalStore): SettingDao {
+    return localStore.settings()
+  }
 }
