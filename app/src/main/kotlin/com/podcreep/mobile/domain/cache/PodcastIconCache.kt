@@ -96,7 +96,11 @@ class PodcastIconCache @Inject constructor(
       L.warning("error fetching icon: ${resp.code} ${resp.message}")
       return
     }
-    var bmp: Bitmap = BitmapFactory.decodeStream(src.inputStream())
+    var bmp: Bitmap? = BitmapFactory.decodeStream(src.inputStream())
+    if (bmp == null) {
+      L.warning("could not decode stream from: $url")
+      return
+    }
     L.info(" - icon downloaded for '${podcast.title}': ${bmp.width}x${bmp.height}")
 
     // TODO: Maybe don't load the whole bitmap just to resize it, we can decode the bounds
