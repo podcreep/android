@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.podcreep.mobile.R
 import com.podcreep.mobile.data.local.Podcast
 import com.podcreep.mobile.util.L
 import com.podcreep.mobile.util.Server
@@ -46,7 +47,16 @@ class PodcastIconCache @Inject constructor(
     var uri = getRemoteUriOrNull(podcast)
     if (uri == null) {
       refresh(podcast)
-      uri = getRemoteUriOrNull(podcast)!!
+      uri = getRemoteUriOrNull(podcast)
+      if (uri == null) {
+        // It could still be null, in that case let's use a hardcoded one.
+        val packageName = appContext.packageName
+        val resourceId = R.drawable.ic_podcast // Replace with your drawable name
+        uri = Uri.parse("android.resource://$packageName/$resourceId")
+
+        // It shouldn't ever be null
+        uri = uri!!
+      }
     }
 
     return uri
