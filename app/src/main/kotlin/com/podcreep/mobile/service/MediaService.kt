@@ -104,11 +104,15 @@ class MediaService : MediaBrowserServiceCompat(), LifecycleOwner {
       audioFocusManager.abandon()
     }
 
-    override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
+    override fun onPlayFromMediaId(mediaId: String, extras: Bundle?) {
       L.info("onPlayFromMediaId($mediaId)")
 
-      val pair = MediaIdBuilder().parse(mediaId!!)
-      val podcast = pair!!.first
+      val pair = MediaIdBuilder().parse(mediaId)
+      if (pair == null) {
+        L.warning("couldn't find media with Id $mediaId")
+        return
+      }
+      val podcast = pair.first
       val episode = pair.second
 
       // Display the notification and place the service in the foreground

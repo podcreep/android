@@ -131,17 +131,25 @@ class MediaManager @Inject constructor(
     updateState(false)
   }
 
-  fun updateVolumeBoost() {
+  private fun updateVolumeBoost() {
     CoroutineScope(Dispatchers.IO).launch {
       val volumeBoost = settingsRepository.getInt("VolumeBoost", 100) / 100f
-      L.info("DEANH: volumeBoost: %f", volumeBoost)
+      L.info("volumeBoost: %f", volumeBoost)
       if (volumeBoost < 1f || volumeBoost > 3f) {
         return@launch
       }
       val gain = log10(volumeBoost) * 2000f
-      loudnessEnhancer?.setTargetGain(Math.round(gain))
-      L.info("DEANH: loundnessEnhancer: %s %f", if (loudnessEnhancer == null) "null" else "non-null", gain)
-      loudnessEnhancer?.enabled = true
+      try {
+        loudnessEnhancer?.setTargetGain(Math.round(gain))
+        L.info(
+          "loudnessEnhancer: %s %f",
+          if (loudnessEnhancer == null) "null" else "non-null",
+          gain
+        )
+        loudnessEnhancer?.enabled = true
+      } catch (e: RuntimeException) {
+        L.warning("error adjusting loudness: %s", e)
+      }
     }
   }
 
