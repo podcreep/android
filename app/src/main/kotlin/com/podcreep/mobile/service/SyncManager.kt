@@ -55,7 +55,7 @@ class SyncManager @Inject constructor(
     try {
       storeSyncer.sync()
     } catch (e: Exception) {
-      L.warning("Error", e)
+      L.warning("Error: %s", e)
       return false
     } finally {
       isSyncing = false
@@ -74,6 +74,11 @@ class SyncManager @Inject constructor(
     }
 
     val workInfo = WorkManager.getInstance(context).getWorkInfoById(UUID.fromString(uuid))
+    if (workInfo.get() == null) {
+      // Work ID hasn't been queued yet, or it failed to get queued?
+      enqueueWorker()
+      return
+    }
     when (workInfo.get().state) {
       WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> enqueueWorker()
       else -> L.info("Worker already queued, nothing to do.")
@@ -114,8 +119,8 @@ class SyncManager @Inject constructor(
             .setRequiresStorageNotLow(true)
             .build())
         .build()
-    WorkManager.getInstance(context).enqueue(workRequest).result.get()
-    L.info(String.format("New worker enqueued, ID: %s", workRequest.id.toString()))
+    val result = WorkManager.getInstance(context).enqueue(workRequest).result.get()
+    L.info(String.format("New worker enqueued, ID: %s %s", workRequest.id.toString(), result))
 
     val s = Settings(context)
     s.put(Settings.SYNC_WORK_ID, workRequest.id.toString())
