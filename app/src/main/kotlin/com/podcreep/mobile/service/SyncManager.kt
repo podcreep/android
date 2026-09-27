@@ -37,7 +37,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class SyncManager @Inject constructor(
-  @ApplicationContext val context: Context,
+  @param:ApplicationContext val context: Context,
   private val storeSyncer: StoreSyncer,
   private val settings: Settings) {
 

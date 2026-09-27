@@ -4,9 +4,7 @@ import com.podcreep.mobile.data.local.Episode
 import com.podcreep.mobile.data.local.Podcast
 import java.util.*
 
-/**
- * Simple helper for building media IDs.
- */
+/** Simple helper for building media IDs. */
 class MediaIdBuilder {
   companion object {
     private val mapping: TreeMap<String, Pair<Podcast, Episode>> = TreeMap()

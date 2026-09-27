@@ -15,6 +15,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.net.toUri
+import androidx.core.graphics.scale
 
 /**
  * A cache of the podcast icons. We'll save them to disk and hand out Uris that we can display
@@ -22,7 +24,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class PodcastIconCache @Inject constructor(
-  @ApplicationContext val appContext: Context,
+  @param:ApplicationContext val appContext: Context,
   private val server: Server) {
 
   companion object {
@@ -52,10 +54,7 @@ class PodcastIconCache @Inject constructor(
         // It could still be null, in that case let's use a hardcoded one.
         val packageName = appContext.packageName
         val resourceId = R.drawable.ic_podcast // Replace with your drawable name
-        uri = Uri.parse("android.resource://$packageName/$resourceId")
-
-        // It shouldn't ever be null
-        uri = uri!!
+        uri = "android.resource://$packageName/$resourceId".toUri()
       }
     }
 
@@ -125,7 +124,7 @@ class PodcastIconCache @Inject constructor(
       }
       L.info(" - resizing '${podcast.title}' icon to: ${destWidth}x$destHeight")
       val oldBmp = bmp
-      bmp = Bitmap.createScaledBitmap(bmp, destWidth, destHeight, true)
+      bmp = bmp.scale(destWidth, destHeight)
       oldBmp.recycle()
     }
 

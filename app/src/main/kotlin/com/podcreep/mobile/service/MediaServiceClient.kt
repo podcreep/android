@@ -2,86 +2,91 @@ package com.podcreep.mobile.service
 
 import android.content.ComponentName
 import android.content.Context
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
+import androidx.core.content.ContextCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
+import androidx.media3.session.MediaBrowser
+import androidx.media3.session.SessionToken
 import com.podcreep.mobile.data.local.Episode
 import com.podcreep.mobile.data.local.Podcast
 import com.podcreep.mobile.ui.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
-/**
- * MediaServiceClient is a helper class that uses the media browser/media session API to talk with
- * the media service. Doing it this way means we keep things nicely in sync with other playback
- * state.
- */
-class MediaServiceClient @Inject constructor(@ApplicationContext val context: Context) {
+/** MediaServiceClient uses Media3 MediaBrowser to communicate with MediaService. */
+class MediaServiceClient @Inject constructor(@param:ApplicationContext val context: Context) {
   abstract class Callbacks {
-    open fun onPlaybackStateChanged(state: PlaybackStateCompat) {}
-    open fun onMetadataChanged(metadata: MediaMetadataCompat) {}
+    open fun onPlaybackStateChanged(isPlaying: Boolean, playbackState: Int) {}
+    open fun onMetadataChanged(mediaItem: MediaItem?) {}
   }
 
   companion object {
     val TAG = "MediaServiceClient"
   }
 
-  private val mediaBrowser: MediaBrowserCompat
+  private var mediaBrowser: MediaBrowser? = null
   private val callbacks: ArrayList<Callbacks> = ArrayList()
-  private var mediaController: MediaControllerCompat? = null
-
   private var activity: MainActivity? = null
 
-  private var lastPlaybackState: PlaybackStateCompat? = null
-  private var lastMetadata: MediaMetadataCompat? = null
-
+  private var lastIsPlaying: Boolean = false
+  private var lastPlaybackState: Int = Player.STATE_IDLE
+  private var lastMediaItem: MediaItem? = null
 
   init {
-    mediaBrowser = MediaBrowserCompat(
-        context,
-        ComponentName(context, MediaService::class.java),
-        MediaBrowserConnectionCallbacks(),
-        null // optional Bundle
-    )
-    mediaBrowser.connect()
+    val sessionToken = SessionToken(context, ComponentName(context, MediaService::class.java))
+    val browserFuture = MediaBrowser.Builder(context, sessionToken).buildAsync()
+    browserFuture.addListener({
+      try {
+        val browser = browserFuture.get()
+        mediaBrowser = browser
+        browser.addListener(object : Player.Listener {
+          override fun onIsPlayingChanged(isPlaying: Boolean) {
+            lastIsPlaying = isPlaying
+            lastPlaybackState = browser.playbackState
+            notifyPlaybackStateChanged()
+          }
+
+          override fun onPlaybackStateChanged(playbackState: Int) {
+            lastPlaybackState = playbackState
+            notifyPlaybackStateChanged()
+          }
+
+          override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            lastMediaItem = mediaItem
+            notifyMetadataChanged()
+          }
+        })
+        lastIsPlaying = browser.isPlaying
+        lastPlaybackState = browser.playbackState
+        lastMediaItem = browser.currentMediaItem
+        notifyPlaybackStateChanged()
+        notifyMetadataChanged()
+      } catch (e: ExecutionException) {
+        e.printStackTrace()
+      } catch (e: InterruptedException) {
+        e.printStackTrace()
+      }
+    }, ContextCompat.getMainExecutor(context))
   }
 
   fun attachActivity(activity: MainActivity) {
-    val oldActivity = this.activity
-    if (oldActivity != null) {
-      // TODO: error?
-      detachActivity(oldActivity)
-    }
     this.activity = activity
-    MediaControllerCompat.setMediaController(activity, mediaController)
   }
 
   fun detachActivity(activity: MainActivity) {
-    if (this.activity != activity) {
-      // TODO: error?
-      return
+    if (this.activity == activity) {
+      this.activity = null
     }
-    this.activity = null
   }
 
-  // TODO(deanh): Convert this stuff to a flow
   fun addCallback(callback: Callbacks): Callbacks {
-    if (callbacks.contains(callback)) {
-      return callback
+    if (!callbacks.contains(callback)) {
+      callbacks.add(callback)
+      callback.onPlaybackStateChanged(lastIsPlaying, lastPlaybackState)
+      callback.onMetadataChanged(lastMediaItem)
     }
-
-    callbacks.add(callback)
-
-    val playbackState = lastPlaybackState
-    if (playbackState != null) {
-      callback.onPlaybackStateChanged(playbackState)
-    }
-    val metadata = lastMetadata
-    if (metadata != null) {
-      callback.onMetadataChanged(metadata)
-    }
-
     return callback
   }
 
@@ -90,78 +95,44 @@ class MediaServiceClient @Inject constructor(@ApplicationContext val context: Co
   }
 
   fun play(podcast: Podcast, episode: Episode) {
-    val mediaIdBuilder = MediaIdBuilder()
-    mediaController?.transportControls?.playFromMediaId(
-        mediaIdBuilder.getMediaId(podcast, episode), null)
+    val mediaId = MediaIdBuilder().getMediaId(podcast, episode)
+    mediaBrowser?.setMediaItem(
+      MediaItem.Builder()
+        .setMediaId(mediaId)
+        .setUri(episode.mediaUrl)
+        .setMediaMetadata(
+          MediaMetadata.Builder()
+            .setTitle(episode.title)
+            .setArtist(podcast.title)
+            .build()
+        )
+        .build()
+    )
+    mediaBrowser?.prepare()
+    mediaBrowser?.play()
   }
 
   fun play() {
-    mediaController?.transportControls?.play()
+    mediaBrowser?.play()
   }
 
   fun pause() {
-    mediaController?.transportControls?.pause()
+    mediaBrowser?.pause()
   }
 
   fun skipForward() {
-    // TODO: make these custom actions.
-    mediaController?.transportControls?.skipToNext()
+    mediaBrowser?.seekForward()
   }
 
   fun skipBack() {
-    // TODO: make these custom actions.
-    mediaController?.transportControls?.skipToPrevious()
+    mediaBrowser?.seekBack()
   }
 
-  private var controllerCallback = object : MediaControllerCompat.Callback() {
-    override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-      if (metadata == null) {
-        return
-      }
-      lastMetadata = metadata
-
-      callbacks.forEach {
-        it.onMetadataChanged(metadata)
-      }
-    }
-
-    override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      if (state == null) {
-        return
-      }
-      lastPlaybackState = state
-
-      callbacks.forEach {
-        it.onPlaybackStateChanged(state)
-      }
-    }
+  private fun notifyPlaybackStateChanged() {
+    callbacks.forEach { it.onPlaybackStateChanged(lastIsPlaying, lastPlaybackState) }
   }
 
-  private inner class MediaBrowserConnectionCallbacks : MediaBrowserCompat.ConnectionCallback() {
-    override fun onConnected() {
-      // Get the token for the MediaSession
-      mediaBrowser.sessionToken.also { token ->
-        // Create a MediaControllerCompat.
-        mediaController = MediaControllerCompat(context, token)
-
-        // Get the current values of things.
-        lastPlaybackState = mediaController?.playbackState
-        lastMetadata = mediaController?.metadata
-        controllerCallback.onPlaybackStateChanged(lastPlaybackState)
-        controllerCallback.onMetadataChanged(lastMetadata)
-
-        // Register a Callback to stay in sync
-        mediaController?.registerCallback(controllerCallback)
-
-      }
-    }
-
-    override fun onConnectionSuspended() {
-      // The Service has crashed. Disable transport controls until it automatically reconnects
-    }
-
-    override fun onConnectionFailed() {
-      // The Service has refused our connection
-    }
+  private fun notifyMetadataChanged() {
+    callbacks.forEach { it.onMetadataChanged(lastMediaItem) }
   }
 }

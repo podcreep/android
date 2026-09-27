@@ -68,7 +68,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.moshi)
     implementation(libs.okhttp)
-    implementation(libs.androidx.media)
+    implementation(libs.androidx.media3.exoplayer)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
@@ -81,8 +81,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
+  implementation(libs.androidx.media3.session)
 
-    ksp(libs.androidx.room.compiler)
+  ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)

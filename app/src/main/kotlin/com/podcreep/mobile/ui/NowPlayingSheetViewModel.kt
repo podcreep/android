@@ -1,9 +1,8 @@
 package com.podcreep.mobile.ui
 
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import com.podcreep.mobile.service.MediaServiceClient
 import com.podcreep.mobile.util.L
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,24 +42,25 @@ class NowPlayingSheetViewModel @Inject constructor(
     val callbacks = mediaServiceClient.addCallback(object : MediaServiceClient.Callbacks() {
       var currState = initialNowPlaying.copy()
 
-      override fun onMetadataChanged(metadata: MediaMetadataCompat) {
-        val title = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE) ?: ""
-        val imageUrl = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI) ?: ""
+      override fun onMetadataChanged(mediaItem: MediaItem?) {
+        val metadata = mediaItem?.mediaMetadata
+        val title = metadata?.title?.toString() ?: ""
+        val imageUrl = metadata?.artworkUri?.toString() ?: ""
 
         log.info("sending title: $title")
         currState = currState.copy(title = title, imageUrl = imageUrl)
         trySend(currState)
       }
 
-      override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
-        val playState = when (state.state) {
-          PlaybackStateCompat.STATE_PLAYING -> PlayState.PLAYING
-          PlaybackStateCompat.STATE_PAUSED -> PlayState.PAUSED
-          PlaybackStateCompat.STATE_BUFFERING -> PlayState.BUFFERING
+      override fun onPlaybackStateChanged(isPlaying: Boolean, playbackState: Int) {
+        val playState = when {
+          isPlaying -> PlayState.PLAYING
+          playbackState == Player.STATE_BUFFERING -> PlayState.BUFFERING
+          playbackState == Player.STATE_READY -> PlayState.PAUSED
           else -> PlayState.STOPPED
         }
 
-        log.info("sending playState: $playState")
+        log.info("sending playState: $playState, isPlaying: $isPlaying, state: $playbackState")
         currState = currState.copy(playState = playState)
         trySend(currState)
       }

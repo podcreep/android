@@ -1,9 +1,8 @@
 package com.podcreep.mobile.ui
 
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.Player
 import com.podcreep.mobile.domain.AuthUseCase
 import com.podcreep.mobile.service.MediaServiceClient
 import com.podcreep.mobile.service.SyncManager
@@ -38,12 +37,12 @@ class PodcreepAppViewModel @Inject constructor(
   // This is a flow that is just true when we should show the bottom sheet vs. when we shouldn't.
   val hideBottomSheet = callbackFlow {
     val callbacks = mediaServiceClient.addCallback(object : MediaServiceClient.Callbacks() {
-      override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
-        L.info("state = %d", state.state)
-        val shouldHide = when (state.state) {
-          PlaybackStateCompat.STATE_PLAYING -> false
-          PlaybackStateCompat.STATE_PAUSED -> false
-          PlaybackStateCompat.STATE_BUFFERING -> false
+      override fun onPlaybackStateChanged(isPlaying: Boolean, playbackState: Int) {
+        L.info("isPlaying = %b, state = %d", isPlaying, playbackState)
+        val shouldHide = when {
+          isPlaying -> false
+          playbackState == Player.STATE_BUFFERING -> false
+          playbackState == Player.STATE_READY -> false
           else -> true
         }
 
