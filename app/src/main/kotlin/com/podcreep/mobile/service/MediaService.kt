@@ -1,23 +1,30 @@
+@file:OptIn(UnstableApi::class)
+
 package com.podcreep.mobile.service
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.CommandButton
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.work.impl.utils.futures.SettableFuture
+import com.google.common.util.concurrent.SettableFuture
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.podcreep.mobile.R
 import com.podcreep.mobile.domain.cache.EpisodeMediaCache
 import com.podcreep.mobile.domain.cache.PodcastIconCache
 import com.podcreep.mobile.util.L
@@ -41,6 +48,8 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
 
   companion object {
     private val L = L("MediaService")
+    const val CUSTOM_ACTION_FORWARD = "skip_forward_30"
+    const val CUSTOM_ACTION_BACK = "skip_back_10"
   }
 
   override val lifecycle = LifecycleRegistry(this)
@@ -57,7 +66,23 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
 
     val player = mediaManager.player
 
+    val customCommandForward = SessionCommand(CUSTOM_ACTION_FORWARD, Bundle.EMPTY)
+    val customCommandBack = SessionCommand(CUSTOM_ACTION_BACK, Bundle.EMPTY)
+
+    val rewindButton = CommandButton.Builder()
+      .setDisplayName(getString(R.string.skip_back_10))
+      .setIconResId(R.drawable.ic_rewind_10_24dp)
+      .setSessionCommand(customCommandBack)
+      .build()
+
+    val forwardButton = CommandButton.Builder()
+      .setDisplayName(getString(R.string.skip_forward_30))
+      .setIconResId(R.drawable.ic_forward_30_24dp)
+      .setSessionCommand(customCommandForward)
+      .build()
+
     session = MediaLibrarySession.Builder(this, player, MediaLibrarySessionCallback())
+      .setCustomLayout(ImmutableList.of(rewindButton, forwardButton))
       .build()
   }
 
@@ -83,6 +108,32 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
   }
 
   private inner class MediaLibrarySessionCallback : MediaLibrarySession.Callback {
+
+    override fun onConnect(
+      session: MediaSession,
+      controller: MediaSession.ControllerInfo
+    ): MediaSession.ConnectionResult {
+      val connectionResult = super.onConnect(session, controller)
+      val customCommandForward = SessionCommand(CUSTOM_ACTION_FORWARD, Bundle.EMPTY)
+      val customCommandBack = SessionCommand(CUSTOM_ACTION_BACK, Bundle.EMPTY)
+
+      val playerCommands = connectionResult.availablePlayerCommands.buildUpon()
+        .remove(Player.COMMAND_SEEK_TO_PREVIOUS)
+        .remove(Player.COMMAND_SEEK_TO_NEXT)
+        .remove(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+        .remove(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+        .build()
+
+      val sessionCommands = connectionResult.availableSessionCommands.buildUpon()
+        .add(customCommandForward)
+        .add(customCommandBack)
+        .build()
+
+      return MediaSession.ConnectionResult.accept(
+        sessionCommands,
+        playerCommands
+      )
+    }
 
     override fun onGetLibraryRoot(
       session: MediaLibrarySession,

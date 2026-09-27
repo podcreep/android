@@ -1,12 +1,16 @@
+@file:OptIn(UnstableApi::class)
+
 package com.podcreep.mobile.service
 
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.podcreep.mobile.data.SettingsRepository
 import com.podcreep.mobile.data.SubscriptionsRepository
@@ -49,6 +53,8 @@ class MediaManager @Inject constructor(
         .build(),
       true // handle audio focus automatically via Media3 ExoPlayer
     )
+    .setSeekForwardIncrementMs(30000L)
+    .setSeekBackIncrementMs(10000L)
     .build()
 
   var currPodcast: Podcast? = null
@@ -111,7 +117,8 @@ class MediaManager @Inject constructor(
   }
 
   fun skipForward() {
-    val target = (player.currentPosition + 30000).coerceAtMost(player.duration.takeIf { it > 0 } ?: player.currentPosition)
+    val target = (player.currentPosition + 30000)
+      .coerceAtMost(player.duration.takeIf { it > 0 } ?: player.currentPosition)
     player.seekTo(target)
     saveCurrentPosition()
   }
@@ -125,7 +132,7 @@ class MediaManager @Inject constructor(
   fun customAction(action: String?, extras: Bundle?) {
     when (action) {
       "skip_forward_30" -> skipForward()
-      "skip_back_30" -> skipBack()
+      "skip_back_10", "skip_back_30" -> skipBack()
       else -> L.info("Unknown custom action: $action")
     }
   }
