@@ -15,8 +15,8 @@ android {
         applicationId = "com.podcreep.mobile"
         minSdk = 27
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -81,9 +81,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
-  implementation(libs.androidx.media3.session)
+    implementation(libs.androidx.media3.session)
 
-  ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)
