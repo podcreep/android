@@ -26,6 +26,9 @@
         <meta-data
             android:name="com.google.android.gms.car.application.theme"
             android:resource="@style/CarTheme" />
+        <meta-data
+            android:name="androidx.car.app.TintableAttributionIcon"
+            android:resource="@drawable/ic_notification" />
 
         <activity
             android:name=".ui.MainActivity"
