@@ -3,7 +3,6 @@
 package com.podcreep.mobile.service
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.lifecycle.Lifecycle
@@ -32,6 +31,9 @@ import com.podcreep.mobile.util.L
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.net.toUri
+import com.podcreep.mobile.data.local.Episode
+import com.podcreep.mobile.data.local.Podcast
 
 /**
  * This is the main media service for Pod Creep. It handles playback and also lets other bits of the
@@ -113,7 +115,6 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
   }
 
   private inner class MediaLibrarySessionCallback : MediaLibrarySession.Callback {
-
     override fun onConnect(
       session: MediaSession,
       controller: MediaSession.ControllerInfo
@@ -186,6 +187,49 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       return future
     }
 
+    /** This is called when the client sets the media item(s) that it will want to play. */
+    override fun onSetMediaItems(
+      mediaSession: MediaSession,
+      controller: MediaSession.ControllerInfo,
+      mediaItems: List<MediaItem>,
+      startIndex: Int,
+      startPositionMs: Long
+    ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+      var podcast: Podcast? = null
+      var episode: Episode? = null
+
+      val addedItems = this.onAddMediaItems(mediaSession, controller, mediaItems.toMutableList()).get()
+      val updatedItems = addedItems.map { item ->
+        val mediaId = item.mediaId
+        val pair = MediaIdBuilder().parse(mediaId)
+        if (pair != null) {
+          podcast = pair.first
+          episode = pair.second
+        }
+
+        item
+      }
+
+      if (podcast != null && episode != null) {
+        mediaManager.notifyPlay(podcast, episode)
+        val offset = (episode.position ?: 0) * 1000L
+
+        return Futures.immediateFuture(MediaSession.MediaItemsWithStartPosition(
+          updatedItems,
+          startIndex,
+          offset
+        ))
+      }
+
+      return super.onSetMediaItems(
+        mediaSession,
+        controller,
+        mediaItems,
+        startIndex,
+        startPositionMs
+      )
+    }
+
     override fun onAddMediaItems(
       mediaSession: MediaSession,
       controller: MediaSession.ControllerInfo,
@@ -201,7 +245,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
           val podcast = pair.first
           val episode = pair.second
 
-          val uri = mediaCache.getUri(podcast, episode) ?: Uri.parse(episode.mediaUrl)
+          val uri = mediaCache.getUri(podcast, episode) ?: episode.mediaUrl.toUri()
 
           MediaItem.Builder()
             .setMediaId(mediaId)

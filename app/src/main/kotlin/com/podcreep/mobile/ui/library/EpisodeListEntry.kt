@@ -46,9 +46,6 @@ fun EpisodeListEntry(
       modifier = Modifier.size(80.dp).padding(10.dp)
     )
 
-
-
-    
     Column(modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)) {
       Text(
         text = episode.pubDate.humanizeDay(context = LocalContext.current),

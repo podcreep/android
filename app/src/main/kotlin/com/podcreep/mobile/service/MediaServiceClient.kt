@@ -26,7 +26,7 @@ class MediaServiceClient @Inject constructor(@param:ApplicationContext val conte
     val TAG = "MediaServiceClient"
   }
 
-  private var mediaBrowser: MediaBrowser? = null
+  private lateinit var mediaBrowser: MediaBrowser
   private val callbacks: ArrayList<Callbacks> = ArrayList()
   private var activity: MainActivity? = null
 
@@ -96,7 +96,7 @@ class MediaServiceClient @Inject constructor(@param:ApplicationContext val conte
 
   fun play(podcast: Podcast, episode: Episode) {
     val mediaId = MediaIdBuilder().getMediaId(podcast, episode)
-    mediaBrowser?.setMediaItem(
+    mediaBrowser.setMediaItem(
       MediaItem.Builder()
         .setMediaId(mediaId)
         .setUri(episode.mediaUrl)
@@ -108,24 +108,24 @@ class MediaServiceClient @Inject constructor(@param:ApplicationContext val conte
         )
         .build()
     )
-    mediaBrowser?.prepare()
-    mediaBrowser?.play()
+    mediaBrowser.prepare()
+    mediaBrowser.play()
   }
 
   fun play() {
-    mediaBrowser?.play()
+    mediaBrowser.play()
   }
 
   fun pause() {
-    mediaBrowser?.pause()
+    mediaBrowser.pause()
   }
 
   fun skipForward() {
-    mediaBrowser?.seekForward()
+    mediaBrowser.seekForward()
   }
 
   fun skipBack() {
-    mediaBrowser?.seekBack()
+    mediaBrowser.seekBack()
   }
 
   private fun notifyPlaybackStateChanged() {
