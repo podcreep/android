@@ -7,7 +7,10 @@ import com.podcreep.mobile.service.MediaServiceClient
 import com.podcreep.mobile.util.L
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,9 +29,11 @@ class NowPlayingSheetViewModel @Inject constructor(
   data class NowPlaying (
     val playState: PlayState,
     val title: String,
-    val imageUrl: String)
+    val imageUrl: String,
+    val positionMs: Long = 0L,
+    val durationMs: Long = 0L)
 
-  val initialNowPlaying = NowPlaying(PlayState.STOPPED, "", "")
+  val initialNowPlaying = NowPlaying(PlayState.STOPPED, "", "", 0L, 0L)
 
   fun play() {
     mediaServiceClient.play()
@@ -38,17 +43,36 @@ class NowPlayingSheetViewModel @Inject constructor(
     mediaServiceClient.pause()
   }
 
-  val nowPlaying = callbackFlow {
-    val callbacks = mediaServiceClient.addCallback(object : MediaServiceClient.Callbacks() {
-      var currState = initialNowPlaying.copy()
+  fun skipForward() {
+    mediaServiceClient.skipForward()
+  }
 
+  fun skipBack() {
+    mediaServiceClient.skipBack()
+  }
+
+  val nowPlaying = callbackFlow {
+    var currState = initialNowPlaying.copy()
+
+    fun updatePositionAndDuration() {
+      val pos = mediaServiceClient.getPosition()
+      val dur = mediaServiceClient.getDuration()
+      if (currState.positionMs != pos || currState.durationMs != dur) {
+        currState = currState.copy(positionMs = pos, durationMs = dur)
+        trySend(currState)
+      }
+    }
+
+    val callbacks = mediaServiceClient.addCallback(object : MediaServiceClient.Callbacks() {
       override fun onMetadataChanged(mediaItem: MediaItem?) {
         val metadata = mediaItem?.mediaMetadata
         val title = metadata?.title?.toString() ?: ""
         val imageUrl = metadata?.artworkUri?.toString() ?: ""
 
         log.info("sending title: $title")
-        currState = currState.copy(title = title, imageUrl = imageUrl)
+        val pos = mediaServiceClient.getPosition()
+        val dur = mediaServiceClient.getDuration()
+        currState = currState.copy(title = title, imageUrl = imageUrl, positionMs = pos, durationMs = dur)
         trySend(currState)
       }
 
@@ -61,11 +85,25 @@ class NowPlayingSheetViewModel @Inject constructor(
         }
 
         log.info("sending playState: $playState, isPlaying: $isPlaying, state: $playbackState")
-        currState = currState.copy(playState = playState)
+        val pos = mediaServiceClient.getPosition()
+        val dur = mediaServiceClient.getDuration()
+        currState = currState.copy(playState = playState, positionMs = pos, durationMs = dur)
         trySend(currState)
       }
     })
 
-    awaitClose { mediaServiceClient.removeCallback(callbacks) }
+    val tickerJob = launch {
+      while (isActive) {
+        if (currState.playState == PlayState.PLAYING) {
+          updatePositionAndDuration()
+        }
+        delay(500)
+      }
+    }
+
+    awaitClose {
+      tickerJob.cancel()
+      mediaServiceClient.removeCallback(callbacks)
+    }
   }
 }

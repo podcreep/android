@@ -128,6 +128,14 @@ class MediaServiceClient @Inject constructor(@param:ApplicationContext val conte
     mediaBrowser.seekBack()
   }
 
+  fun getPosition(): Long {
+    return if (::mediaBrowser.isInitialized) mediaBrowser.currentPosition.coerceAtLeast(0L) else 0L
+  }
+
+  fun getDuration(): Long {
+    return if (::mediaBrowser.isInitialized && mediaBrowser.duration > 0) mediaBrowser.duration else 0L
+  }
+
   private fun notifyPlaybackStateChanged() {
     callbacks.forEach { it.onPlaybackStateChanged(lastIsPlaying, lastPlaybackState) }
   }

@@ -1,7 +1,12 @@
 package com.podcreep.mobile.ui
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.DrawerValue
@@ -57,17 +62,25 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
         bottomSheetState = rememberStandardBottomSheetState())
       val hideBottomSheet = viewModel.hideBottomSheet.collectAsState(true)
 
-      val radius = (30f * (bottomSheetState.currentFraction(totalHeight))).dp
+      val expansionFraction = bottomSheetState.currentFraction(totalHeight)
+      val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+      val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+      val peekHeight = if (hideBottomSheet.value) 0.dp else 150.dp + navBarBottom
+      val radius = (30f * expansionFraction).dp
 
       BottomSheetScaffold(
         modifier = Modifier
           .fillMaxSize()
-          .padding(bottom = if (hideBottomSheet.value) 0.dp else 90.dp),
-        sheetPeekHeight = if (hideBottomSheet.value) 0.dp else 120.dp,
+          .padding(bottom = if (hideBottomSheet.value) 0.dp else peekHeight),
+        sheetPeekHeight = peekHeight,
         scaffoldState = bottomSheetState,
         sheetShape = RoundedCornerShape(topStart = radius, topEnd = radius),
         sheetContent = {
-          NowPlayingView()
+          NowPlayingView(
+            modifier = Modifier
+              .padding(top = statusBarTop * expansionFraction)
+              .navigationBarsPadding()
+          )
         },
         sheetDragHandle = {},  // No drag handle
       ) { paddingValues  ->
