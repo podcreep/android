@@ -109,7 +109,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
     L.info("onDestroy")
     lifecycle.currentState = Lifecycle.State.DESTROYED
     session?.run {
-      player.release()
+      mediaManager.release()
       release()
     }
     session = null

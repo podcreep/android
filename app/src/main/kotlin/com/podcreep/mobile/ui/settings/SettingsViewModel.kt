@@ -25,7 +25,9 @@ class SettingsViewModel @Inject constructor(
 
   init {
     viewModelScope.launch {
-      volumeBoost_.value = settingsRepository.getInt("VolumeBoost", 0)
+      settingsRepository.observeInt("VolumeBoost", 0).collect {
+        volumeBoost_.value = it
+      }
     }
   }
 }

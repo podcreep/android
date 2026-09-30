@@ -2,6 +2,8 @@ package com.podcreep.mobile.data
 
 import com.podcreep.mobile.data.local.Setting
 import com.podcreep.mobile.data.local.SettingDao
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SettingsRepository @Inject constructor(
@@ -18,6 +20,12 @@ class SettingsRepository @Inject constructor(
     val setting = settingDao.get(name) ?: return defaultValue
     val value = setting.intValue ?: return defaultValue
     return value
+  }
+
+  fun observeInt(name: String, defaultValue: Long): Flow<Long> {
+    return settingDao.observe(name).map { setting ->
+      setting?.intValue ?: defaultValue
+    }
   }
 
   suspend fun setValue(name: String, value: String) {

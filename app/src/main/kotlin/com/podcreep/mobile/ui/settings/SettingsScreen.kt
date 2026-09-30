@@ -20,9 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 
@@ -69,11 +67,11 @@ fun SettingsScreen(drawerState: DrawerState, viewModel: SettingsViewModel = hilt
         )  {
             Text("Volume Boost")
             SliderSetting(
-                minValue = 100f,
-                maxValue = 300f,
+                minValue = 0f,
+                maxValue = 2000f,
                 value = viewModel.volumeBoost.map { it.toFloat() },
-                steps = 7,
-                valueFormatter = { value -> "%.0f %%".format(value) },
+                steps = 20,
+                valueFormatter = { value -> "%.0f dB".format(value / 100f) },
                 valueHandler = { value -> viewModel.setVolumeBoost(value.toLong()) }
             )
         }

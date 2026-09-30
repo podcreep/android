@@ -3,6 +3,7 @@
 package com.podcreep.mobile.service
 
 import android.content.Context
+import android.media.audiofx.LoudnessEnhancer
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
@@ -136,6 +137,10 @@ class MediaManager @Inject constructor(
   var currEpisode: Episode? = null
   private var timeToServerUpdate: Int = SERVER_UPDATE_FREQUENCY_SECONDS
 
+  private var loudnessEnhancer: LoudnessEnhancer? = null
+  private var currentAudioSessionId: Int = C.AUDIO_SESSION_ID_UNSET
+  private var currentVolumeBoost: Int = 0
+
   init {
     exoPlayer.addListener(object : Player.Listener {
       override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -151,7 +156,17 @@ class MediaManager @Inject constructor(
       ) {
         saveCurrentPosition()
       }
+
+      override fun onAudioSessionIdChanged(audioSessionId: Int) {
+        updateLoudnessEnhancer(audioSessionId)
+      }
     })
+
+    CoroutineScope(Dispatchers.Main).launch {
+      settingsRepository.observeInt("VolumeBoost", 0L).collect { boost ->
+        applyVolumeBoost(boost.toInt())
+      }
+    }
   }
 
   /** Called when the session changes tracks, usually due to the UI asking for it. */
@@ -266,5 +281,68 @@ class MediaManager @Inject constructor(
         saveCurrentPosition()
       }
     }
+  }
+
+  private fun applyVolumeBoost(boost: Int) {
+    currentVolumeBoost = boost
+    val enhancer = loudnessEnhancer
+    if (enhancer != null && currentAudioSessionId != C.AUDIO_SESSION_ID_UNSET) {
+      try {
+        enhancer.setTargetGain(currentVolumeBoost)
+        enhancer.enabled = currentVolumeBoost > 0
+      } catch (e: Exception) {
+        L.warning("Error setting LoudnessEnhancer gain: %s", e.message)
+      }
+    } else {
+      updateLoudnessEnhancer(exoPlayer.audioSessionId)
+    }
+  }
+
+  private fun updateLoudnessEnhancer(audioSessionId: Int) {
+    if (audioSessionId == C.AUDIO_SESSION_ID_UNSET) {
+      releaseLoudnessEnhancer()
+      return
+    }
+
+    if (loudnessEnhancer != null && currentAudioSessionId == audioSessionId) {
+      try {
+        loudnessEnhancer?.setTargetGain(currentVolumeBoost)
+        loudnessEnhancer?.enabled = currentVolumeBoost > 0
+        return
+      } catch (e: Exception) {
+        L.warning("Error updating existing LoudnessEnhancer: %s", e.message)
+        releaseLoudnessEnhancer()
+      }
+    }
+
+    releaseLoudnessEnhancer()
+    try {
+      val enhancer = LoudnessEnhancer(audioSessionId)
+      enhancer.setTargetGain(currentVolumeBoost)
+      enhancer.enabled = currentVolumeBoost > 0
+      loudnessEnhancer = enhancer
+      currentAudioSessionId = audioSessionId
+      L.info("Created LoudnessEnhancer for audioSessionId=$audioSessionId with gain=$currentVolumeBoost mB")
+    } catch (e: Exception) {
+      L.warning("Failed to create LoudnessEnhancer for audioSessionId=$audioSessionId: %s", e.message)
+      loudnessEnhancer = null
+      currentAudioSessionId = C.AUDIO_SESSION_ID_UNSET
+    }
+  }
+
+  private fun releaseLoudnessEnhancer() {
+    try {
+      loudnessEnhancer?.release()
+    } catch (e: Exception) {
+      L.warning("Error releasing LoudnessEnhancer: %s", e.message)
+    } finally {
+      loudnessEnhancer = null
+      currentAudioSessionId = C.AUDIO_SESSION_ID_UNSET
+    }
+  }
+
+  fun release() {
+    releaseLoudnessEnhancer()
+    exoPlayer.release()
   }
 }
