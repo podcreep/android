@@ -4,7 +4,9 @@ package com.podcreep.mobile.service
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.annotation.OptIn
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -119,15 +121,19 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       session: MediaSession,
       controller: MediaSession.ControllerInfo
     ): MediaSession.ConnectionResult {
+      iconCache.onPackageConnected(controller.packageName)
+
       val connectionResult = super.onConnect(session, controller)
       val customCommandForward = SessionCommand(CUSTOM_ACTION_FORWARD, Bundle.EMPTY)
       val customCommandBack = SessionCommand(CUSTOM_ACTION_BACK, Bundle.EMPTY)
 
       val playerCommands = connectionResult.availablePlayerCommands.buildUpon()
-        .remove(Player.COMMAND_SEEK_TO_PREVIOUS)
-        .remove(Player.COMMAND_SEEK_TO_NEXT)
-        .remove(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
-        .remove(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+        .add(Player.COMMAND_SEEK_TO_PREVIOUS)
+        .add(Player.COMMAND_SEEK_TO_NEXT)
+        .add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+        .add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+        .add(Player.COMMAND_SEEK_FORWARD)
+        .add(Player.COMMAND_SEEK_BACK)
         .build()
 
       val sessionCommands = connectionResult.availableSessionCommands.buildUpon()
@@ -139,6 +145,37 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
         sessionCommands,
         playerCommands
       )
+    }
+
+    override fun onMediaButtonEvent(
+      session: MediaSession,
+      controllerInfo: MediaSession.ControllerInfo,
+      intent: Intent
+    ): Boolean {
+      val keyEvent = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+      if (keyEvent != null) {
+        when (keyEvent.keyCode) {
+          KeyEvent.KEYCODE_MEDIA_NEXT,
+          KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
+          KeyEvent.KEYCODE_MEDIA_STEP_FORWARD,
+          KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD -> {
+            if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+              mediaManager.skipForward()
+            }
+            return true
+          }
+          KeyEvent.KEYCODE_MEDIA_PREVIOUS,
+          KeyEvent.KEYCODE_MEDIA_REWIND,
+          KeyEvent.KEYCODE_MEDIA_STEP_BACKWARD,
+          KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD -> {
+            if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+              mediaManager.skipBack()
+            }
+            return true
+          }
+        }
+      }
+      return super.onMediaButtonEvent(session, controllerInfo, intent)
     }
 
     override fun onGetLibraryRoot(
@@ -198,7 +235,9 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       var podcast: Podcast? = null
       var episode: Episode? = null
 
-      val addedItems = this.onAddMediaItems(mediaSession, controller, mediaItems.toMutableList()).get()
+      val addedItemsFuture = this.onAddMediaItems(mediaSession, controller, mediaItems.toMutableList())
+      val addedItems = if (addedItemsFuture.isDone) addedItemsFuture.get() else mediaItems
+
       val updatedItems = addedItems.map { item ->
         val mediaId = item.mediaId
         val pair = MediaIdBuilder().parse(mediaId)
@@ -210,15 +249,19 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
         item
       }
 
-      if (podcast != null && episode != null) {
-        mediaManager.notifyPlay(podcast, episode)
-        val offset = (episode.position ?: 0) * 1000L
+      val p = podcast
+      val e = episode
+      if (p != null && e != null) {
+        mediaManager.notifyPlay(p, e)
+        val offset = (e.position ?: 0) * 1000L
 
-        return Futures.immediateFuture(MediaSession.MediaItemsWithStartPosition(
-          updatedItems,
-          startIndex,
-          offset
-        ))
+        return Futures.immediateFuture(
+          MediaSession.MediaItemsWithStartPosition(
+            updatedItems,
+            startIndex,
+            offset
+          )
+        )
       }
 
       return super.onSetMediaItems(
@@ -246,6 +289,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
           val episode = pair.second
 
           val uri = mediaCache.getUri(podcast, episode) ?: episode.mediaUrl.toUri()
+          val artworkUri = item.mediaMetadata.artworkUri ?: iconCache.getRemoteUriOrNull(podcast)
 
           MediaItem.Builder()
             .setMediaId(mediaId)
@@ -254,6 +298,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
               MediaMetadata.Builder()
                 .setTitle(episode.title)
                 .setArtist(podcast.title)
+                .setArtworkUri(artworkUri)
                 .setIsBrowsable(false)
                 .setIsPlayable(true)
                 .build()

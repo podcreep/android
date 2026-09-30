@@ -49,7 +49,7 @@ class MediaManager @Inject constructor(
     private const val SERVER_UPDATE_FREQUENCY_SECONDS = 20
   }
 
-  class OffsetInterceptingPlayer(private val playerEngine: Player) : ForwardingPlayer(playerEngine) {
+  inner class OffsetInterceptingPlayer(private val playerEngine: Player) : ForwardingPlayer(playerEngine) {
     override fun setMediaItem(mediaItem: MediaItem) {
       super.setMediaItem(mediaItem, calculateOffsetMsFor(mediaItem))
     }
@@ -71,6 +71,29 @@ class MediaManager @Inject constructor(
     override fun setMediaItems(mediaItems: List<MediaItem>, startIndex: Int, startPositionMs: Long) {
       // Blocks external controllers from clearing or rewriting your offset
       super.setMediaItems(mediaItems, startIndex, calculateOffsetMsFor(mediaItems))
+    }
+
+    override fun seekForward() {
+      skipForward()
+    }
+
+    override fun seekBack() {
+      skipBack()
+    }
+
+    override fun isCommandAvailable(command: Int): Boolean {
+      return when (command) {
+        COMMAND_SEEK_FORWARD,
+        COMMAND_SEEK_BACK -> true
+        else -> super.isCommandAvailable(command)
+      }
+    }
+
+    override fun getAvailableCommands(): Player.Commands {
+      return super.getAvailableCommands().buildUpon()
+        .add(COMMAND_SEEK_FORWARD)
+        .add(COMMAND_SEEK_BACK)
+        .build()
     }
 
     private fun calculateOffsetMsFor(mediaItems: List<MediaItem>): Long {
