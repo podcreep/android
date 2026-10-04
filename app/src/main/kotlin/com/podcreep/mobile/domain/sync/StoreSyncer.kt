@@ -89,7 +89,8 @@ class StoreSyncer @Inject constructor(
                 pubDate = pubDateFmt.parse(ep.pubDate)!!,
                 position = ep.position,
                 lastListenTime = ep.lastListenTime,
-                isComplete = null)
+                isComplete = null,
+                durationSecs = if ((ep.duration ?: 0) > 0) ep.duration?.toLong() else null)
             )
           }
         } else {

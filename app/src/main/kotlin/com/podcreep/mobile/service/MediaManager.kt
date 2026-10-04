@@ -253,6 +253,10 @@ class MediaManager @Inject constructor(
     val episode = currEpisode ?: return
     val position = exoPlayer.currentPosition
     episode.position = (position / 1000).toInt()
+    val duration = exoPlayer.duration.takeIf { it > 0 }
+    if (duration != null) {
+      episode.durationSecs = duration / 1000
+    }
     CoroutineScope(Dispatchers.IO).launch {
       subscriptionsRepository.updateEpisode(episode)
     }

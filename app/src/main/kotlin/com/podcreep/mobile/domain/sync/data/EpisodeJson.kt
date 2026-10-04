@@ -6,30 +6,33 @@ import java.util.*
 
 @JsonClass(generateAdapter = false)
 data class EpisodeJson(
-    @Json(name="id")
+    @param:Json(name="id")
     val id: Long,
 
-    @Json(name="podcastID")
+    @param:Json(name="podcastID")
     val podcastID: Long?,
 
-    @Json(name="title")
+    @param:Json(name="title")
     val title: String,
 
-    @Json(name="description")
+    @param:Json(name="description")
     val description: String,
 
-    @Json(name="mediaUrl")
+    @param:Json(name="mediaUrl")
     val mediaUrl: String,
 
-    @Json(name="pubDate")
+    @param:Json(name="pubDate")
     val pubDate: String,
 
-    @Json(name="position")
+    @param:Json(name="position")
     val position: Int?,
 
-    @Json(name="isComplete")
+    @param:Json(name="isComplete")
     val isComplete: Boolean?,
 
-    @Json(name="lastListenTime")
-    val lastListenTime: Date?
+    @param:Json(name="lastListenTime")
+    val lastListenTime: Date?,
+
+    @param:Json(name="duration")
+    val duration: Int?
 )
