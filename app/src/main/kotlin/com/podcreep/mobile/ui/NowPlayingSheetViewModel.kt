@@ -3,6 +3,7 @@ package com.podcreep.mobile.ui
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import com.podcreep.mobile.service.MediaIdBuilder
 import com.podcreep.mobile.service.MediaServiceClient
 import com.podcreep.mobile.util.L
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,11 +30,12 @@ class NowPlayingSheetViewModel @Inject constructor(
   data class NowPlaying (
     val playState: PlayState,
     val title: String,
+    val description: String,
     val imageUrl: String,
     val positionMs: Long = 0L,
     val durationMs: Long = 0L)
 
-  val initialNowPlaying = NowPlaying(PlayState.STOPPED, "", "", 0L, 0L)
+  val initialNowPlaying = NowPlaying(PlayState.STOPPED, "", "", "", 0L, 0L)
 
   fun play() {
     mediaServiceClient.play()
@@ -65,14 +67,26 @@ class NowPlayingSheetViewModel @Inject constructor(
 
     val callbacks = mediaServiceClient.addCallback(object : MediaServiceClient.Callbacks() {
       override fun onMetadataChanged(mediaItem: MediaItem?) {
-        val metadata = mediaItem?.mediaMetadata
-        val title = metadata?.title?.toString() ?: ""
-        val imageUrl = metadata?.artworkUri?.toString() ?: ""
+        if (mediaItem == null) {
+          return
+        }
+        val pair = MediaIdBuilder().parse(mediaItem.mediaId)
+        val episode = pair?.second
+
+        val metadata = mediaItem.mediaMetadata
+        val title = metadata.title?.toString() ?: ""
+        val description = episode?.description ?: ""
+        val imageUrl = metadata.artworkUri?.toString() ?: ""
 
         log.info("sending title: $title")
         val pos = mediaServiceClient.getPosition()
         val dur = mediaServiceClient.getDuration()
-        currState = currState.copy(title = title, imageUrl = imageUrl, positionMs = pos, durationMs = dur)
+        currState = currState.copy(
+          title = title,
+          description = description,
+          imageUrl = imageUrl,
+          positionMs = pos,
+          durationMs = dur)
         trySend(currState)
       }
 
