@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
+import java.util.Locale
 
 /**
  * "Humanize" the given date to display just the day. This is not quite the same as "formatting" as
@@ -31,4 +32,28 @@ fun Date.humanizeDay(context: Context): String {
 
   val format = SimpleDateFormat("MMM d", context.resources.configuration.locales.get(0))
   return format.format(this)
+}
+
+fun formatSeconds(seconds: Int?): String {
+  if (seconds == null || seconds < 0) return "--:--"
+  val h = seconds / 3600
+  val m = (seconds % 3600) / 60
+  val s = seconds % 60
+  return if (h > 0) {
+    String.format(Locale.getDefault(), "%d:%02d:%02d", h, m, s)
+  } else {
+    String.format(Locale.getDefault(), "%02d:%02d", m, s)
+  }
+}
+
+fun formatSeconds(seconds: Long?): String {
+  if (seconds == null || seconds < 0) return "--:--"
+  val h = seconds / 3600
+  val m = (seconds % 3600) / 60
+  val s = seconds % 60
+  return if (h > 0) {
+    String.format(Locale.getDefault(), "%d:%02d:%02d", h, m, s)
+  } else {
+    String.format(Locale.getDefault(), "%02d:%02d", m, s)
+  }
 }

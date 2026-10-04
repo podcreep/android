@@ -27,7 +27,7 @@ data class Episode(
     var position: Int?,
     var isComplete: Boolean?,
     var lastListenTime: Date?,
-    @ColumnInfo(name = "duration") var durationSecs: Long?
+    var durationSecs: Long?
 ) {
   val duration: Duration?
     get() = durationSecs?.seconds
