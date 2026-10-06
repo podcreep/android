@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.*
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class EpisodeJson(
     @param:Json(name="id")
     val id: Long,

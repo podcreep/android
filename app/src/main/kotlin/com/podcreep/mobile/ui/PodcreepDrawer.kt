@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -123,6 +124,27 @@ fun PodcreepDrawer(
                     }
                 })
             }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(16.dp)
+            )
+
+            NavigationDrawerItem(
+              label = { Text(text = "Sync Now") },
+              selected = false,
+              icon = {
+                Icon(
+                  painter = painterResource(id = R.drawable.ic_refresh_black_24dp),
+                  contentDescription = "Sync Now"
+                )
+              },
+              onClick = {
+                viewModel.syncNow()
+                scope.launch {
+                  drawerState.close()
+                }
+              }
+            )
 
             HorizontalDivider(
                 modifier = Modifier.padding(16.dp)

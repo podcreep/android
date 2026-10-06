@@ -1,7 +1,6 @@
 package com.podcreep.mobile.service
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.DelegatingWorkerFactory
@@ -15,16 +14,12 @@ import androidx.work.WorkerParameters
 import com.podcreep.mobile.Settings
 import com.podcreep.mobile.domain.sync.StoreSyncer
 import com.podcreep.mobile.util.L
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -100,7 +95,13 @@ class SyncManager @Inject constructor(
     }
   }
 
-  /** Perform a sync now. Runs on a background thread. */
+  fun syncNow() {
+    CoroutineScope(Dispatchers.IO).launch {
+      sync()
+    }
+  }
+
+  /** Perform a sync now. Run this on a background thread. */
   suspend fun sync() {
     performSync()
   }

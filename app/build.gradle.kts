@@ -85,6 +85,7 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
+    ksp(libs.moshiCodegen)
 
     testImplementation(libs.junit)
 

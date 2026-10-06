@@ -86,7 +86,7 @@ suspend fun Call.await(): Response {
 
       @ExperimentalCoroutinesApi
       override fun onResponse(call: Call, response: Response) {
-        cont.resume(response) {
+        cont.resume(response) { _, _, _ ->
           response.close()
         }
       }

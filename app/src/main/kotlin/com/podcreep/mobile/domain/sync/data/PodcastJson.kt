@@ -3,23 +3,23 @@ package com.podcreep.mobile.domain.sync.data
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class PodcastJson(
-    @Json(name="id")
+    @param:Json(name="id")
     var id: Long,
 
-    @Json(name="title")
+    @param:Json(name="title")
     var title: String,
 
-    @Json(name="description")
+    @param:Json(name="description")
     var description: String,
 
-    @Json(name="imageUrl")
+    @param:Json(name="imageUrl")
     var imageUrl: String,
 
-    @Json(name="episodes")
+    @param:Json(name="episodes")
     val episodes: List<EpisodeJson>?,
 
-    @Json(name="isSubscribed")
+    @param:Json(name="isSubscribed")
     val isSubscribed: Boolean?)
 

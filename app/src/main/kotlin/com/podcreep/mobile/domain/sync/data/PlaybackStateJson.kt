@@ -4,17 +4,17 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.Date
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class PlaybackStateJson(
-    @Json(name="podcastID")
+    @param:Json(name="podcastID")
     val podcastID: Long,
 
-    @Json(name="episodeID")
+    @param:Json(name="episodeID")
     val episodeID: Long,
 
-    @Json(name="position")
+    @param:Json(name="position")
     val position: Int,
 
-    @Json(name="lastUpdated")
+    @param:Json(name="lastUpdated")
     val lastUpdated: Date
 )

@@ -8,18 +8,18 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import javax.inject.Inject
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class LoginRequest(
-  @Json(name="username")
+  @param:Json(name="username")
   val username: String,
 
-  @Json(name="password")
+  @param:Json(name="password")
   val password: String
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class LoginResponse(
-  @Json(name="cookie")
+  @param:Json(name="cookie")
   val cookie: String
 )
 

@@ -1,6 +1,5 @@
 package com.podcreep.mobile.domain.sync
 
-import android.content.Context
 import android.util.Log
 import com.podcreep.mobile.data.SubscriptionsRepository
 import com.podcreep.mobile.data.local.Episode
@@ -9,6 +8,7 @@ import com.podcreep.mobile.data.local.Podcast
 import com.podcreep.mobile.data.local.Subscription
 import com.podcreep.mobile.domain.cache.PodcastIconCache
 import com.podcreep.mobile.domain.sync.data.SubscriptionJson
+import com.podcreep.mobile.util.L
 import com.podcreep.mobile.util.Server
 import com.podcreep.mobile.util.await
 import com.podcreep.mobile.util.toRequestBody
@@ -19,14 +19,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class SubscriptionsSyncPostRequest(
-    @Json(name="todo")
+    @param:Json(name="todo")
     val todo: Boolean)
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class SubscriptionsSyncPostResponse(
-    @Json(name="subscriptions")
+    @param:Json(name="subscriptions")
     val subscriptions: List<SubscriptionJson>)
 
 /**
@@ -39,15 +39,14 @@ class StoreSyncer @Inject constructor(
   private val localStore: LocalStore,
   private val subscriptionsRepository: SubscriptionsRepository
 ) {
-  companion object {
-    const val TAG = "StoreSyncer"
-  }
+  private val L: L = L("StoreSyncer")
 
   // pubDate will be in a format like: 2019-04-14T03:00:00-07:00
   private val pubDateFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US)
 
   suspend fun sync() {
-    Log.i(TAG, "Beginning sync")
+    L.info("Beginning sync")
+    val startTime = System.currentTimeMillis()
 
     // Attempt to save all our pending playback state, if we have any.
     playbackStateSyncer.syncPending()
@@ -55,12 +54,13 @@ class StoreSyncer @Inject constructor(
     val request = server.request("/api/subscriptions/sync")
         .post(SubscriptionsSyncPostRequest(false).toRequestBody())
     val resp = server.call(request).await().fromJson<SubscriptionsSyncPostResponse>()
+    L.info("Sync response received in ${System.currentTimeMillis() - startTime}ms")
 
     val podcastsToSyncIcons = HashMap<Long, Podcast>()
 
     localStore.runInTransaction {
       for (sub in resp.subscriptions) {
-        Log.i(TAG, "Syncing subscription '${sub.podcast.title}'")
+        L.info("Syncing subscription '${sub.podcast.title}'")
 
         val podcast = Podcast(
           id = sub.podcast.id,
@@ -77,7 +77,7 @@ class StoreSyncer @Inject constructor(
 
         val episodes = sub.podcast.episodes
         if (episodes != null) {
-          Log.i(TAG, "  adding '${episodes.size}' episodes.")
+          L.info("  adding '${episodes.size}' episodes.")
           for (ep in sub.podcast.episodes!!) {
             subscriptionsRepository.syncEpisode(
               Episode(
@@ -94,7 +94,7 @@ class StoreSyncer @Inject constructor(
             )
           }
         } else {
-          Log.i(TAG, "  no episodes?")
+          L.info("  no episodes?")
         }
 
         // TODO: any positions that aren't in podcasts.episodes, update those
@@ -104,6 +104,8 @@ class StoreSyncer @Inject constructor(
     for (podcast in podcastsToSyncIcons.values) {
       iconCache.refresh(podcast)
     }
+
+    L.info("Sync complete in ${System.currentTimeMillis() - startTime}ms")
   }
 
   /** Called when we log out, we need to clear our local data store. */
