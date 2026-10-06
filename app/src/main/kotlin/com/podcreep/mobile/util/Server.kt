@@ -47,6 +47,10 @@ class Server @Inject constructor(settings: Settings) {
     }
 
     fun url(url: String): String {
+      if (url.startsWith("http:") || url.startsWith("https:")) {
+        return url
+      }
+
       return when {
         isEmulator() -> "http://10.0.2.2:8080$url"
         //BuildConfig.DEBUG -> "http://127.0.0.1:8080$url"

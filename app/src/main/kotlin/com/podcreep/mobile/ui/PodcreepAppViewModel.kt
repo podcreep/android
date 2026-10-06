@@ -38,7 +38,7 @@ class PodcreepAppViewModel @Inject constructor(
   val hideBottomSheet = callbackFlow {
     val callbacks = mediaServiceClient.addCallback(object : MediaServiceClient.Callbacks() {
       override fun onPlaybackStateChanged(isPlaying: Boolean, playbackState: Int) {
-        L.info("isPlaying = %b, state = %d", isPlaying, playbackState)
+        L.info("isPlaying = $isPlaying, state = $playbackState")
         val shouldHide = when {
           isPlaying -> false
           playbackState == Player.STATE_BUFFERING -> false

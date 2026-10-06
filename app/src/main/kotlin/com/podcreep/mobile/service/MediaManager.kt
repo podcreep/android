@@ -295,7 +295,7 @@ class MediaManager @Inject constructor(
         enhancer.setTargetGain(currentVolumeBoost)
         enhancer.enabled = currentVolumeBoost > 0
       } catch (e: Exception) {
-        L.warning("Error setting LoudnessEnhancer gain: %s", e.message)
+        L.warning("Error setting LoudnessEnhancer gain", e)
       }
     } else {
       updateLoudnessEnhancer(exoPlayer.audioSessionId)
@@ -314,7 +314,7 @@ class MediaManager @Inject constructor(
         loudnessEnhancer?.enabled = currentVolumeBoost > 0
         return
       } catch (e: Exception) {
-        L.warning("Error updating existing LoudnessEnhancer: %s", e.message)
+        L.warning("Error updating existing LoudnessEnhancer", e)
         releaseLoudnessEnhancer()
       }
     }
@@ -328,7 +328,7 @@ class MediaManager @Inject constructor(
       currentAudioSessionId = audioSessionId
       L.info("Created LoudnessEnhancer for audioSessionId=$audioSessionId with gain=$currentVolumeBoost mB")
     } catch (e: Exception) {
-      L.warning("Failed to create LoudnessEnhancer for audioSessionId=$audioSessionId: %s", e.message)
+      L.warning("Failed to create LoudnessEnhancer for audioSessionId=$audioSessionId", e)
       loudnessEnhancer = null
       currentAudioSessionId = C.AUDIO_SESSION_ID_UNSET
     }
@@ -338,7 +338,7 @@ class MediaManager @Inject constructor(
     try {
       loudnessEnhancer?.release()
     } catch (e: Exception) {
-      L.warning("Error releasing LoudnessEnhancer: %s", e.message)
+      L.warning("Error releasing LoudnessEnhancer", e)
     } finally {
       loudnessEnhancer = null
       currentAudioSessionId = C.AUDIO_SESSION_ID_UNSET

@@ -101,7 +101,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val id = super.onStartCommand(intent, flags, startId)
-    L.info("onStart %s %d", intent, flags)
+    L.info("onStart $intent $flags")
     return id
   }
 
@@ -183,7 +183,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       browser: MediaSession.ControllerInfo,
       params: LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
-      L.info("onGetLibraryRoot(%s)", browser.packageName)
+      L.info("onGetLibraryRoot(${browser.packageName})")
 
       iconCache.onPackageConnected(browser.packageName)
 
@@ -208,7 +208,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       pageSize: Int,
       params: LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-      L.info("onGetChildren(%s)", parentId)
+      L.info("onGetChildren(${parentId})")
 
       val future = SettableFuture.create<LibraryResult<ImmutableList<MediaItem>>>()
 

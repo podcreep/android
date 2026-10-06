@@ -11,21 +11,21 @@ class L(private val tag: String) {
   fun debug(msg: String) {
     Log.d(GLOBAL_TAG, String.format("%s: %s", tag, msg))
   }
-  fun debug(msg: String, vararg params: Any?) {
-    debug(String.format(msg, *params))
+  fun debug(msg: String, tr: Throwable) {
+    Log.d(GLOBAL_TAG, String.format("%s: %s", tag, msg), tr)
   }
 
   fun info(msg: String) {
     Log.i(GLOBAL_TAG, String.format("%s: %s", tag, msg))
   }
-  fun info(msg: String, vararg params: Any?) {
-    info(String.format(msg, *params))
+  fun info(msg: String, tr: Throwable) {
+    Log.i(GLOBAL_TAG, String.format("%s: %s", tag, msg), tr)
   }
 
   fun warning(msg: String) {
     Log.w(GLOBAL_TAG, String.format("%s: %s", tag, msg))
   }
-  fun warning(msg: String, vararg params: Any?) {
-    warning(String.format(msg, *params))
+  fun warning(msg: String, tr: Throwable) {
+    Log.w(GLOBAL_TAG, String.format("%s: %s", tag, msg), tr)
   }
 }
