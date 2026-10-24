@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,6 +33,17 @@ fun EpisodeListEntry(
   onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> Unit,
   showProgressDuration: Boolean = true,
 ) {
+  val context = LocalContext.current
+  val humanizedDate = remember(episode.pubDate) {
+    episode.pubDate.humanizeDay(context)
+  }
+  val positionText = remember(episode.position) {
+    formatSeconds(episode.position)
+  }
+  val durationText = remember(episode.durationSecs) {
+    formatSeconds(episode.durationSecs)
+  }
+
   Row (
     modifier = Modifier
       .fillMaxWidth()
@@ -53,7 +65,7 @@ fun EpisodeListEntry(
         .padding(top = 5.dp, bottom = 5.dp)
     ) {
       Text(
-        text = episode.pubDate.humanizeDay(context = LocalContext.current),
+        text = humanizedDate,
         maxLines = 1,
         modifier = Modifier.alpha(0.6f),
       )
@@ -75,13 +87,13 @@ fun EpisodeListEntry(
         horizontalAlignment = Alignment.End,
       ) {
         Text(
-          text = formatSeconds(episode.position),
+          text = positionText,
           maxLines = 1,
           style = MaterialTheme.typography.bodyMedium,
           textAlign = TextAlign.End,
         )
         Text(
-          text = formatSeconds(episode.durationSecs),
+          text = durationText,
           maxLines = 1,
           modifier = Modifier.alpha(0.6f),
           style = MaterialTheme.typography.bodySmall,

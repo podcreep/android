@@ -11,7 +11,10 @@ fun InProgress(onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> Unit
   val episodeWithPodcast = viewModel.episodeWithPodcast.collectAsState(initial = emptyList())
 
   LazyColumn {
-    itemsIndexed(episodeWithPodcast.value) { index, epAndPod ->
+    itemsIndexed(
+      items = episodeWithPodcast.value,
+      key = { _, epAndPod -> epAndPod.episode.id }
+    ) { index, epAndPod ->
       EpisodeListEntry(epAndPod.podcast, epAndPod.episode, onEpisodeDetailsClick)
     }
   }

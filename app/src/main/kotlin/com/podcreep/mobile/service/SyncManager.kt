@@ -69,12 +69,13 @@ class SyncManager @Inject constructor(
     }
 
     val workInfo = WorkManager.getInstance(context).getWorkInfoById(UUID.fromString(uuid))
-    if (workInfo.get() == null) {
+    val info = workInfo.get()
+    if (info == null) {
       // Work ID hasn't been queued yet, or it failed to get queued?
       enqueueWorker()
       return
     }
-    when (workInfo.get().state) {
+    when (info.state) {
       WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> enqueueWorker()
       else -> L.info("Worker already queued, nothing to do.")
     }
@@ -85,8 +86,7 @@ class SyncManager @Inject constructor(
     val lastSync: LocalDateTime = settings.get(Settings.LAST_SYNC_TIME)
 
     // If we haven't synced in the last hour, sync now.
-    val dontSyncAfter = LocalDateTime.now().plusHours(1)
-    if (lastSync.isBefore(dontSyncAfter)) {
+    if (lastSync.isBefore(LocalDateTime.now().minusHours(1))) {
       settings.put(Settings.LAST_SYNC_TIME, LocalDateTime.now())
 
       CoroutineScope(Dispatchers.IO).launch {

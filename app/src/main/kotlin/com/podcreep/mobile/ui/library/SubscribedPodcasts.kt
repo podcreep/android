@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -33,8 +34,14 @@ fun SubscribedPodcasts(
   val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
 
   LazyColumn {
-    itemsIndexed(subscriptions.value) { index, sub ->
+    itemsIndexed(
+      items = subscriptions.value,
+      key = { index, sub -> sub.podcast?.id ?: index }
+    ) { index, sub ->
       val podcast = sub.podcast ?: return@itemsIndexed
+      val descriptionText = remember(podcast.description) {
+        AnnotatedString.fromHtml(podcast.description)
+      }
       Row (
         modifier = Modifier.clickable {
           onPodcastDetailsClick(podcast.id)
@@ -55,7 +62,7 @@ fun SubscribedPodcasts(
             fontWeight = FontWeight.Bold
           )
           Text (
-            text = AnnotatedString.fromHtml(podcast.description),
+            text = descriptionText,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.alpha(0.6f),

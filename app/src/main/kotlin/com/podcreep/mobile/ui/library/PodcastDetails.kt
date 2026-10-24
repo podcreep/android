@@ -54,8 +54,11 @@ fun PodcastDetails(onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> 
         Column (Modifier.clickable(enabled = needExpandedDescription) {
           expandedDescription = !expandedDescription
         }) {
+            val descriptionText = remember(podcast.description) {
+                AnnotatedString.fromHtml(podcast.description)
+            }
             Text(
-                text = AnnotatedString.fromHtml(podcast.description),
+                text = descriptionText,
                 onTextLayout = { layout ->
                     needExpandedDescription = expandedDescription || layout.hasVisualOverflow
                 },
@@ -72,7 +75,10 @@ fun PodcastDetails(onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> 
             }
         }
         LazyColumn {
-            itemsIndexed(episodes.value) { index, episode ->
+            itemsIndexed(
+                items = episodes.value,
+                key = { _, episode -> episode.id }
+            ) { index, episode ->
                 EpisodeListEntry(podcast, episode, onEpisodeDetailsClick)
             }
         }

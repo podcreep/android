@@ -16,6 +16,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -43,7 +44,9 @@ sealed class TopLevelItem(var route: String, var icon: Int, var title: String) {
 @Composable
 fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
   if (viewModel.isLoggedIn.collectAsState().value) {
-    viewModel.maybeSync()
+    LaunchedEffect(Unit) {
+      viewModel.maybeSync()
+    }
     val navController = rememberNavController()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
