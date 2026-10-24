@@ -32,7 +32,12 @@ class PodcastIconCache @Inject constructor(
   }
 
   private val L: L = L("PodcastIconCache")
-  private val connectedPackages = HashSet<String>()
+  private val connectedPackages = HashSet<String>().apply {
+    add("com.android.systemui")
+    add("com.google.android.projection.gearhead")
+    add("com.android.car.carlauncher")
+    add("com.google.android.carassistant")
+  }
 
   /**
    * Called when a package connects to our media service. We'll add it to a list of packages we'll
@@ -73,14 +78,24 @@ class PodcastIconCache @Inject constructor(
     }
 
     val uri = FileProvider.getUriForFile(appContext, "com.podcreep.fileprovider", file)
-    // Grant everybody who has connected to us access to our URI.
+    // Grant everybody who has connected to us (plus system UI) access to our URI.
     for (packageName in connectedPackages) {
-      appContext.grantUriPermission(
-        packageName, uri,
-        Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      grantUriPermissionSafely(packageName, uri)
     }
 
     return uri
+  }
+
+  private fun grantUriPermissionSafely(packageName: String, uri: Uri) {
+    try {
+      appContext.grantUriPermission(
+        packageName,
+        uri,
+        Intent.FLAG_GRANT_READ_URI_PERMISSION
+      )
+    } catch (e: Exception) {
+      L.warning("Failed to grant URI permission to $packageName: ${e.message}")
+    }
   }
 
   /** Get a {@link Uri} that can be called only from this process (e.g. our UI). */

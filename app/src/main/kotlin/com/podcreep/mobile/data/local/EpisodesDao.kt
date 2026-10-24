@@ -18,6 +18,9 @@ interface EpisodesDao {
   @Query("SELECT * FROM episodes WHERE podcastID=:podcastID ORDER BY pubDate DESC")
   fun get(podcastID: Long): Flow<List<Episode>>
 
+  @Query("SELECT * FROM episodes")
+  fun getAll(): Flow<List<Episode>>
+
   @Query("SELECT * FROM episodes WHERE id=:episodeID AND podcastID=:podcastID")
   fun get(podcastID: Long, episodeID: Long): Flow<Episode>
 

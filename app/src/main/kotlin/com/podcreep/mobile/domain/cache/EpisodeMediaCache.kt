@@ -13,8 +13,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.internal.headersContentLength
 import okio.buffer
 import okio.sink
@@ -59,6 +62,55 @@ class EpisodeMediaCache @Inject constructor(
     extraBufferCapacity = 64,
     onBufferOverflow = BufferOverflow.DROP_OLDEST
   )
+  val statusUpdates: Flow<String> = _statusUpdates.asSharedFlow()
+
+  data class DownloadedFileInfo(
+    val podcastId: Long,
+    val episodeId: Long,
+    val file: File,
+    val sizeBytes: Long,
+    val lastModified: Long
+  )
+
+  fun getDownloadedFiles(): List<DownloadedFileInfo> {
+    val podcastsDir = File(appContext.cacheDir, "podcasts")
+    if (!podcastsDir.exists() || !podcastsDir.isDirectory) {
+      return emptyList()
+    }
+
+    val result = mutableListOf<DownloadedFileInfo>()
+    val podcastDirs = podcastsDir.listFiles() ?: return emptyList()
+
+    for (podcastDir in podcastDirs) {
+      if (!podcastDir.isDirectory) continue
+      val podcastId = podcastDir.name.toLongOrNull() ?: continue
+      val files = podcastDir.listFiles() ?: continue
+      for (file in files) {
+        if (file.isFile && file.length() > 0) {
+          val episodeId = file.name.removeSuffix("-media.mp3").removeSuffix(".mp3").substringBefore("-").toLongOrNull()
+          if (episodeId != null) {
+            result.add(
+              DownloadedFileInfo(
+                podcastId = podcastId,
+                episodeId = episodeId,
+                file = file,
+                sizeBytes = file.length(),
+                lastModified = file.lastModified()
+              )
+            )
+          }
+        }
+      }
+    }
+    return result
+  }
+
+  fun deleteDownload(podcastId: Long, episodeId: Long): Boolean {
+    val file = File(appContext.cacheDir, "podcasts/$podcastId/$episodeId-media.mp3")
+    val deleted = if (file.exists()) file.delete() else false
+    notifyStatusChanged("$podcastId:$episodeId")
+    return deleted
+  }
 
   private fun mediaKey(podcast: Podcast, episode: Episode): String {
     return "${podcast.id}:${episode.id}"
@@ -113,6 +165,26 @@ class EpisodeMediaCache @Inject constructor(
     }
 
     return null
+  }
+
+  suspend fun ensureDownloaded(podcast: Podcast, episode: Episode): Uri? {
+    val existingUri = getUri(podcast, episode)
+    if (existingUri != null) {
+      return existingUri
+    }
+
+    val key = mediaKey(podcast, episode)
+    if (inProgressDownloads.containsKey(key)) {
+      _statusUpdates.first { updatedKey ->
+        updatedKey == key && !inProgressDownloads.containsKey(key)
+      }
+    } else {
+      withContext(Dispatchers.IO) {
+        download(podcast, episode)
+      }
+    }
+
+    return getUri(podcast, episode)
   }
 
   fun queueDownload(podcast: Podcast, episode: Episode) {

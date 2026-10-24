@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.podcreep.mobile.R
 import com.podcreep.mobile.ui.auth.LoginScreen
 import com.podcreep.mobile.ui.library.SubscriptionsScreen
+import com.podcreep.mobile.ui.settings.DownloadsScreen
 import com.podcreep.mobile.ui.settings.SettingsScreen
 import com.podcreep.mobile.util.currentFraction
 
@@ -94,7 +95,17 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
             SubscriptionsScreen(drawerState)
           }
           composable(TopLevelItem.Settings.route) {
-            SettingsScreen(drawerState)
+            SettingsScreen(
+              drawerState = drawerState,
+              onNavigateToDownloads = {
+                navController.navigate("downloads")
+              }
+            )
+          }
+          composable("downloads") {
+            DownloadsScreen(
+              onNavigateUp = { navController.navigateUp() }
+            )
           }
         }
       }
@@ -103,4 +114,3 @@ fun PodcreepApp(viewModel: PodcreepAppViewModel = hiltViewModel()) {
     LoginScreen()
   }
 }
-

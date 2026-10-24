@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.annotation.OptIn
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -232,45 +233,55 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       startIndex: Int,
       startPositionMs: Long
     ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
-      var podcast: Podcast? = null
-      var episode: Episode? = null
-
       val addedItemsFuture = this.onAddMediaItems(mediaSession, controller, mediaItems.toMutableList())
-      val addedItems = if (addedItemsFuture.isDone) addedItemsFuture.get() else mediaItems
+      val future = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
 
-      val updatedItems = addedItems.map { item ->
-        val mediaId = item.mediaId
-        val pair = MediaIdBuilder().parse(mediaId)
-        if (pair != null) {
-          podcast = pair.first
-          episode = pair.second
+      addedItemsFuture.addListener({
+        try {
+          val addedItems = addedItemsFuture.get()
+          var podcast: Podcast? = null
+          var episode: Episode? = null
+
+          val updatedItems = addedItems.map { item ->
+            val mediaId = item.mediaId
+            val pair = MediaIdBuilder().parse(mediaId)
+            if (pair != null) {
+              podcast = pair.first
+              episode = pair.second
+            }
+
+            item
+          }
+
+          val p = podcast
+          val e = episode
+          if (p != null && e != null) {
+            mediaManager.notifyPlay(p, e)
+            val offset = (e.position ?: 0) * 1000L
+
+            future.set(
+              MediaSession.MediaItemsWithStartPosition(
+                updatedItems,
+                startIndex,
+                offset
+              )
+            )
+          } else {
+            future.set(
+              MediaSession.MediaItemsWithStartPosition(
+                updatedItems,
+                startIndex,
+                startPositionMs
+              )
+            )
+          }
+        } catch (e: Exception) {
+          L.warning("Error in onSetMediaItems", e)
+          future.setException(e)
         }
+      }, ContextCompat.getMainExecutor(this@MediaService))
 
-        item
-      }
-
-      val p = podcast
-      val e = episode
-      if (p != null && e != null) {
-        mediaManager.notifyPlay(p, e)
-        val offset = (e.position ?: 0) * 1000L
-
-        return Futures.immediateFuture(
-          MediaSession.MediaItemsWithStartPosition(
-            updatedItems,
-            startIndex,
-            offset
-          )
-        )
-      }
-
-      return super.onSetMediaItems(
-        mediaSession,
-        controller,
-        mediaItems,
-        startIndex,
-        startPositionMs
-      )
+      return future
     }
 
     override fun onAddMediaItems(
@@ -278,39 +289,44 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
       controller: MediaSession.ControllerInfo,
       mediaItems: MutableList<MediaItem>
     ): ListenableFuture<MutableList<MediaItem>> {
+      val future = SettableFuture.create<MutableList<MediaItem>>()
 
-      val updatedItems = mediaItems.map { item ->
-        val mediaId = item.mediaId
-        L.info("onAddMediaItems($mediaId)")
+      lifecycleScope.launch {
+        val updatedItems = mediaItems.map { item ->
+          val mediaId = item.mediaId
+          L.info("onAddMediaItems($mediaId)")
 
-        val pair = MediaIdBuilder().parse(mediaId)
-        if (pair != null) {
-          val podcast = pair.first
-          val episode = pair.second
+          val pair = MediaIdBuilder().parse(mediaId)
+          if (pair != null) {
+            val podcast = pair.first
+            val episode = pair.second
 
-          val uri = mediaCache.getUri(podcast, episode) ?: episode.mediaUrl.toUri()
-          val artworkUri = item.mediaMetadata.artworkUri ?: iconCache.getRemoteUriOrNull(podcast)
+            val uri = mediaCache.ensureDownloaded(podcast, episode) ?: episode.mediaUrl.toUri()
+            val artworkUri = item.mediaMetadata.artworkUri ?: iconCache.getRemoteUriOrNull(podcast)
 
-          MediaItem.Builder()
-            .setMediaId(mediaId)
-            .setUri(uri)
-            .setMediaMetadata(
-              MediaMetadata.Builder()
-                .setTitle(episode.title)
-                .setArtist(podcast.title)
-                .setArtworkUri(artworkUri)
-                .setIsBrowsable(false)
-                .setIsPlayable(true)
-                .build()
-            )
-            .build()
-        } else {
-          L.warning("couldn't find media with Id $mediaId")
-          item
-        }
-      }.toMutableList()
+            MediaItem.Builder()
+              .setMediaId(mediaId)
+              .setUri(uri)
+              .setMediaMetadata(
+                MediaMetadata.Builder()
+                  .setTitle(episode.title)
+                  .setArtist(podcast.title)
+                  .setArtworkUri(artworkUri)
+                  .setIsBrowsable(false)
+                  .setIsPlayable(true)
+                  .build()
+              )
+              .build()
+          } else {
+            L.warning("couldn't find media with Id $mediaId")
+            item
+          }
+        }.toMutableList()
 
-      return Futures.immediateFuture(updatedItems)
+        future.set(updatedItems)
+      }
+
+      return future
     }
 
     override fun onCustomCommand(

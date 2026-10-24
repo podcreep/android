@@ -181,23 +181,29 @@ class MediaManager @Inject constructor(
     currPodcast = podcast
     currEpisode = episode
 
-    val uri = mediaCache.getUri(podcast, episode) ?: episode.mediaUrl.toUri()
+    CoroutineScope(Dispatchers.Main).launch {
+      val uri = mediaCache.ensureDownloaded(podcast, episode) ?: episode.mediaUrl.toUri()
 
-    val mediaItem = MediaItem.Builder()
-      .setUri(uri)
-      .setMediaId(MediaIdBuilder().getMediaId(podcast, episode))
-      .setMediaMetadata(
-        MediaMetadata.Builder()
-          .setTitle(episode.title)
-          .setArtist(podcast.title)
-          .setArtworkUri(iconCache.getRemoteUriOrNull(podcast))
-          .build()
-      )
-      .build()
+      if (currPodcast?.id != podcast.id || currEpisode?.id != episode.id) {
+        return@launch
+      }
 
-    exoPlayer.setMediaItem(mediaItem)
-    exoPlayer.prepare()
-    exoPlayer.play()
+      val mediaItem = MediaItem.Builder()
+        .setUri(uri)
+        .setMediaId(MediaIdBuilder().getMediaId(podcast, episode))
+        .setMediaMetadata(
+          MediaMetadata.Builder()
+            .setTitle(episode.title)
+            .setArtist(podcast.title)
+            .setArtworkUri(iconCache.getRemoteUri(podcast))
+            .build()
+        )
+        .build()
+
+      exoPlayer.setMediaItem(mediaItem)
+      exoPlayer.prepare()
+      exoPlayer.play()
+    }
   }
 
   fun skipForward() {
