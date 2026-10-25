@@ -10,7 +10,7 @@ import androidx.room.TypeConverters
  */
 @Database(
     entities = [Subscription::class, Podcast::class, Episode::class, Setting::class],
-    version = 11,
+    version = 12,
     exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LocalStore : RoomDatabase() {

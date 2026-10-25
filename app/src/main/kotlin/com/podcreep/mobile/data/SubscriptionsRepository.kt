@@ -8,6 +8,7 @@ import com.podcreep.mobile.data.local.Subscription
 import com.podcreep.mobile.data.local.SubscriptionsDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import java.util.Date
 import javax.inject.Inject
 
 class SubscriptionsRepository @Inject constructor(
@@ -56,6 +57,10 @@ class SubscriptionsRepository @Inject constructor(
     return episodesDao.get(podcastID, episodeID)
   }
 
+  fun getEpisodeSync(podcastID: Long, episodeID: Long): Episode? {
+    return episodesDao.getSync(podcastID, episodeID)
+  }
+
   fun podcasts(): Flow<List<Podcast>> {
     return podcastsDao.get()
   }
@@ -66,6 +71,10 @@ class SubscriptionsRepository @Inject constructor(
 
   suspend fun updateEpisode(episode: Episode) {
     return episodesDao.insert(episode)
+  }
+
+  suspend fun updateDownloadTime(episodeID: Long, downloadTime: Date?) {
+    episodesDao.updateDownloadTime(episodeID, downloadTime)
   }
 
   fun syncPodcast(podcast: Podcast) {

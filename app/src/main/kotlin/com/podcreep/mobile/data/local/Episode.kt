@@ -27,7 +27,8 @@ data class Episode(
     var position: Int?,
     var isComplete: Boolean?,
     var lastListenTime: Date?,
-    var durationSecs: Long?
+    var durationSecs: Long?,
+    var downloadTime: Date? = null
 ) {
   val duration: Duration?
     get() = durationSecs?.seconds

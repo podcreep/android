@@ -79,6 +79,7 @@ class StoreSyncer @Inject constructor(
         if (episodes != null) {
           L.info("  adding '${episodes.size}' episodes.")
           for (ep in sub.podcast.episodes!!) {
+            val existing = subscriptionsRepository.getEpisodeSync(podcast.id, ep.id)
             subscriptionsRepository.syncEpisode(
               Episode(
                 id = ep.id,
@@ -90,7 +91,9 @@ class StoreSyncer @Inject constructor(
                 position = ep.position,
                 lastListenTime = ep.lastListenTime,
                 isComplete = null,
-                durationSecs = if ((ep.duration ?: 0) > 0) ep.duration?.toLong() else null)
+                durationSecs = if ((ep.duration ?: 0) > 0) ep.duration?.toLong() else null,
+                downloadTime = existing?.downloadTime
+              )
             )
           }
         } else {

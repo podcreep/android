@@ -22,6 +22,8 @@ import okhttp3.internal.headersContentLength
 import okio.buffer
 import okio.sink
 import java.io.File
+import com.podcreep.mobile.data.local.EpisodesDao
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,7 +34,9 @@ import javax.inject.Singleton
 @Singleton
 class EpisodeMediaCache @Inject constructor(
   @param:ApplicationContext val appContext: Context,
-  private val server: Server) {
+  private val server: Server,
+  private val episodesDao: EpisodesDao
+) {
 
   private val L = L("EpisodeMediaCache")
 
@@ -105,9 +109,10 @@ class EpisodeMediaCache @Inject constructor(
     return result
   }
 
-  fun deleteDownload(podcastId: Long, episodeId: Long): Boolean {
+  suspend fun deleteDownload(podcastId: Long, episodeId: Long): Boolean {
     val file = File(appContext.cacheDir, "podcasts/$podcastId/$episodeId-media.mp3")
     val deleted = if (file.exists()) file.delete() else false
+    episodesDao.updateDownloadTime(episodeId, null)
     notifyStatusChanged("$podcastId:$episodeId")
     return deleted
   }
@@ -240,6 +245,7 @@ class EpisodeMediaCache @Inject constructor(
           }
         }
       }
+      episodesDao.updateDownloadTime(episode.id, Date())
     } catch (e: Exception) {
       L.warning("Failed to download episode ${episode.id}", e)
       failedDownloads.add(key)

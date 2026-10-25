@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-
+import java.util.Date
 
 @Dao
 interface EpisodesDao {
@@ -23,6 +23,9 @@ interface EpisodesDao {
 
   @Query("SELECT * FROM episodes WHERE id=:episodeID AND podcastID=:podcastID")
   fun get(podcastID: Long, episodeID: Long): Flow<Episode>
+
+  @Query("SELECT * FROM episodes WHERE id=:episodeID AND podcastID=:podcastID")
+  fun getSync(podcastID: Long, episodeID: Long): Episode?
 
   @Query("""
     SELECT *
@@ -42,6 +45,9 @@ interface EpisodesDao {
     LIMIT $MAX_RESULT_SIZE
   """)
   fun getNewEpisodes(): Flow<List<Episode>>
+
+  @Query("UPDATE episodes SET downloadTime = :downloadTime WHERE id = :episodeID")
+  suspend fun updateDownloadTime(episodeID: Long, downloadTime: Date?)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(vararg episodes: Episode)

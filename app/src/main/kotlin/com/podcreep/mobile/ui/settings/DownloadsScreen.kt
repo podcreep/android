@@ -241,7 +241,7 @@ fun CleanUpDialog(
 
   val sortedOldestFirst = remember(episodes) {
     episodes.sortedWith(
-      compareBy<DownloadedEpisodeItem> { it.pubDate?.time ?: it.lastModified }
+      compareBy<DownloadedEpisodeItem> { it.downloadTime?.time ?: it.lastModified }
         .thenBy { it.lastModified }
     )
   }

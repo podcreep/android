@@ -23,6 +23,7 @@ data class DownloadedEpisodeItem(
   val sizeBytes: Long,
   val lastModified: Long,
   val pubDate: Date?,
+  val downloadTime: Date?,
   val episodeTitle: String,
   val podcastTitle: String
 )
@@ -61,10 +62,14 @@ class DownloadsViewModel @Inject constructor(
         sizeBytes = fileInfo.sizeBytes,
         lastModified = fileInfo.lastModified,
         pubDate = ep?.pubDate,
+        downloadTime = ep?.downloadTime ?: Date(fileInfo.lastModified),
         episodeTitle = ep?.title ?: "Episode ${fileInfo.episodeId}",
         podcastTitle = pod?.title ?: "Podcast ${fileInfo.podcastId}"
       )
-    }
+    }.sortedWith(
+      compareByDescending<DownloadedEpisodeItem> { it.downloadTime?.time ?: it.lastModified }
+        .thenByDescending { it.lastModified }
+    )
 
     val totalSize = items.sumOf { it.sizeBytes }
     DownloadsUiState(
@@ -92,7 +97,7 @@ class DownloadsViewModel @Inject constructor(
       if (currentEpisodes.isEmpty() || targetBytesToFree <= 0) return@launch
 
       val sortedOldestFirst = currentEpisodes.sortedWith(
-        compareBy<DownloadedEpisodeItem> { it.pubDate?.time ?: it.lastModified }
+        compareBy<DownloadedEpisodeItem> { it.downloadTime?.time ?: it.lastModified }
           .thenBy { it.lastModified }
       )
 
