@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,20 +39,21 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DrawerItem(item: TopLevelItem, selected: Boolean, onItemClick: (TopLevelItem) -> Unit) {
-    val background = if (selected) R.color.purple_200 else android.R.color.transparent
+    val background = if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent
+    val contentColor = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = { onItemClick(item) })
             .height(45.dp)
-            .background(colorResource(id = background))
+            .background(background)
             .padding(start = 10.dp)
     ) {
         Image(
             painter = painterResource(id = item.icon),
             contentDescription = item.title,
-            colorFilter = ColorFilter.tint(Color.White),
+            colorFilter = ColorFilter.tint(contentColor),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .height(35.dp)
@@ -63,7 +63,7 @@ fun DrawerItem(item: TopLevelItem, selected: Boolean, onItemClick: (TopLevelItem
         Text(
             text = item.title,
             fontSize = 18.sp,
-            color = Color.White
+            color = contentColor
         )
     }
 }

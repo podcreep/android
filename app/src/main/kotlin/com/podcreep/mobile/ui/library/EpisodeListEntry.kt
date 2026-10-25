@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,17 +66,21 @@ fun EpisodeListEntry(
       Text(
         text = humanizedDate,
         maxLines = 1,
-        modifier = Modifier.alpha(0.6f),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Text(
         text = episode.title,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
       )
-      Text (
+      Text(
         text = podcast.title,
         maxLines = 1,
-        modifier = Modifier.alpha(0.6f),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
 
@@ -90,13 +93,14 @@ fun EpisodeListEntry(
           text = positionText,
           maxLines = 1,
           style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurface,
           textAlign = TextAlign.End,
         )
         Text(
           text = durationText,
           maxLines = 1,
-          modifier = Modifier.alpha(0.6f),
           style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
           textAlign = TextAlign.End,
         )
       }

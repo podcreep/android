@@ -70,7 +70,9 @@ fun DownloadsScreen(
       CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
           containerColor = MaterialTheme.colorScheme.primaryContainer,
-          titleContentColor = MaterialTheme.colorScheme.primary,
+          titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+          navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+          actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ),
         title = {
           Text("Downloads")
