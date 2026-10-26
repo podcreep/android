@@ -41,7 +41,7 @@ class BrowseTreeGenerator @Inject constructor(
   }
 
   private fun iconUrl(name: String): Uri {
-    return "android.resource://com.podcreep/drawable/$name".toUri()
+    return "android.resource://com.podcreep.mobile/drawable/$name".toUri()
   }
 
   private fun getRootChildren(): MutableList<MediaItem> {
