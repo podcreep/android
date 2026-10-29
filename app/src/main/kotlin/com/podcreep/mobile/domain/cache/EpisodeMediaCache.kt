@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.headersContentLength
 import okio.buffer
 import okio.sink
 import java.io.File
@@ -220,8 +219,9 @@ class EpisodeMediaCache @Inject constructor(
       val startTime = System.currentTimeMillis()
       val req = server.request(episode.mediaUrl).get()
       val resp = server.call(req).await()
-      L.info(" - ${resp.headersContentLength()} bytes total after ${System.currentTimeMillis() - startTime}ms")
-      ipd.totalSize = resp.headersContentLength()
+      val contentLength = resp.headers["Content-Length"]?.toLong() ?: 0
+      L.info(" - $contentLength bytes total after ${System.currentTimeMillis() - startTime}ms")
+      ipd.totalSize = contentLength
 
       var lastPercent = -1
 

@@ -22,6 +22,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.SettableFuture
 import com.google.common.collect.ImmutableList
@@ -124,11 +125,10 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
     ): MediaSession.ConnectionResult {
       iconCache.onPackageConnected(controller.packageName)
 
-      val connectionResult = super.onConnect(session, controller)
       val customCommandForward = SessionCommand(CUSTOM_ACTION_FORWARD, Bundle.EMPTY)
       val customCommandBack = SessionCommand(CUSTOM_ACTION_BACK, Bundle.EMPTY)
 
-      val playerCommands = connectionResult.availablePlayerCommands.buildUpon()
+      val playerCommands = MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
         .add(Player.COMMAND_SEEK_TO_PREVIOUS)
         .add(Player.COMMAND_SEEK_TO_NEXT)
         .add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
@@ -137,7 +137,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
         .add(Player.COMMAND_SEEK_BACK)
         .build()
 
-      val sessionCommands = connectionResult.availableSessionCommands.buildUpon()
+      val sessionCommands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
         .add(customCommandForward)
         .add(customCommandBack)
         .build()
@@ -218,7 +218,7 @@ class MediaService : MediaLibraryService(), LifecycleOwner {
           val mediaItems = browseTreeGenerator.getChildren(parentId)
           future.set(LibraryResult.ofItemList(mediaItems, params))
         } catch (e: Exception) {
-          future.set(LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN))
+          future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
         }
       }
 
