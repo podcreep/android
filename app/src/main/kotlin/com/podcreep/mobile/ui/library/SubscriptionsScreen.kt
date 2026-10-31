@@ -1,5 +1,10 @@
 package com.podcreep.mobile.ui.library
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,9 +29,21 @@ fun SubscriptionsScreen(drawerState: DrawerState) {
     topBar = { TopBar(drawerState, navController, pagerState) },
   ) { paddingValues ->
     NavHost(
-      navController,
+      navController = navController,
       modifier = Modifier.padding(paddingValues),
       startDestination = NavItem.NewReleases(),
+      enterTransition = {
+        slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) + fadeIn(animationSpec = tween(300))
+      },
+      exitTransition = {
+        slideOutHorizontally(targetOffsetX = { -it / 3 }, animationSpec = tween(300)) + fadeOut(animationSpec = tween(300))
+      },
+      popEnterTransition = {
+        slideInHorizontally(initialOffsetX = { -it / 3 }, animationSpec = tween(300)) + fadeIn(animationSpec = tween(300))
+      },
+      popExitTransition = {
+        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300)) + fadeOut(animationSpec = tween(300))
+      }
     ) {
 
       composable<NavItem.NewReleases> {

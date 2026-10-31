@@ -3,12 +3,13 @@ package com.podcreep.mobile.ui.library
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,50 +37,52 @@ fun PodcastDetails(onEpisodeDetailsClick: (podcastID: Long, episodeID: Long) -> 
     var needExpandedDescription by remember { mutableStateOf(false) }
     var expandedDescription by remember { mutableStateOf(false) }
 
-    Column {
-        Row {
-            AsyncImage(
-                model = Server.url(podcast.imageUrl),
-                placeholder = painterResource(R.drawable.ic_podcast),
-                contentDescription = null,
-                modifier = Modifier.size(80.dp).padding(10.dp)
-            )
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column {
+            Row {
+                AsyncImage(
+                    model = Server.url(podcast.imageUrl),
+                    placeholder = painterResource(R.drawable.ic_podcast),
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp).padding(10.dp)
+                )
 
-            Column {
+                Column {
+                    Text(
+                        text = podcast.title
+                    )
+                }
+            }
+            Column (Modifier.clickable(enabled = needExpandedDescription) {
+              expandedDescription = !expandedDescription
+            }) {
+                val descriptionText = remember(podcast.description) {
+                    AnnotatedString.fromHtml(podcast.description)
+                }
                 Text(
-                    text = podcast.title
+                    text = descriptionText,
+                    onTextLayout = { layout ->
+                        needExpandedDescription = expandedDescription || layout.hasVisualOverflow
+                    },
+                    maxLines = if (expandedDescription) Int.MAX_VALUE else 4,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
+                if (needExpandedDescription) {
+                    Text(
+                        text = stringResource(if(expandedDescription) R.string.less else R.string.more),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                }
             }
-        }
-        Column (Modifier.clickable(enabled = needExpandedDescription) {
-          expandedDescription = !expandedDescription
-        }) {
-            val descriptionText = remember(podcast.description) {
-                AnnotatedString.fromHtml(podcast.description)
-            }
-            Text(
-                text = descriptionText,
-                onTextLayout = { layout ->
-                    needExpandedDescription = expandedDescription || layout.hasVisualOverflow
-                },
-                maxLines = if (expandedDescription) Int.MAX_VALUE else 4,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            if (needExpandedDescription) {
-                Text(
-                    text = stringResource(if(expandedDescription) R.string.less else R.string.more),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-                )
-            }
-        }
-        LazyColumn {
-            itemsIndexed(
-                items = episodes.value,
-                key = { _, episode -> episode.id }
-            ) { index, episode ->
-                EpisodeListEntry(podcast, episode, onEpisodeDetailsClick)
+            LazyColumn {
+                itemsIndexed(
+                    items = episodes.value,
+                    key = { _, episode -> episode.id }
+                ) { index, episode ->
+                    EpisodeListEntry(podcast, episode, onEpisodeDetailsClick)
+                }
             }
         }
     }
